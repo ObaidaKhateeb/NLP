@@ -177,8 +177,11 @@ def sentence_tokenize(sentence):
             word += letter
     if word:
         tokenized_sentence.append(word)
-    tokenized_sentence = ' '.join(tokenized_sentence) 
-    return tokenized_sentence
+    if len(tokenized_sentence) >= 4:
+        tokenized_sentence = ' '.join(tokenized_sentence) 
+        return tokenized_sentence
+    else:
+        return None
 
 #helper method for for extract_relevant_text that creates a sentence object and add it to the relevant protocol 
 def sentence_handle(protocol, curr_speaker, paragraph_txt):
@@ -188,8 +191,9 @@ def sentence_handle(protocol, curr_speaker, paragraph_txt):
             curr_sentence = curr_sentence.strip()
             if sentence_validity(curr_sentence):
                 curr_sentence = sentence_tokenize(curr_sentence)
-                sentence = Sentence(protocol.name, protocol.keneset, protocol.type, protocol.number, curr_speaker, curr_sentence)
-                protocol.add_sentence(curr_speaker, sentence)
+                if curr_sentence:
+                    sentence = Sentence(protocol.name, protocol.keneset, protocol.type, protocol.number, curr_speaker, curr_sentence)
+                    protocol.add_sentence(curr_speaker, sentence)
             curr_sentence = ''
         else:
             curr_sentence += letter
