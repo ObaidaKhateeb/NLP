@@ -143,14 +143,27 @@ def find_last_relevant(file_content):
     else: 
         return idx
 
+#helper method for sentence_handle which checks validity of a sentence
+def sentence_validity(sentence):
+    hebrew_alphabet = {'א', 'ב', 'ג', 'ד', 'ה', 'ו', 'ז', 'ח', 'ט', 'י', 'כ', 'ל', 'מ', 'נ', 'ס', 'ע', 'פ', 'צ', 'ק', 'ר', 'ש', 'ת', '', 'ך', 'ם', 'ן', 'ף', 'ץ'}
+    if all(letter not in hebrew_alphabet for letter in sentence):
+        return False
+    if any('a' <= letter <= 'z' or 'A' <= letter <= 'Z' for letter in sentence):
+        return False
+    if '- - -' in sentence or '---' in sentence or '– – –' in sentence or '–––' in sentence:
+        return False
+    return True
+    
+
 #helper method for for extract_relevant_text that creates a sentence object and add it to the relevant protocol 
 def sentence_handle(protocol, curr_speaker, paragraph_txt):
     curr_sentence = ''
     for letter in paragraph_txt: 
         if letter in ['.', '?', '!']:
             curr_sentence = curr_sentence.strip()
-            sentence = Sentence(protocol.name, protocol.keneset, protocol.type, protocol.number, curr_speaker, curr_sentence)
-            protocol.add_sentence(curr_speaker, sentence)
+            if sentence_validity(curr_sentence):
+                sentence = Sentence(protocol.name, protocol.keneset, protocol.type, protocol.number, curr_speaker, curr_sentence)
+                protocol.add_sentence(curr_speaker, sentence)
             curr_sentence = ''
         else:
             curr_sentence += letter
