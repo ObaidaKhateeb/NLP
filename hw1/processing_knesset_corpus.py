@@ -24,13 +24,15 @@ class Protocol:
             self.sentences[speaker] = [sentence]
     def print_speakers(self):
         print(f"{self.name}:")
+        print(len(self.sentences.keys()))
         for speaker in self.sentences.keys():
             print(speaker)
     def print_speech(self):
-        print("Speech:")
-        for sentences in self.sentences.values():
-            for sentence in sentences:
-                print(sentence.text)
+        #print("Speech:")
+        counter = 0 
+        for sentences_c in self.sentences.values():
+            counter += len(sentences_c)
+        print(counter)
 
 #Input: String of number which can be numeric or as hebrew word
 #Output: Integer equivalent of the number
@@ -63,7 +65,7 @@ def convertToInt(word):
 #Input: string which could represent someone's name 
 #Output: the name without the additions and titles 
 def speakerClean(speaker):
-    ministries = ['התשתיות הלאומיות', 'המשטרה', 'לביטחון פנים', 'לאיכות הסביבה', 'להגנת הסביבה', 'החינוך והתרבות', 'החינוך', 'התחבורה והבטיחות בדרכים', 'התחבורה', 'האוצר', 'הכלכלה והתכנון', 'המשפטים', 'הבריאות', 'החקלאות ופיתוח הכפר', 'החקלאות', 'החוץ', 'הבינוי והשיכון ', 'העבודה, הרווחה והשירותים החברתיים', 'העבודה', 'התעשייה והמסחר', 'התעשייה, המסחר והתעסוקה', 'התיירות', 'המדע והטכנולוגיה', 'הפנים', 'המדע, התרבות והספורט', 'התרבות והספורט', 'האנרגיה והמים', 'לענייני דתות', 'במשרד ראש הממשלה', 'לנושאים אסטרטגיים ולענייני מודיעין', 'לקליטת העלייה', 'לאזרחים ותיקים']
+    ministries = ['התשתיות הלאומיות', 'המשטרה', 'לביטחון פנים', 'לאיכות הסביבה', 'להגנת הסביבה', 'החינוך והתרבות', 'החינוך', 'התחבורה והבטיחות בדרכים', 'התחבורה', 'האוצר', 'הכלכלה והתכנון', 'המשפטים', 'הבריאות', 'החקלאות ופיתוח הכפר', 'החקלאות', 'החוץ', 'הבינוי והשיכון ', 'העבודה, הרווחה והשירותים החברתיים', 'העבודה והרווחה', 'העבודה', 'התעשייה והמסחר', 'התעשייה, המסחר והתעסוקה', 'התיירות', 'המדע והטכנולוגיה', 'הפנים', 'המדע, התרבות והספורט', 'התרבות והספורט', 'האנרגיה והמים', 'לענייני דתות', 'במשרד ראש הממשלה', 'לנושאים אסטרטגיים ולענייני מודיעין', 'לקליטת העלייה', 'לאזרחים ותיקים']
     open_brac = speaker.find('(')
     close_brac = speaker.find(')')
     if open_brac != -1 and close_brac != -1:
@@ -74,7 +76,7 @@ def speakerClean(speaker):
         speaker = speaker[:open_an_brac] + speaker[close_an_brac+1:]
         open_an_brac = speaker.find('<<')
         close_an_brac = speaker.find('>>')
-    speaker = speaker.replace('<', '').replace('>','').replace('היו"ר', '').replace('היו”ר', '').replace('יו"ר הכנסת', '').replace('יו”ר הכנסת', '').replace('יו"ר ועדת הכנסת', '').replace('יו”ר ועדת הכנסת', '').replace('-', '').replace('מ"מ', '').replace('מ”מ', '').replace('סגן', '').replace('סגנית', '').replace('מזכיר הכנסת','').replace('מזכירת הכנסת','').replace('תשובת','').replace('ראש הממשלה', '')
+    speaker = speaker.replace('<', '').replace('>','').replace('היו"ר', '').replace('היו”ר', '').replace('יו"ר הכנסת', '').replace('יו”ר הכנסת', '').replace('יו"ר ועדת הכנסת', '').replace('יו”ר ועדת הכנסת', '').replace('-', '').replace('מ"מ', '').replace('מ”מ', '').replace('סגן', '').replace('סגנית', '').replace('מזכיר הכנסת','').replace('מזכירת הכנסת','').replace('תשובת','').replace('ראש הממשלה', '').replace('עו"ד', '').replace('עו”ד', '').replace('ד"ר', '').replace('ד”ר', '')
     if 'שר' in speaker or 'השר' in speaker or 'שרת' in speaker or 'השרה' in speaker:     
         speaker = speaker.replace('שר ','').replace('השר ','').replace('שרת ','').replace('השרה ','')
         for ministry in ministries:
@@ -174,23 +176,35 @@ def extract_relevant_text(file_content, protocol):
     last_idx = find_last_relevant(file_content)
     curr_speaker = None
     for paragraph in file_content.paragraphs[first_idx:last_idx]:
+        #check if the paragraph 'high' underlined 
         paragraph_txt = paragraph.text.strip()
-        if paragraph_txt.endswith(':'):
+        total_letters = 0
+        underlined_letters = len(paragraph.text.strip())
+        underlined_paragraph = False
+        for run in paragraph.runs:
+            if run.underline:
+                underlined_letters += len(run.text)
+        if underlined_letters >= total_letters - 1: #sometimes ':' at the end is not underlined
+            underlined_paragraph = True
+        if paragraph_txt.endswith(':') and underlined_paragraph:
             paragraph_txt_cleaned = speakerClean(paragraph_txt)[:-1]
+            curr_speaker = paragraph_txt_cleaned
             if len(paragraph_txt_cleaned.split()) < 6:
                 curr_speaker = paragraph_txt_cleaned
             else: #deal with it as speech
                 sentence_handle(protocol, curr_speaker, paragraph_txt)
-        elif paragraph_txt.endswith(':>'):
+        elif paragraph_txt.endswith(':>') and underlined_paragraph:
             paragraph_txt_cleaned = speakerClean(paragraph_txt)[:-1]
+            curr_speaker = paragraph_txt_cleaned
             if len(paragraph_txt_cleaned.split()) < 6:
                 curr_speaker = paragraph_txt_cleaned
             else: #deal with it as speech
                 sentence_handle(protocol, curr_speaker, paragraph_txt)
-        elif ':' in paragraph_txt:
+        elif ':' in paragraph_txt and underlined_paragraph:
             pot_curr_speaker = speakerClean(paragraph_txt)
             if pot_curr_speaker.endswith(':'):
                 paragraph_txt_cleaned = pot_curr_speaker[:-1]
+                curr_speaker = paragraph_txt_cleaned
                 if len(paragraph_txt_cleaned.split()) < 6:
                     curr_speaker = paragraph_txt_cleaned
                 else: #deal with it as speech
@@ -199,7 +213,6 @@ def extract_relevant_text(file_content, protocol):
                 sentence_handle(protocol, curr_speaker, paragraph_txt)
         else:
             sentence_handle(protocol, curr_speaker, paragraph_txt)
-    #don't forget the case of the file where it will return nothing 
 
 #Input: path to a folder
 #Output: file names, paths, and contents for all .docx files in the folder
@@ -220,8 +233,8 @@ for file_name in file_names:
     protocol = Protocol(file_name, keneset_no, protocol_type, protocol_no)
     protocols.append(protocol)
     extract_relevant_text(file_contents[file_name], protocol)
-    print(file_name)
+    #print(file_name)
 
-    #protocol.print_speakers()
-    protocol.print_speech()
+    protocol.print_speakers()
+    #protocol.print_speech()
 
