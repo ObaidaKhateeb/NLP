@@ -206,14 +206,12 @@ def extract_relevant_text(file_content, protocol):
             underlined_paragraph = True
         if paragraph_txt.endswith(':') and underlined_paragraph:
             paragraph_txt_cleaned = speakerClean(paragraph_txt)[:-1]
-            curr_speaker = paragraph_txt_cleaned
             if len(paragraph_txt_cleaned.split()) < 6:
                 curr_speaker = paragraph_txt_cleaned
             else: #deal with it as speech
                 sentence_handle(protocol, curr_speaker, paragraph_txt)
         elif paragraph_txt.endswith(':>') and underlined_paragraph:
             paragraph_txt_cleaned = speakerClean(paragraph_txt)[:-1]
-            curr_speaker = paragraph_txt_cleaned
             if len(paragraph_txt_cleaned.split()) < 6:
                 curr_speaker = paragraph_txt_cleaned
             else: #deal with it as speech
@@ -222,7 +220,6 @@ def extract_relevant_text(file_content, protocol):
             pot_curr_speaker = speakerClean(paragraph_txt)
             if pot_curr_speaker.endswith(':'):
                 paragraph_txt_cleaned = pot_curr_speaker[:-1]
-                curr_speaker = paragraph_txt_cleaned
                 if len(paragraph_txt_cleaned.split()) < 6:
                     curr_speaker = paragraph_txt_cleaned
                 else: #deal with it as speech
