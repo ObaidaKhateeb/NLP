@@ -145,8 +145,15 @@ def find_last_relevant(file_content):
 
 #helper method for for extract_relevant_text that creates a sentence object and add it to the relevant protocol 
 def sentence_handle(protocol, curr_speaker, paragraph_txt):
-    sentence = Sentence(protocol.name, protocol.keneset, protocol.type, protocol.number, curr_speaker, paragraph_txt)
-    protocol.add_sentence(curr_speaker, sentence)
+    curr_sentence = ''
+    for letter in paragraph_txt: 
+        if letter in ['.', '?', '!']:
+            curr_sentence = curr_sentence.strip()
+            sentence = Sentence(protocol.name, protocol.keneset, protocol.type, protocol.number, curr_speaker, curr_sentence)
+            protocol.add_sentence(curr_speaker, sentence)
+            curr_sentence = ''
+        else:
+            curr_sentence += letter
 
 #extracts the relevant sentences and arranges them according to protocol and speaker
 def extract_relevant_text(file_content, protocol):
@@ -200,8 +207,8 @@ for file_name in file_names:
     protocol = Protocol(file_name, keneset_no, protocol_type, protocol_no)
     protocols.append(protocol)
     extract_relevant_text(file_contents[file_name], protocol)
-    #print(file_name)
+    print(file_name)
 
-    protocol.print_speakers()
-    #protocol.print_speech()
+    #protocol.print_speakers()
+    protocol.print_speech()
 
