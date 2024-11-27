@@ -28,11 +28,12 @@ class Protocol:
         for speaker in self.sentences.keys():
             print(speaker)
     def print_speech(self):
-        #print("Speech:")
-        counter = 0 
-        for sentences_c in self.sentences.values():
-            counter += len(sentences_c)
-        print(counter)
+        print(f"{self.name}:")
+        #counter = 0 
+        for sentence_c in self.sentences.values():
+            for sentence in sentence_c:
+                print(sentence.text)
+        #print(counter)
 
 #Input: String of number which can be numeric or as hebrew word
 #Output: Integer equivalent of the number
@@ -76,7 +77,7 @@ def speakerClean(speaker):
         speaker = speaker[:open_an_brac] + speaker[close_an_brac+1:]
         open_an_brac = speaker.find('<<')
         close_an_brac = speaker.find('>>')
-    speaker = speaker.replace('<', '').replace('>','').replace('היו"ר', '').replace('היו”ר', '').replace('יו"ר הכנסת', '').replace('יו”ר הכנסת', '').replace('יו"ר ועדת הכנסת', '').replace('יו”ר ועדת הכנסת', '').replace('-', '').replace('מ"מ', '').replace('מ”מ', '').replace('סגן', '').replace('סגנית', '').replace('מזכיר הכנסת','').replace('מזכירת הכנסת','').replace('תשובת','').replace('ראש הממשלה', '').replace('עו"ד', '').replace('עו”ד', '').replace('ד"ר', '').replace('ד”ר', '')
+    speaker = speaker.replace('<', '').replace('>','').replace('היו"ר', '').replace('היו”ר', '').replace('יו"ר הכנסת', '').replace('יו”ר הכנסת', '').replace('יו"ר ועדת הכנסת', '').replace('יו”ר ועדת הכנסת', '').replace('-', '').replace('מ"מ', '').replace('מ”מ', '').replace('סגן', '').replace('סגנית', '').replace('מזכיר הכנסת','').replace('מזכירת הכנסת','').replace('תשובת','').replace('ראש הממשלה', '').replace('עו"ד', '').replace('עו”ד', '').replace('ד"ר', '').replace('ד”ר', '').replace('     ', ' ').replace('    ', ' ').replace('   ', ' ').replace('  ', ' ')
     if 'שר' in speaker or 'השר' in speaker or 'שרת' in speaker or 'השרה' in speaker:     
         speaker = speaker.replace('שר ','').replace('השר ','').replace('שרת ','').replace('השרה ','')
         for ministry in ministries:
@@ -155,7 +156,29 @@ def sentence_validity(sentence):
     if '- - -' in sentence or '---' in sentence or '– – –' in sentence or '–––' in sentence:
         return False
     return True
-    
+
+def sentence_tokenize(sentence):
+    marks = {',', ';', ':', '(', ')', ' '}
+    tokenized_sentence = []
+    word = ''
+    for i,letter in enumerate(sentence):
+        if letter in marks:
+            if word:
+                tokenized_sentence.append(word)
+                word = ''
+            if letter != ' ':
+                tokenized_sentence.append(letter)
+        elif letter == '"' and (i == 0 or sentence[i-1] == ' ' or i == len(sentence)-1 or sentence[i+1] == ' '):
+            if word:
+                tokenized_sentence.append(word)
+                tokenized_sentence.append(letter)
+                word = ''
+        else:
+            word += letter
+    if word:
+        tokenized_sentence.append(word)
+    tokenized_sentence = ' '.join(tokenized_sentence) 
+    return tokenized_sentence
 
 #helper method for for extract_relevant_text that creates a sentence object and add it to the relevant protocol 
 def sentence_handle(protocol, curr_speaker, paragraph_txt):
@@ -164,6 +187,7 @@ def sentence_handle(protocol, curr_speaker, paragraph_txt):
         if letter in ['.', '?', '!']:
             curr_sentence = curr_sentence.strip()
             if sentence_validity(curr_sentence):
+                curr_sentence = sentence_tokenize(curr_sentence)
                 sentence = Sentence(protocol.name, protocol.keneset, protocol.type, protocol.number, curr_speaker, curr_sentence)
                 protocol.add_sentence(curr_speaker, sentence)
             curr_sentence = ''
@@ -235,6 +259,6 @@ for file_name in file_names:
     extract_relevant_text(file_contents[file_name], protocol)
     #print(file_name)
 
-    protocol.print_speakers()
-    #protocol.print_speech()
+    #protocol.print_speakers()
+    protocol.print_speech()
 
