@@ -1,5 +1,7 @@
 import os
 from docx import Document
+import json
+import sys
 
 class Sentence:
     def __init__(self, protocol_name, keneset, protocol_type, protocol_no, speaker, text):
@@ -22,18 +24,6 @@ class Protocol:
             self.sentences[speaker].append(sentence)
         else:
             self.sentences[speaker] = [sentence]
-    def print_speakers(self):
-        print(f"{self.name}:")
-        print(len(self.sentences.keys()))
-        for speaker in self.sentences.keys():
-            print(speaker)
-    def print_speech(self):
-        print(f"{self.name}:")
-        #counter = 0 
-        for sentence_c in self.sentences.values():
-            for sentence in sentence_c:
-                print(sentence.text)
-        #print(counter)
 
 #Input: String of number which can be numeric or as hebrew word
 #Output: Integer equivalent of the number
@@ -250,19 +240,38 @@ def read_files(folder):
     file_contents = {file_name: Document(file_path) for file_name, file_path in file_paths.items()}
     return file_names, file_paths, file_contents
 
+def jsonl_make(protocols, file):
+    with open(file, 'w', encoding = 'utf-8') as jsonl_file:
+        for protocol in protocols:
+            for speaker, sentences in protocol.sentences.items():
+                for sentence in sentences:
+                    sentence_data = {
+                        "protocol_name": sentence.protocol_name,
+                        "knesset_number": sentence.keneset,
+                        "protocol_type": sentence.protocol_type,
+                        "protocol_number": sentence.protocol_no,
+                        "speaker_name": sentence.speaker,
+                        "sentence_text": sentence.text
+                    }
+                    jsonl_file.write(json.dumps(sentence_data, ensure_ascii=False) + '\n')
 
-folder_path = "protocol_for_hw1" 
-file_names, file_paths, file_contents = read_files(folder_path)
-protocols = []
+def main():
+    if len(sys.argv) != 3:
+        print("Error: Incorrect # of arguments.\n")
+        sys.exit(1)
+    else:
+        print("Creating the corpus ..\n")
+    folder_path = sys.argv[1] #"protocol_for_hw1" 
+    file = sys.argv[2] #"corpus.jsonl"
+    file_names, file_paths, file_contents = read_files(folder_path)
+    protocols = []
+    for file_name in file_names: 
+        keneset_no, protocol_type = extract_metada_from_name(file_name)
+        protocol_no = extract_metada_from_content(file_contents[file_name])
+        protocol = Protocol(file_name, keneset_no, protocol_type, protocol_no)
+        protocols.append(protocol)
+        extract_relevant_text(file_contents[file_name], protocol)
+    jsonl_make(protocols, file)
 
-for file_name in file_names: 
-    keneset_no, protocol_type = extract_metada_from_name(file_name)
-    protocol_no = extract_metada_from_content(file_contents[file_name])
-    protocol = Protocol(file_name, keneset_no, protocol_type, protocol_no)
-    protocols.append(protocol)
-    extract_relevant_text(file_contents[file_name], protocol)
-    #print(file_name)
-
-    #protocol.print_speakers()
-    protocol.print_speech()
-
+if __name__ == "__main__":
+    main()
