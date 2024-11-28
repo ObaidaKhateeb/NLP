@@ -24,9 +24,12 @@ class Protocol:
             self.sentences[speaker].append(sentence)
         else:
             self.sentences[speaker] = [sentence]
+    def check(self): #function for tests .. will be deleted later 
+        print(len(self.sentences.keys()))
 
+#Helper method for 'extract_metada_from_content'. It checks if the given string represent an integer number, and if yes, it return its integer value
 #Input: String of number which can be numeric or as hebrew word
-#Output: Integer equivalent of the number
+#Output: Integer equivalent of the number or -1 in case it's not identified a number
 def convertToInt(word):
     digits_dict = {'אחת': 1, 'שתיים': 2, 'שלוש': 3, 'ארבע': 4, 'חמש': 5, 'חמיש': 5, 'שש': 6, 'שיש': 6, 'שבע': 7, 'שמונה': 8, 'תשע': 9, 'עשר': 10, 'עשרים': 20, 'שמונים': 80, 'מאה': 100, 'מאתיים': 200}
     if word[:-1].isdigit():
@@ -204,19 +207,13 @@ def extract_relevant_text(file_content, protocol):
                 underlined_letters += len(run.text)
         if underlined_letters >= total_letters - 1: #sometimes ':' at the end is not underlined
             underlined_paragraph = True
-        if paragraph_txt.endswith(':') and underlined_paragraph:
+        if underlined_paragraph and (paragraph_txt.endswith(':') or paragraph_txt.endswith(':>')):
             paragraph_txt_cleaned = speakerClean(paragraph_txt)[:-1]
             if len(paragraph_txt_cleaned.split()) < 6:
                 curr_speaker = paragraph_txt_cleaned
             else: #deal with it as speech
                 sentence_handle(protocol, curr_speaker, paragraph_txt)
-        elif paragraph_txt.endswith(':>') and underlined_paragraph:
-            paragraph_txt_cleaned = speakerClean(paragraph_txt)[:-1]
-            if len(paragraph_txt_cleaned.split()) < 6:
-                curr_speaker = paragraph_txt_cleaned
-            else: #deal with it as speech
-                sentence_handle(protocol, curr_speaker, paragraph_txt)
-        elif ':' in paragraph_txt and underlined_paragraph:
+        elif underlined_paragraph and ':' in paragraph_txt:
             pot_curr_speaker = speakerClean(paragraph_txt)
             if pot_curr_speaker.endswith(':'):
                 paragraph_txt_cleaned = pot_curr_speaker[:-1]
@@ -253,13 +250,13 @@ def jsonl_make(protocols, file):
                     jsonl_file.write(json.dumps(sentence_data, ensure_ascii=False) + '\n')
 
 def main():
-    if len(sys.argv) != 3:
-        print("Error: Incorrect # of arguments.\n")
-        sys.exit(1)
-    else:
-        print("Creating the corpus ..\n")
-    folder_path = sys.argv[1] #"protocol_for_hw1" 
-    file = sys.argv[2] #"corpus.jsonl"
+    #if len(sys.argv) != 3:
+    #    print("Error: Incorrect # of arguments.\n")
+    #    sys.exit(1)
+    #else:
+    #    print("Creating the corpus ..\n")
+    folder_path = "protocol_for_hw1"  #sys.argv[1] 
+    file = "corpus.jsonl" #sys.argv[2]
     file_names, file_paths, file_contents = read_files(folder_path)
     protocols = []
     for file_name in file_names: 
@@ -268,7 +265,8 @@ def main():
         protocol = Protocol(file_name, keneset_no, protocol_type, protocol_no)
         protocols.append(protocol)
         extract_relevant_text(file_contents[file_name], protocol)
-    jsonl_make(protocols, file)
+        protocol.check()
+    #jsonl_make(protocols, file)
 
 if __name__ == "__main__":
     main()
