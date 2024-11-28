@@ -31,7 +31,7 @@ class Protocol:
 #Input: String of number which can be numeric or as hebrew word
 #Output: Integer equivalent of the number or -1 in case it's not identified a number
 def convertToInt(word):
-    digits_dict = {'אחת': 1, 'שתיים': 2, 'שלוש': 3, 'ארבע': 4, 'חמש': 5, 'חמיש': 5, 'שש': 6, 'שיש': 6, 'שבע': 7, 'שמונה': 8, 'תשע': 9, 'עשר': 10, 'עשרים': 20, 'שמונים': 80, 'מאה': 100, 'מאתיים': 200}
+    digits_dict = {'אחת': 1, 'שתיים': 2, 'שתים' : 2, 'שלוש': 3, 'ארבע': 4, 'חמש': 5, 'חמיש': 5, 'שש': 6, 'שיש': 6, 'שבע': 7, 'שמונה': 8, 'תשע': 9, 'עשר': 10, 'עשרים': 20, 'שמונים': 80, 'מאה': 100, 'מאתיים': 200, 'אלף': 1000}
     if word[:-1].isdigit():
         if word[-1].isdigit():
             return int(word)
@@ -265,7 +265,7 @@ def main():
         protocol = Protocol(file_name, keneset_no, protocol_type, protocol_no)
         protocols.append(protocol)
         extract_relevant_text(file_contents[file_name], protocol)
-        protocol.check()
+        #protocol.check()
     #jsonl_make(protocols, file)
 
 if __name__ == "__main__":
