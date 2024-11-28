@@ -26,6 +26,8 @@ class Protocol:
             self.sentences[speaker] = [sentence]
     def check(self): #function for tests .. will be deleted later 
         print(len(self.sentences.keys()))
+        for key in self.sentences.keys():
+            print(key)
 
 #Helper method for 'extract_metada_from_content'. It checks if the given string represent an integer number, and if yes, it return its integer value
 #Input: String of number which can be numeric or as hebrew word
@@ -248,13 +250,15 @@ def jsonl_make(protocols, file):
                     jsonl_file.write(json.dumps(sentence_data, ensure_ascii=False) + '\n')
 
 def main():
-    if len(sys.argv) != 3:
-        print("Error: Incorrect # of arguments.\n")
-        sys.exit(1)
-    else:
-        print("Creating the corpus ..\n")
-    folder_path = sys.argv[1] #"protocol_for_hw1" 
-    file = sys.argv[2] #"corpus.jsonl"
+    #if len(sys.argv) != 3:
+    #    print("Error: Incorrect # of arguments.\n")
+    #    sys.exit(1)
+    #else:
+    #    print("Creating the corpus ..\n")
+    #folder_path = sys.argv[1] 
+    folder_path = "protocol_for_hw1" 
+    #file = sys.argv[2] 
+    file = "corpus.jsonl"
     file_names, file_paths, file_contents = read_files(folder_path)
     protocols = []
     for file_name in file_names: 
@@ -264,8 +268,8 @@ def main():
         protocols.append(protocol)
         #print(protocol.name)
         extract_relevant_text(file_contents[file_name], protocol)
-        #protocol.check()
-    jsonl_make(protocols, file)
+        protocol.check()
+    #jsonl_make(protocols, file)
 
 if __name__ == "__main__":
     main()
