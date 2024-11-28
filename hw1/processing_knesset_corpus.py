@@ -32,11 +32,10 @@ class Protocol:
 #Output: Integer equivalent of the number or -1 in case it's not identified a number
 def convertToInt(word):
     digits_dict = {'אחת': 1, 'שתיים': 2, 'שתים' : 2, 'שלוש': 3, 'ארבע': 4, 'חמש': 5, 'חמיש': 5, 'שש': 6, 'שיש': 6, 'שבע': 7, 'שמונה': 8, 'תשע': 9, 'עשר': 10, 'עשרים': 20, 'שמונים': 80, 'מאה': 100, 'מאתיים': 200, 'אלף': 1000}
-    if word[:-1].isdigit():
-        if word[-1].isdigit():
-            return int(word)
-        else:
-            return int(word[:-1]) #to get rid of '<' at the end of the number
+    if word.isdigit():
+        return int(word)
+    elif word[:-1].isdigit():
+        return int(word[:-1]) #to get rid of '<' at the end of the number
     else:
         word = word.replace('-', ' ') #consider '-' as space since noticed that there are many protocols numbers written as strings consists of words seperated by '-' 
         word_splitted = word.split()
