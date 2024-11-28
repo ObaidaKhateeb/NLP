@@ -32,28 +32,36 @@ class Protocol:
 
 #Helper method for 'extract_metada_from_content'. It checks if the given string represent an integer number, and if yes, it return its integer value
 #Input: String of number which can be numeric or as hebrew word
-#Output: Integer equivalent of the number or -1 in case it's not identified a number
+#Output: Integer equivalent of the number or -1 in case it's not identified as a number
 def convertToInt(word):
-    digits_dict = {'אחת': 1, 'שתיים': 2, 'שתים' : 2, 'שלוש': 3, 'ארבע': 4, 'חמש': 5, 'חמיש': 5, 'שש': 6, 'שיש': 6, 'שבע': 7, 'שמונה': 8, 'תשע': 9, 'עשר': 10, 'עשרים': 20, 'שמונים': 80, 'מאה': 100, 'מאתיים': 200, 'אלף': 1000}
+    digits_dict = {'אחת': 1, 'שתיים': 2, 'שתים' : 2, 'שלוש': 3, 'ארבע': 4, 'חמש': 5, 
+                   'חמיש': 5, 'שש': 6, 'שיש': 6, 'שבע': 7, 'שמונה': 8, 'תשע': 9, 'עשר': 10, 
+                   'עשרים': 20, 'שמונים': 80, 'מאה': 100, 'מאתיים': 200, 'אלף': 1000}
+    # case 1: string in numeric form
     if word.isdigit():
         return int(word)
-    elif word[:-1].isdigit():
-        return int(word[:-1]) #to get rid of '<' at the end of the number
+    elif word[:-1].isdigit(): #to deal with the cases where the number followed by '<' directly
+        return int(word[:-1])
+    #case 3: string in string form 
     else:
-        word = word.replace('-', ' ') #consider '-' as space since noticed that there are many protocols numbers written as strings consists of words seperated by '-' 
-        word_splitted = word.split()
+        word_splitted = word.split('-')
         word_splitted = [word[1:] if word[0] in ['ו', 'ה']else word for word in word_splitted]
         for i in range(len(word_splitted)):
+            #option 1: digit from the digits dictionary 
             if word_splitted[i] in digits_dict:
                 word_splitted[i] = digits_dict[word_splitted[i]]
+            #option 2: digit in plural form
             elif word_splitted[i][-2:] == 'ים' and word_splitted[i][:-2] in digits_dict:
                 word_splitted[i] = digits_dict[word_splitted[i][:-2]] * 10
+            #option 3: the word 'מאות'
             elif word_splitted[i] == 'מאות' and i > 0:
                 word_splitted[i-1] *= 100
                 word_splitted[i] = 0
+            #option 4: the word 'עשרה'
             elif word_splitted[i] == 'עשרה' and i > 0:
                 word_splitted[i-1] += 10
                 word_splitted[i] = 0
+            #option 5: the string didn't identify as a word
             else:
                 return -1
         return sum(word_splitted)
@@ -61,24 +69,49 @@ def convertToInt(word):
 #Input: string which could represent someone's name 
 #Output: the name without the additions and titles 
 def speakerClean(speaker):
-    ministries = ['התשתיות הלאומיות', 'המשטרה', 'לביטחון פנים', 'לאיכות הסביבה', 'להגנת הסביבה', 'החינוך והתרבות', 'החינוך', 'התחבורה והבטיחות בדרכים', 'התחבורה', 'האוצר', 'הכלכלה והתכנון', 'המשפטים', 'הבריאות', 'החקלאות ופיתוח הכפר', 'החקלאות', 'החוץ', 'הבינוי והשיכון ', 'העבודה, הרווחה והשירותים החברתיים', 'העבודה והרווחה', 'העבודה', 'התעשייה והמסחר', 'התעשייה, המסחר והתעסוקה', 'התיירות', 'המדע והטכנולוגיה', 'הפנים', 'המדע, התרבות והספורט', 'התרבות והספורט', 'האנרגיה והמים', 'לענייני דתות', 'במשרד ראש הממשלה', 'לנושאים אסטרטגיים ולענייני מודיעין', 'לקליטת העלייה', 'לאזרחים ותיקים']
+    ministries = ['התשתיות הלאומיות', 'התשתיות', 'המשטרה', 'לביטחון פנים', 'לאיכות הסביבה', 
+                  'להגנת הסביבה', 'החינוך, התרבות והספורט', 'החינוך והתרבות', 'החינוך', 
+                  'התחבורה והבטיחות בדרכים', 'התחבורה', 'האוצר', 'הכלכלה והתכנון', 'המשפטים', 
+                  'הבריאות', 'החקלאות ופיתוח הכפר', 'החקלאות', 'החוץ', 'הבינוי והשיכון ', 
+                  'העבודה, הרווחה והשירותים החברתיים', 'העבודה והרווחה', 'העבודה', 
+                  'התעשייה והמסחר', 'התעשייה, המסחר והתעסוקה', 'התיירות', 'המדע והטכנולוגיה', 
+                  'הפנים', 'המדע, התרבות והספורט', 'התרבות והספורט', 'האנרגיה והמים', 
+                  'לענייני דתות', 'במשרד ראש הממשלה', 'לנושאים אסטרטגיים ולענייני מודיעין', 
+                  'לקליטת העלייה', 'לאזרחים ותיקים', 'במשרד', 'הביטחון', 'המודיעין']
+    titles_and_symbols = ['<', '>', 'היו"ר', '', 'היו”ר', 'יו"ר הכנסת', 'יו”ר הכנסת', 
+                          'יו"ר ועדת הכנסת', 'יו”ר ועדת הכנסת', 'מ"מ', 'מ”מ', 'סגן', 'סגנית', 
+                          'מזכיר הכנסת', 'מזכירת הכנסת', 'תשובת', 'ראש הממשלה', 'עו"ד', 'עו”ד', 
+                          'ד"ר', 'ד”ר', "פרופ'", 'נצ"מ', 'ניצב', '     ', '    ', '   ', '  ']
+    #remove the party name
     open_brac = speaker.find('(')
     close_brac = speaker.find(')')
     if open_brac != -1 and close_brac != -1:
         speaker = speaker[:open_brac] + speaker[close_brac+1:]
+    #remove the tag
     open_an_brac = speaker.find('<<')
     close_an_brac = speaker.find('>>')
     while(open_an_brac != -1 and close_an_brac != -1):
         speaker = speaker[:open_an_brac] + speaker[close_an_brac+1:]
         open_an_brac = speaker.find('<<')
         close_an_brac = speaker.find('>>')
-    speaker = speaker.replace('<', '').replace('>','').replace('היו"ר', '').replace('היו”ר', '').replace('יו"ר הכנסת', '').replace('יו”ר הכנסת', '').replace('יו"ר ועדת הכנסת', '').replace('יו”ר ועדת הכנסת', '').replace('-', '').replace('מ"מ', '').replace('מ”מ', '').replace('סגן', '').replace('סגנית', '').replace('מזכיר הכנסת','').replace('מזכירת הכנסת','').replace('תשובת','').replace('ראש הממשלה', '').replace('עו"ד', '').replace('עו”ד', '').replace('ד"ר', '').replace('ד”ר', '').replace("פרופ'", '').replace('נצ"מ','').replace('ניצב','').replace('     ', ' ').replace('    ', ' ').replace('   ', ' ').replace('  ', ' ')
-    if 'שר ' in speaker or 'השר ' in speaker or 'שרת ' in speaker or 'השרה ' in speaker:     
+    #remove the title, other symbols and multi spaces 
+    for element in titles_and_symbols:
+        speaker = speaker.replace(element, '')
+    #replace the '-' by a space, this can be effective in cases without cases like when it connect names
+    speaker = speaker.replace('-', ' ')
+    #remove minister titles, these titles are special case because they can followed by the ministry name 
+    if 'השר ' in speaker or 'שרת ' in speaker or 'השרה ' in speaker:     
         speaker = speaker.replace('השרה ','').replace('השר ','').replace('שרת ','').replace('שר ','')
         for ministry in ministries:
             if ministry in speaker or 'ה' + ministry in speaker:
                 speaker = speaker.replace(ministry, '')
     speaker = speaker.strip()
+    #remove minister title only if it appears in the beginning, this to avoid ditortion of first names ends with this suffix like 'Asher'
+    if 'שר ' in speaker and speaker.find('שר ') == 0: 
+        speaker = speaker.replace('שר ', '')
+        for ministry in ministries:
+            if ministry in speaker or 'ה' + ministry in speaker:
+                speaker = speaker.replace(ministry, '')
     return speaker
 
 #Input: file/protocol name
@@ -94,17 +127,18 @@ def extract_metada_from_name(file_name):
 def extract_metada_from_content(file_content):
     for paragraph in file_content.paragraphs:
         paragraph_stripped = paragraph.text.strip()
+        #iterates over the occurrences of the two string until it found a one that's followed by a number
         for word in ["הישיבה", "פרוטוקול מס'"]:
             while True:
                 word_idx = paragraph_stripped.find(word)
                 if word_idx != -1:
-                    paragraph_stripped = paragraph_stripped[word_idx+len(word):]
+                    paragraph_stripped = paragraph_stripped[word_idx+len(word):] #slicing the paragraph to the part after the occurence
                     paragraph_words = paragraph_stripped.split()
                     if paragraph_words:
-                        string_to_int = convertToInt(paragraph_words[0])
+                        string_to_int = convertToInt(paragraph_words[0]) #if the string followed by a number it should be the first in the new sliced paragraph
                     else:
                         continue
-                    if string_to_int != -1: 
+                    if string_to_int != -1: #if a number identified after the string
                         return string_to_int 
                     else:
                         continue 
@@ -112,7 +146,7 @@ def extract_metada_from_content(file_content):
                     break
     return -1
 
-#helper method for for extract_relevant_text
+#helper method for for extract_relevant_text, it identifies the start of the relevant text
 #Input: .docx file of a protocol
 #Output: index of the first relevant paragraph
 def find_starting_relevant(file_content): 
@@ -127,7 +161,7 @@ def find_starting_relevant(file_content):
             return paragraph_idx
     return paragraph_idx
 
-#helper method for for extract_relevant_text
+#helper method for for extract_relevant_text, it identifies the last relevant paragraph
 #Input: .docx file of a protocol
 #Output: index of the last relevant paragraph
 def find_last_relevant(file_content): 
@@ -136,8 +170,8 @@ def find_last_relevant(file_content):
     while (not len(curr_paragraph) or ('הישיבה ננעלה' not in curr_paragraph and 'הטקס ננעל' not in curr_paragraph)) and idx > 0:
         idx -= 1
         curr_paragraph = file_content.paragraphs[idx].text
-    if idx == 0:
-        return idx - 1 #when failed to find last relevant, the last sentence will be the last relevant
+    if idx == 0: #when it fails to find a message states debate ending explicitly, it assumes that the last paragraph in the protocol is the last relevant
+        return idx - 1 
     else: 
         return idx
 
@@ -148,7 +182,7 @@ def sentence_validity(sentence):
         return False
     if any('a' <= letter <= 'z' or 'A' <= letter <= 'Z' for letter in sentence):
         return False
-    if '- - -' in sentence or '---' in sentence or '– – –' in sentence or '–––' in sentence:
+    if '- -' in sentence or '– –' in sentence:
         return False
     return True
 
@@ -206,10 +240,16 @@ def extract_relevant_text(file_content, protocol):
                 j += 1
             if 'בעד' in file_content.paragraphs[first_idx + j].text and 'נגד' in file_content.paragraphs[first_idx + j+1].text:
                 curr_speaker = None
+        #check if there's a debate pause. If yes, consider the paragraph irrelevant until there's a speaker
+        if 'הישיבה נפסקה' in paragraph.text:
+            print(paragraph.text)
+            curr_speaker = None
         paragraph_txt = paragraph.text.strip()
         #meeting one of the first two if's making the paragraph as potential speaker's name
         if paragraph_txt.endswith(':') or paragraph_txt.endswith(':>'):
             paragraph_txt_cleaned = speakerClean(paragraph_txt)[:-1]
+            if 'ביום' in paragraph_txt: #if this is the case then 'ביום' is part of a sentence that come after the name of the speaker but it neither its name nor its speech
+                continue
             if len(paragraph_txt_cleaned.split()) < 6:
                 curr_speaker = paragraph_txt_cleaned
             elif curr_speaker: #deal with it as speech
@@ -218,6 +258,8 @@ def extract_relevant_text(file_content, protocol):
             pot_curr_speaker = speakerClean(paragraph_txt)
             if pot_curr_speaker.endswith(':'):
                 paragraph_txt_cleaned = pot_curr_speaker[:-1]
+                if 'ביום' in paragraph_txt:
+                    continue
                 if len(paragraph_txt_cleaned.split()) < 6:
                     curr_speaker = paragraph_txt_cleaned
                 elif curr_speaker: #deal with it as speech
