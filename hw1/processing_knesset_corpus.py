@@ -195,8 +195,17 @@ def extract_relevant_text(file_content, protocol):
     first_idx = find_starting_relevant(file_content)
     last_idx = find_last_relevant(file_content)
     curr_speaker = None
-    for paragraph in file_content.paragraphs[first_idx:last_idx]:
-        #check if the paragraph 'high' underlined 
+    for i,paragraph in enumerate(file_content.paragraphs[first_idx:last_idx]):
+        #check if there's a vote. If yes, consider the text irrelevant until there's a speaker
+        if 'הצבעה' in paragraph.text or 'ההצבעה' in paragraph.text or 'הצבעת' in paragraph.text:
+            j = i+1
+            while not file_content.paragraphs[first_idx+j].text:
+                j += 1
+            if 'בעד' in file_content.paragraphs[first_idx + j].text and 'נגד' in file_content.paragraphs[first_idx + j+1].text:
+                print(file_content.paragraphs[first_idx + j].text)
+                print(file_content.paragraphs[first_idx + j+1].text)
+                curr_speaker = None
+        #check if the paragraph "high" underlined (high underlined = fully underlined or underlined until the last character)
         paragraph_txt = paragraph.text.strip()
         total_letters = 0
         underlined_letters = len(paragraph.text.strip())
@@ -206,11 +215,12 @@ def extract_relevant_text(file_content, protocol):
                 underlined_letters += len(run.text)
         if underlined_letters >= total_letters - 1: #sometimes ':' at the end is not underlined
             underlined_paragraph = True
+        #meeting one of the first two if's making the paragraph as potential speaker's name
         if underlined_paragraph and (paragraph_txt.endswith(':') or paragraph_txt.endswith(':>')):
             paragraph_txt_cleaned = speakerClean(paragraph_txt)[:-1]
             if len(paragraph_txt_cleaned.split()) < 6:
                 curr_speaker = paragraph_txt_cleaned
-            else: #deal with it as speech
+            elif curr_speaker: #deal with it as speech
                 sentence_handle(protocol, curr_speaker, paragraph_txt)
         elif underlined_paragraph and ':' in paragraph_txt:
             pot_curr_speaker = speakerClean(paragraph_txt)
@@ -218,11 +228,11 @@ def extract_relevant_text(file_content, protocol):
                 paragraph_txt_cleaned = pot_curr_speaker[:-1]
                 if len(paragraph_txt_cleaned.split()) < 6:
                     curr_speaker = paragraph_txt_cleaned
-                else: #deal with it as speech
+                elif curr_speaker: #deal with it as speech
                     sentence_handle(protocol, curr_speaker, paragraph_txt)
-            else: #else deal with it as a speech 
+            elif curr_speaker: #else deal with it as a speech 
                 sentence_handle(protocol, curr_speaker, paragraph_txt)
-        else:
+        elif curr_speaker:
             sentence_handle(protocol, curr_speaker, paragraph_txt)
 
 #Input: path to a folder
@@ -263,6 +273,7 @@ def main():
         protocol_no = extract_metada_from_content(file_contents[file_name])
         protocol = Protocol(file_name, keneset_no, protocol_type, protocol_no)
         protocols.append(protocol)
+        #print(protocol.name)
         extract_relevant_text(file_contents[file_name], protocol)
         #protocol.check()
     #jsonl_make(protocols, file)
