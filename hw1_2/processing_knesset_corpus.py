@@ -229,20 +229,20 @@ def sentence_handle(protocol, curr_speaker, paragraph_txt):
 
 #extracts the relevant sentences and arranges them according to protocol and speaker
 def extract_relevant_text(file_content, protocol):
+    #find the first and last paragraphs of the block where relevant texts 
     first_idx = find_starting_relevant(file_content)
     last_idx = find_last_relevant(file_content)
     curr_speaker = None
     for i,paragraph in enumerate(file_content.paragraphs[first_idx:last_idx]):
-        #check if there's a vote. If yes, consider the text irrelevant until there's a speaker
+        #type 1 of sentences to exclude: those related to 'vote'. If it a vote sentence, consider the text irrelevant until there's a speaker
         if 'הצבעה' in paragraph.text or 'ההצבעה' in paragraph.text or 'הצבעת' in paragraph.text:
             j = i+1
             while not file_content.paragraphs[first_idx+j].text:
                 j += 1
             if 'בעד' in file_content.paragraphs[first_idx + j].text and 'נגד' in file_content.paragraphs[first_idx + j+1].text:
                 curr_speaker = None
-        #check if there's a debate pause. If yes, consider the paragraph irrelevant until there's a speaker
+        #type 2 of sentences to exclude: those related to 'debate pause'. If it so, consider the paragraph irrelevant until there's a speaker
         if 'הישיבה נפסקה' in paragraph.text:
-            print(paragraph.text)
             curr_speaker = None
         paragraph_txt = paragraph.text.strip()
         #meeting one of the first two if's making the paragraph as potential speaker's name
