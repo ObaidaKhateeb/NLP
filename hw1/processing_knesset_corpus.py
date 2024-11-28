@@ -202,27 +202,16 @@ def extract_relevant_text(file_content, protocol):
             while not file_content.paragraphs[first_idx+j].text:
                 j += 1
             if 'בעד' in file_content.paragraphs[first_idx + j].text and 'נגד' in file_content.paragraphs[first_idx + j+1].text:
-                print(file_content.paragraphs[first_idx + j].text)
-                print(file_content.paragraphs[first_idx + j+1].text)
                 curr_speaker = None
-        #check if the paragraph "high" underlined (high underlined = fully underlined or underlined until the last character)
         paragraph_txt = paragraph.text.strip()
-        total_letters = 0
-        underlined_letters = len(paragraph.text.strip())
-        underlined_paragraph = False
-        for run in paragraph.runs:
-            if run.underline:
-                underlined_letters += len(run.text)
-        if underlined_letters >= total_letters - 1: #sometimes ':' at the end is not underlined
-            underlined_paragraph = True
         #meeting one of the first two if's making the paragraph as potential speaker's name
-        if underlined_paragraph and (paragraph_txt.endswith(':') or paragraph_txt.endswith(':>')):
+        if paragraph_txt.endswith(':') or paragraph_txt.endswith(':>'):
             paragraph_txt_cleaned = speakerClean(paragraph_txt)[:-1]
             if len(paragraph_txt_cleaned.split()) < 6:
                 curr_speaker = paragraph_txt_cleaned
             elif curr_speaker: #deal with it as speech
                 sentence_handle(protocol, curr_speaker, paragraph_txt)
-        elif underlined_paragraph and ':' in paragraph_txt:
+        elif ':' in paragraph_txt:
             pot_curr_speaker = speakerClean(paragraph_txt)
             if pot_curr_speaker.endswith(':'):
                 paragraph_txt_cleaned = pot_curr_speaker[:-1]
@@ -259,13 +248,13 @@ def jsonl_make(protocols, file):
                     jsonl_file.write(json.dumps(sentence_data, ensure_ascii=False) + '\n')
 
 def main():
-    #if len(sys.argv) != 3:
-    #    print("Error: Incorrect # of arguments.\n")
-    #    sys.exit(1)
-    #else:
-    #    print("Creating the corpus ..\n")
-    folder_path = "protocol_for_hw1"  #sys.argv[1] 
-    file = "corpus.jsonl" #sys.argv[2]
+    if len(sys.argv) != 3:
+        print("Error: Incorrect # of arguments.\n")
+        sys.exit(1)
+    else:
+        print("Creating the corpus ..\n")
+    folder_path = sys.argv[1] #"protocol_for_hw1" 
+    file = sys.argv[2] #"corpus.jsonl"
     file_names, file_paths, file_contents = read_files(folder_path)
     protocols = []
     for file_name in file_names: 
@@ -276,7 +265,7 @@ def main():
         #print(protocol.name)
         extract_relevant_text(file_contents[file_name], protocol)
         #protocol.check()
-    #jsonl_make(protocols, file)
+    jsonl_make(protocols, file)
 
 if __name__ == "__main__":
     main()
