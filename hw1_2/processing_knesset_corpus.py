@@ -25,6 +25,7 @@ class Protocol:
         else:
             self.sentences[speaker] = [sentence]
     def check(self): #function for tests .. will be deleted later 
+        print(self.name)
         print(len(self.sentences.keys()))
         for key in self.sentences.keys():
             print(key)
@@ -71,9 +72,9 @@ def speakerClean(speaker):
         speaker = speaker[:open_an_brac] + speaker[close_an_brac+1:]
         open_an_brac = speaker.find('<<')
         close_an_brac = speaker.find('>>')
-    speaker = speaker.replace('<', '').replace('>','').replace('היו"ר', '').replace('היו”ר', '').replace('יו"ר הכנסת', '').replace('יו”ר הכנסת', '').replace('יו"ר ועדת הכנסת', '').replace('יו”ר ועדת הכנסת', '').replace('-', '').replace('מ"מ', '').replace('מ”מ', '').replace('סגן', '').replace('סגנית', '').replace('מזכיר הכנסת','').replace('מזכירת הכנסת','').replace('תשובת','').replace('ראש הממשלה', '').replace('עו"ד', '').replace('עו”ד', '').replace('ד"ר', '').replace('ד”ר', '').replace('     ', ' ').replace('    ', ' ').replace('   ', ' ').replace('  ', ' ')
-    if 'שר' in speaker or 'השר' in speaker or 'שרת' in speaker or 'השרה' in speaker:     
-        speaker = speaker.replace('שר ','').replace('השר ','').replace('שרת ','').replace('השרה ','')
+    speaker = speaker.replace('<', '').replace('>','').replace('היו"ר', '').replace('היו”ר', '').replace('יו"ר הכנסת', '').replace('יו”ר הכנסת', '').replace('יו"ר ועדת הכנסת', '').replace('יו”ר ועדת הכנסת', '').replace('-', '').replace('מ"מ', '').replace('מ”מ', '').replace('סגן', '').replace('סגנית', '').replace('מזכיר הכנסת','').replace('מזכירת הכנסת','').replace('תשובת','').replace('ראש הממשלה', '').replace('עו"ד', '').replace('עו”ד', '').replace('ד"ר', '').replace('ד”ר', '').replace("פרופ'", '').replace('נצ"מ','').replace('ניצב','').replace('     ', ' ').replace('    ', ' ').replace('   ', ' ').replace('  ', ' ')
+    if 'שר ' in speaker or 'השר ' in speaker or 'שרת ' in speaker or 'השרה ' in speaker:     
+        speaker = speaker.replace('השרה ','').replace('השר ','').replace('שרת ','').replace('שר ','')
         for ministry in ministries:
             if ministry in speaker or 'ה' + ministry in speaker:
                 speaker = speaker.replace(ministry, '')
