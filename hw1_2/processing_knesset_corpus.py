@@ -31,21 +31,37 @@ class Protocol:
         for key in self.sentences.keys():
             print(key)
 
-invalid_names = {'2', 'ברצוני', 'כרצוני', 'רצוני', 'אני', 'אחרי', 'הצעת', 'המועצה', 
-                 'ביום', 'בפסקה', 'קריאה', 'קריאות', 'האפשרות', 'קוראת', 'קורא', 'הצעת'}
+ministries = {'התשתיות הלאומיות', 'התשתיות', 'המשטרה', 'לביטחון פנים', 'לביטחון הפנים', 
+              'לאיכות הסביבה', 'להגנת הסביבה', 'החינוך, התרבות והספורט', 'החינוך והתרבות', 
+              'החינוך', 'התחבורה והבטיחות בדרכים', 'התחבורה', 'האוצר', 'הכלכלה והתכנון', 
+              'הכלכלה', 'המשפטים', 'הבריאות', 'החקלאות ופיתוח הכפר', 'החקלאות', 'החוץ', 
+              'הבינוי והשיכון ', 'העבודה, הרווחה והשירותים החברתיים', 'העבודה והרווחה', 
+              'העבודה', 'הרווחה', 'התעשייה והמסחר', 'התעשייה, המסחר והתעסוקה', 'התיירות', 
+              'המדע והטכנולוגיה', 'הפנים', 'המדע, התרבות והספורט', 'התרבות והספורט', 
+              'האנרגיה והמים', 'לענייני דתות', 'במשרד ראש הממשלה', 
+              'לנושאים אסטרטגיים ולענייני מודיעין', 'לקליטת העלייה', 'לאזרחים ותיקים', 
+              'במשרד', 'הביטחון', 'המודיעין', 'התקשורת'}
+titles_and_symbols = ['<', '>', 'היו"ר', 'היו”ר', 'יו"ר הכנסת', 'יו”ר הכנסת', 
+                      'יו"ר ועדת הכנסת', 'יו”ר ועדת הכנסת', 'מ"מ', 'מ”מ', 'סגן', 'סגנית', 
+                      'מזכיר הכנסת', 'מזכירת הכנסת', 'תשובת', 'המשנה לראש הממשלה', 'ראש הממשלה', 
+                      'עו"ד', 'עו”ד', 'ד"ר', 'ד”ר', "פרופ'", 'נצ"מ', 'ניצב', '     ', '    ', 
+                      '   ', '  ']
+invalid_names = {'2', 'ברצוני', 'כרצוני', 'רצוני', 'אני', 'אחרי', 'הצעת', 'המועצה', 'ביום', 
+                 'בפסקה', 'קריאה', 'קריאות', 'האפשרות', 'קוראת', 'קורא', 'הצעת'}
 name_duplicates = {"מ' שטרית" : "מאיר שטרית", "ד' שילנסקי" : "דב שילנסקי", 
                    "םשה גפני" : "משה גפני", "ס' טריף" : "סאלח טריף", 
                    "1 סאלח טריף" : "סאלח טריף", "אופיר פינס" : "אופיר פינס פז", 
                    "י יוסף ג'בארין" : "יוסף ג'בארין"}
-
+patterns = [r'(\b\w+\b)\s+(\b\w+\b)\s+(\b\w+\b)\s+(\b\w+\b)', 
+            r'(\b\w+\b)\s+(\b\w+\b)\s+(\b\w+\b)', r'(\b\w+\b)\s+(\b\w+\b)', r'(\b\w+\b)']
+digits_dict = {'אחת': 1, 'שתיים': 2, 'שתים' : 2, 'שלוש': 3, 'ארבע': 4, 'חמש': 5, 'חמיש': 5, 
+               'שש': 6, 'שיש': 6, 'שבע': 7, 'שמונה': 8, 'תשע': 9, 'עשר': 10, 'עשרים': 20, 
+               'שמונים': 80, 'מאה': 100, 'מאתיים': 200, 'אלף': 1000}
 
 #Helper method for 'extract_metada_from_content'. It checks if the given string represent an integer number, and if yes, it return its integer value
 #Input: String of number which can be numeric or as hebrew word
 #Output: Integer equivalent of the number or -1 in case it's not identified as a number
 def convertToInt(word):
-    digits_dict = {'אחת': 1, 'שתיים': 2, 'שתים' : 2, 'שלוש': 3, 'ארבע': 4, 'חמש': 5, 
-                   'חמיש': 5, 'שש': 6, 'שיש': 6, 'שבע': 7, 'שמונה': 8, 'תשע': 9, 'עשר': 10, 
-                   'עשרים': 20, 'שמונים': 80, 'מאה': 100, 'מאתיים': 200, 'אלף': 1000}
     # case 1: string in numeric form
     if word.isdigit():
         return int(word)
@@ -78,19 +94,6 @@ def convertToInt(word):
 #Input: string which could represent someone's name 
 #Output: the name without the additions and titles 
 def speakerClean(speaker):
-    ministries = ['התשתיות הלאומיות', 'התשתיות', 'המשטרה', 'לביטחון פנים', 'לביטחון הפנים', 'לאיכות הסביבה', 
-                  'להגנת הסביבה', 'החינוך, התרבות והספורט', 'החינוך והתרבות', 'החינוך', 
-                  'התחבורה והבטיחות בדרכים', 'התחבורה', 'האוצר', 'הכלכלה והתכנון', 'הכלכלה', 'המשפטים', 
-                  'הבריאות', 'החקלאות ופיתוח הכפר', 'החקלאות', 'החוץ', 'הבינוי והשיכון ', 
-                  'העבודה, הרווחה והשירותים החברתיים', 'העבודה והרווחה', 'העבודה', 
-                  'התעשייה והמסחר', 'התעשייה, המסחר והתעסוקה', 'התיירות', 'המדע והטכנולוגיה', 
-                  'הפנים', 'המדע, התרבות והספורט', 'התרבות והספורט', 'האנרגיה והמים', 
-                  'לענייני דתות', 'במשרד ראש הממשלה', 'לנושאים אסטרטגיים ולענייני מודיעין', 
-                  'לקליטת העלייה', 'לאזרחים ותיקים', 'במשרד', 'הביטחון', 'המודיעין', 'התקשורת']
-    titles_and_symbols = ['<', '>', 'היו"ר', '', 'היו”ר', 'יו"ר הכנסת', 'יו”ר הכנסת', 
-                          'יו"ר ועדת הכנסת', 'יו”ר ועדת הכנסת', 'מ"מ', 'מ”מ', 'סגן', 'סגנית', 
-                          'מזכיר הכנסת', 'מזכירת הכנסת', 'תשובת', 'המשנה לראש הממשלה', 'ראש הממשלה', 'עו"ד', 'עו”ד', 
-                          'ד"ר', 'ד”ר', "פרופ'", 'נצ"מ', 'ניצב', '     ', '    ', '   ', '  ']
     #remove the party name
     open_brac = speaker.find('(')
     close_brac = speaker.find(')')
@@ -111,9 +114,11 @@ def speakerClean(speaker):
     #remove minister titles, these titles are special case because they can be followed by the ministry name 
     if 'השר ' in speaker or 'שרת ' in speaker or 'השרה ' in speaker:     
         speaker = speaker.replace('השרה ','').replace('השר ','').replace('שרת ','').replace('שר ','')
-        for ministry in ministries:
-            if ministry in speaker or 'ה' + ministry in speaker:
-                speaker = speaker.replace(ministry, '')
+        for pattern in patterns:
+            ministry_name = re.search(pattern, speaker)
+            if ministry_name and ministry_name.group(0) in ministries:
+                speaker = speaker[ministry_name.end():].strip()
+                break
     speaker = speaker.strip()
     #remove minister title only if it appears in the beginning, this to avoid ditortion of first names ends with this suffix like 'Asher'
     if 'שר ' in speaker and speaker.find('שר ') == 0: 
