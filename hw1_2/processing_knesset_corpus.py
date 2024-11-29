@@ -376,9 +376,6 @@ def main():
     #jsonl_make(protocols, file)
     end_t = time.time()
     print(end_t - start_t)
-    speakers_set = set([speaker for speakers in speakers_dict.values() for speaker in speakers])
-    for speaker in speakers_set:
-        print(speaker)
 
 if __name__ == "__main__":
     main()
