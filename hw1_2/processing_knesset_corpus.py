@@ -2,6 +2,7 @@ import os
 from docx import Document
 import json
 import sys
+import re 
 
 class Sentence:
     def __init__(self, protocol_name, keneset, protocol_type, protocol_no, speaker, text):
@@ -29,6 +30,14 @@ class Protocol:
         print(len(self.sentences.keys()))
         for key in self.sentences.keys():
             print(key)
+
+invalid_names = {'2', 'ברצוני', 'כרצוני', 'רצוני', 'אני', 'אחרי', 'הצעת', 'המועצה', 
+                 'ביום', 'בפסקה', 'קריאה', 'קריאות', 'האפשרות', 'קוראת', 'קורא', 'הצעת'}
+name_duplicates = {"מ' שטרית" : "מאיר שטרית", "ד' שילנסקי" : "דב שילנסקי", 
+                   "םשה גפני" : "משה גפני", "ס' טריף" : "סאלח טריף", 
+                   "1 סאלח טריף" : "סאלח טריף", "אופיר פינס" : "אופיר פינס פז", 
+                   "י יוסף ג'בארין" : "יוסף ג'בארין"}
+
 
 #Helper method for 'extract_metada_from_content'. It checks if the given string represent an integer number, and if yes, it return its integer value
 #Input: String of number which can be numeric or as hebrew word
@@ -69,18 +78,18 @@ def convertToInt(word):
 #Input: string which could represent someone's name 
 #Output: the name without the additions and titles 
 def speakerClean(speaker):
-    ministries = ['התשתיות הלאומיות', 'התשתיות', 'המשטרה', 'לביטחון פנים', 'לאיכות הסביבה', 
+    ministries = ['התשתיות הלאומיות', 'התשתיות', 'המשטרה', 'לביטחון פנים', 'לביטחון הפנים', 'לאיכות הסביבה', 
                   'להגנת הסביבה', 'החינוך, התרבות והספורט', 'החינוך והתרבות', 'החינוך', 
-                  'התחבורה והבטיחות בדרכים', 'התחבורה', 'האוצר', 'הכלכלה והתכנון', 'המשפטים', 
+                  'התחבורה והבטיחות בדרכים', 'התחבורה', 'האוצר', 'הכלכלה והתכנון', 'הכלכלה', 'המשפטים', 
                   'הבריאות', 'החקלאות ופיתוח הכפר', 'החקלאות', 'החוץ', 'הבינוי והשיכון ', 
                   'העבודה, הרווחה והשירותים החברתיים', 'העבודה והרווחה', 'העבודה', 
                   'התעשייה והמסחר', 'התעשייה, המסחר והתעסוקה', 'התיירות', 'המדע והטכנולוגיה', 
                   'הפנים', 'המדע, התרבות והספורט', 'התרבות והספורט', 'האנרגיה והמים', 
                   'לענייני דתות', 'במשרד ראש הממשלה', 'לנושאים אסטרטגיים ולענייני מודיעין', 
-                  'לקליטת העלייה', 'לאזרחים ותיקים', 'במשרד', 'הביטחון', 'המודיעין']
+                  'לקליטת העלייה', 'לאזרחים ותיקים', 'במשרד', 'הביטחון', 'המודיעין', 'התקשורת']
     titles_and_symbols = ['<', '>', 'היו"ר', '', 'היו”ר', 'יו"ר הכנסת', 'יו”ר הכנסת', 
                           'יו"ר ועדת הכנסת', 'יו”ר ועדת הכנסת', 'מ"מ', 'מ”מ', 'סגן', 'סגנית', 
-                          'מזכיר הכנסת', 'מזכירת הכנסת', 'תשובת', 'ראש הממשלה', 'עו"ד', 'עו”ד', 
+                          'מזכיר הכנסת', 'מזכירת הכנסת', 'תשובת', 'המשנה לראש הממשלה', 'ראש הממשלה', 'עו"ד', 'עו”ד', 
                           'ד"ר', 'ד”ר', "פרופ'", 'נצ"מ', 'ניצב', '     ', '    ', '   ', '  ']
     #remove the party name
     open_brac = speaker.find('(')
@@ -97,9 +106,9 @@ def speakerClean(speaker):
     #remove the title, other symbols and multi spaces 
     for element in titles_and_symbols:
         speaker = speaker.replace(element, '')
-    #replace the '-' by a space, this can be effective in cases without cases like when it connect names
+    #replace the '-' by a space
     speaker = speaker.replace('-', ' ')
-    #remove minister titles, these titles are special case because they can followed by the ministry name 
+    #remove minister titles, these titles are special case because they can be followed by the ministry name 
     if 'השר ' in speaker or 'שרת ' in speaker or 'השרה ' in speaker:     
         speaker = speaker.replace('השרה ','').replace('השר ','').replace('שרת ','').replace('שר ','')
         for ministry in ministries:
@@ -112,6 +121,7 @@ def speakerClean(speaker):
         for ministry in ministries:
             if ministry in speaker or 'ה' + ministry in speaker:
                 speaker = speaker.replace(ministry, '')
+        speaker = speaker.strip()
     return speaker
 
 #Input: file/protocol name
@@ -234,7 +244,7 @@ def extract_relevant_text(file_content, protocol):
     last_idx = find_last_relevant(file_content)
     curr_speaker = None
     for i,paragraph in enumerate(file_content.paragraphs[first_idx:last_idx]):
-        #type 1 of sentences to exclude: those related to 'vote'. If it a vote sentence, consider the text irrelevant until there's a speaker
+        #type 1 of sentences to exclude: those related to 'vote'. If it's a vote sentence, consider the text irrelevant until there's a speaker
         if 'הצבעה' in paragraph.text or 'ההצבעה' in paragraph.text or 'הצבעת' in paragraph.text:
             j = i+1
             while not file_content.paragraphs[first_idx+j].text:
@@ -248,20 +258,18 @@ def extract_relevant_text(file_content, protocol):
         #meeting one of the first two if's making the paragraph as potential speaker's name
         if paragraph_txt.endswith(':') or paragraph_txt.endswith(':>'):
             paragraph_txt_cleaned = speakerClean(paragraph_txt)[:-1]
-            if 'ביום' in paragraph_txt: #if this is the case then 'ביום' is part of a sentence that come after the name of the speaker but it neither its name nor its speech
-                continue
-            if len(paragraph_txt_cleaned.split()) < 6:
-                curr_speaker = paragraph_txt_cleaned
+            first_string = re.search(r'\b\w+\b', paragraph_txt_cleaned)
+            if len(paragraph_txt_cleaned.split()) < 6 and first_string and first_string.group(0) not in invalid_names:
+                curr_speaker = paragraph_txt_cleaned if paragraph_txt_cleaned not in name_duplicates else name_duplicates[paragraph_txt_cleaned]
             elif curr_speaker: #deal with it as speech
                 sentence_handle(protocol, curr_speaker, paragraph_txt)
         elif ':' in paragraph_txt:
             pot_curr_speaker = speakerClean(paragraph_txt)
             if pot_curr_speaker.endswith(':'):
                 paragraph_txt_cleaned = pot_curr_speaker[:-1]
-                if 'ביום' in paragraph_txt:
-                    continue
-                if len(paragraph_txt_cleaned.split()) < 6:
-                    curr_speaker = paragraph_txt_cleaned
+                first_string = re.search(r'\b\w+\b', paragraph_txt_cleaned)
+                if len(paragraph_txt_cleaned.split()) < 6 and first_string and first_string.group(0) not in invalid_names:
+                    curr_speaker = paragraph_txt_cleaned if paragraph_txt_cleaned not in name_duplicates else name_duplicates[paragraph_txt_cleaned]
                 elif curr_speaker: #deal with it as speech
                     sentence_handle(protocol, curr_speaker, paragraph_txt)
             elif curr_speaker: #else deal with it as a speech 
