@@ -28,7 +28,8 @@ class Protocol:
     def check(self): #function for tests .. will be deleted later 
         print(self.name)
         print(len(self.sentences.keys()))
-        for key in self.sentences.keys():
+        sorted_keys = sorted(self.sentences.keys(), key=lambda name: name.split()[-1])
+        for key in sorted_keys:
             print(key)
 
 ministries = {'התשתיות הלאומיות', 'התשתיות', 'המשטרה', 'לביטחון פנים', 'לביטחון הפנים', 
@@ -47,16 +48,23 @@ titles_and_symbols = ['<', '>', 'היו"ר', 'היו”ר', 'יו"ר הכנסת'
                       'עו"ד', 'עו”ד', 'ד"ר', 'ד”ר', "פרופ'", 'נצ"מ', 'ניצב', '     ', '    ', 
                       '   ', '  ']
 invalid_names = {'2', 'ברצוני', 'כרצוני', 'רצוני', 'אני', 'אחרי', 'הצעת', 'המועצה', 'ביום', 
-                 'בפסקה', 'קריאה', 'קריאות', 'האפשרות', 'קוראת', 'קורא', 'הצעת'}
+                 'בפסקה', 'קריאה', 'קריאות', 'האפשרות', 'קוראת', 'קורא', 'הצעת', 'מסקנות'}
 name_duplicates = {"מ' שטרית" : "מאיר שטרית", "ד' שילנסקי" : "דב שילנסקי", 
                    "םשה גפני" : "משה גפני", "ס' טריף" : "סאלח טריף", 
                    "1 סאלח טריף" : "סאלח טריף", "אופיר פינס" : "אופיר פינס פז", 
-                   "י יוסף ג'בארין" : "יוסף ג'בארין"}
+                   "י יוסף ג'בארין" : "יוסף ג'בארין", "אורה עשאהל זילברשטיין" : "אורה עשהאל זילברשטיין", 
+                   "שלי יחימוביץ'" : "שלי יחימוביץ", "ע' מאור" : "ענת מאור", "א' סלמוביץ" : "אסתר סלמוביץ", 
+                   "י' עזרן" : "יוסף עזרן", "ע' עלי" : "עובדיה עלי", "ש' וייס" : "שבח וייס", 
+                   "ח' דיין" : "חיים דיין", "ש' בניזרי" : "שלמה בניזרי", "ד' טל" : "דוד טל", 
+                   "ו' צאדק חאג' יחיא" : "וליד צאדק חאג' יחיא", "י' אדלשטיין" : "יולי יואל אדלשטיין", 
+                   "ש' הלפרט" : "שמואל הלפרט", "מ' לוי" : "מקסים לוי", "ש' הלפרט" : "שמואל הלפרט",
+                   "נ' חזן" : "נעמי חזן", "נ' לנגנטל" : "נחום לנגנטל", "ר' מלול" : "רחמים מלול"}
 patterns = [r'(\b\w+\b)\s+(\b\w+\b)\s+(\b\w+\b)\s+(\b\w+\b)', 
             r'(\b\w+\b)\s+(\b\w+\b)\s+(\b\w+\b)', r'(\b\w+\b)\s+(\b\w+\b)', r'(\b\w+\b)']
 digits_dict = {'אחת': 1, 'שתיים': 2, 'שתים' : 2, 'שלוש': 3, 'ארבע': 4, 'חמש': 5, 'חמיש': 5, 
                'שש': 6, 'שיש': 6, 'שבע': 7, 'שמונה': 8, 'תשע': 9, 'עשר': 10, 'עשרים': 20, 
                'שמונים': 80, 'מאה': 100, 'מאתיים': 200, 'אלף': 1000}
+speakers_dict = {}
 
 #Helper method for 'extract_metada_from_content'. It checks if the given string represent an integer number, and if yes, it return its integer value
 #Input: String of number which can be numeric or as hebrew word
@@ -123,9 +131,11 @@ def speakerClean(speaker):
     #remove minister title only if it appears in the beginning, this to avoid ditortion of first names ends with this suffix like 'Asher'
     if 'שר ' in speaker and speaker.find('שר ') == 0: 
         speaker = speaker.replace('שר ', '')
-        for ministry in ministries:
-            if ministry in speaker or 'ה' + ministry in speaker:
-                speaker = speaker.replace(ministry, '')
+        for pattern in patterns:
+            ministry_name = re.search(pattern, speaker)
+            if ministry_name and ministry_name.group(0) in ministries:
+                speaker = speaker[ministry_name.end():].strip()
+                break
         speaker = speaker.strip()
     return speaker
 
@@ -192,12 +202,11 @@ def find_last_relevant(file_content):
 
 #helper method for sentence_handle which checks validity of a sentence
 def sentence_validity(sentence):
-    hebrew_alphabet = {'א', 'ב', 'ג', 'ד', 'ה', 'ו', 'ז', 'ח', 'ט', 'י', 'כ', 'ל', 'מ', 'נ', 'ס', 'ע', 'פ', 'צ', 'ק', 'ר', 'ש', 'ת', '', 'ך', 'ם', 'ן', 'ף', 'ץ'}
-    if all(letter not in hebrew_alphabet for letter in sentence):
+    if all(not('א' <= letter <= 'ת') for letter in sentence):
         return False
     if any('a' <= letter <= 'z' or 'A' <= letter <= 'Z' for letter in sentence):
         return False
-    if '- -' in sentence or '– –' in sentence:
+    if '- -' in sentence or '– –' in sentence or '...' in sentence:
         return False
     return True
 
@@ -222,7 +231,7 @@ def sentence_tokenize(sentence):
     if word:
         tokenized_sentence.append(word)
     if len(tokenized_sentence) >= 4:
-        tokenized_sentence = ' '.join(tokenized_sentence) 
+        tokenized_sentence = ' '.join(tokenized_sentence)
         return tokenized_sentence
     else:
         return None
@@ -230,16 +239,35 @@ def sentence_tokenize(sentence):
 #helper method for for extract_relevant_text that creates a sentence object and add it to the relevant protocol 
 def sentence_handle(protocol, curr_speaker, paragraph_txt):
     curr_sentence = ''
-    for letter in paragraph_txt: 
-        if letter in ['.', '?', '!']:
-            curr_sentence = curr_sentence.strip()
+    for i,letter in enumerate(paragraph_txt): 
+        if letter in ['?', '!']:
             if sentence_validity(curr_sentence):
                 curr_sentence = sentence_tokenize(curr_sentence)
                 if curr_sentence:
                     sentence = Sentence(protocol.name, protocol.keneset, protocol.type, protocol.number, curr_speaker, curr_sentence)
                     protocol.add_sentence(curr_speaker, sentence)
             curr_sentence = ''
-        else:
+        elif letter in ['.']:
+            #case 1: '.' is a decimal point, not considered as an end of a sentence
+            if len(curr_sentence) > 0 and i != len(paragraph_txt) - 1 and curr_sentence[-1].isdigit() and paragraph_txt[i+1].isdigit():
+               curr_sentence += letter
+            #case 2: '.' is a period, precedeed by a number, not considered as an end of a sentence
+            elif len(curr_sentence) > 2 and curr_sentence[-1].isdigit() and curr_sentence[-2] == ' ' and curr_sentence[-3] in [',' , ':']:
+                curr_sentence += letter
+            elif len(curr_sentence) == 1 and curr_sentence[-1].isdigit():
+                curr_sentence += letter
+            #case 3: '.' is a period, precedeed by a letter, not considered as an end of a sentence
+            elif len(curr_sentence) > 1 and  'א' <= curr_sentence[-1] <= 'י' and curr_sentence[-2] == ' ':
+                curr_sentence += letter
+            #case 4: '.' is an end of a sentence
+            else:
+                if sentence_validity(curr_sentence):
+                    curr_sentence = sentence_tokenize(curr_sentence)
+                    if curr_sentence:
+                        sentence = Sentence(protocol.name, protocol.keneset, protocol.type, protocol.number, curr_speaker, curr_sentence)
+                        protocol.add_sentence(curr_speaker, sentence)
+                curr_sentence = ''
+        elif not (letter == ' ' and curr_sentence == ''): #to avoid a sentence starting with spaces 
             curr_sentence += letter
 
 #extracts the relevant sentences and arranges them according to protocol and speaker
@@ -262,25 +290,45 @@ def extract_relevant_text(file_content, protocol):
         paragraph_txt = paragraph.text.strip()
         #meeting one of the first two if's making the paragraph as potential speaker's name
         if paragraph_txt.endswith(':') or paragraph_txt.endswith(':>'):
-            paragraph_txt_cleaned = speakerClean(paragraph_txt)[:-1]
+            paragraph_txt_cleaned = speakerClean(paragraph_txt)[:-1].strip()
             first_string = re.search(r'\b\w+\b', paragraph_txt_cleaned)
             if len(paragraph_txt_cleaned.split()) < 6 and first_string and first_string.group(0) not in invalid_names:
                 curr_speaker = paragraph_txt_cleaned if paragraph_txt_cleaned not in name_duplicates else name_duplicates[paragraph_txt_cleaned]
+                curr_speaker_last = curr_speaker.split()[-1]
+                if curr_speaker_last in speakers_dict:
+                    speakers_dict[curr_speaker_last].append(curr_speaker)
+                else:
+                    speakers_dict[curr_speaker_last] = [curr_speaker]
             elif curr_speaker: #deal with it as speech
                 sentence_handle(protocol, curr_speaker, paragraph_txt)
         elif ':' in paragraph_txt:
             pot_curr_speaker = speakerClean(paragraph_txt)
             if pot_curr_speaker.endswith(':'):
-                paragraph_txt_cleaned = pot_curr_speaker[:-1]
+                paragraph_txt_cleaned = pot_curr_speaker[:-1].strip()
                 first_string = re.search(r'\b\w+\b', paragraph_txt_cleaned)
                 if len(paragraph_txt_cleaned.split()) < 6 and first_string and first_string.group(0) not in invalid_names:
                     curr_speaker = paragraph_txt_cleaned if paragraph_txt_cleaned not in name_duplicates else name_duplicates[paragraph_txt_cleaned]
+                    curr_speaker_last = curr_speaker.split()[-1]
+                    if curr_speaker_last in speakers_dict:
+                        speakers_dict[curr_speaker_last].append(curr_speaker)
+                    else:
+                        speakers_dict[curr_speaker_last] = [curr_speaker]
                 elif curr_speaker: #deal with it as speech
                     sentence_handle(protocol, curr_speaker, paragraph_txt)
             elif curr_speaker: #else deal with it as a speech 
                 sentence_handle(protocol, curr_speaker, paragraph_txt)
         elif curr_speaker:
             sentence_handle(protocol, curr_speaker, paragraph_txt)
+
+def speaker_full_name(speaker1):
+    speaker1_splitted = speaker1.split()
+    if not len(speaker1_splitted[0]) == 2 or not speaker1_splitted[0][1] == "'" or not len(speaker1_splitted) > 1:
+        return speaker1
+    for speaker2 in speakers_dict[speaker1_splitted[-1]]:
+        speaker2_splitted = speaker2.split()
+        if len(speaker2_splitted[0]) > 2 and len(speaker2_splitted) > 1 and speaker1_splitted[0][0] == speaker2_splitted[0][0] and speaker1_splitted[-1] == speaker2_splitted[-1]:
+            return speaker2
+    return speaker1
 
 #Input: path to a folder
 #Output: file names, paths, and contents for all .docx files in the folder
@@ -294,18 +342,20 @@ def jsonl_make(protocols, file):
     with open(file, 'w', encoding = 'utf-8') as jsonl_file:
         for protocol in protocols:
             for speaker, sentences in protocol.sentences.items():
+                speaker_f = speaker_full_name(speaker)
                 for sentence in sentences:
                     sentence_data = {
                         "protocol_name": sentence.protocol_name,
                         "knesset_number": sentence.keneset,
                         "protocol_type": sentence.protocol_type,
                         "protocol_number": sentence.protocol_no,
-                        "speaker_name": sentence.speaker,
+                        "speaker_name": speaker_f,
                         "sentence_text": sentence.text
                     }
                     jsonl_file.write(json.dumps(sentence_data, ensure_ascii=False) + '\n')
-
+import time
 def main():
+    start_t = time.time()
     #if len(sys.argv) != 3:
     #    print("Error: Incorrect # of arguments.\n")
     #    sys.exit(1)
@@ -317,15 +367,16 @@ def main():
     file = "corpus.jsonl"
     file_names, file_paths, file_contents = read_files(folder_path)
     protocols = []
-    for file_name in file_names: 
+    for file_name in sorted(file_names): 
         keneset_no, protocol_type = extract_metada_from_name(file_name)
         protocol_no = extract_metada_from_content(file_contents[file_name])
         protocol = Protocol(file_name, keneset_no, protocol_type, protocol_no)
         protocols.append(protocol)
-        #print(protocol.name)
         extract_relevant_text(file_contents[file_name], protocol)
-        protocol.check()
+        #protocol.check()
     #jsonl_make(protocols, file)
+    end_t = time.time()
+    print(end_t - start_t)
 
 if __name__ == "__main__":
     main()
