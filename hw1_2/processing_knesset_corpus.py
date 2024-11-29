@@ -325,7 +325,7 @@ def speaker_full_name(speaker1):
         return speaker1
     for speaker2 in speakers_dict[speaker1_splitted[-1]]:
         speaker2_splitted = speaker2.split()
-        if len(speaker2_splitted[0]) > 2 and len(speaker2_splitted) > 1 and speaker1_splitted[0][0] == speaker2_splitted[0][0] and speaker1_splitted[-1] == speaker2_splitted[-1]:
+        if len(speaker2_splitted[0]) >= 2 and speaker2_splitted[0][1] != "'" and len(speaker2_splitted) > 1 and speaker1_splitted[0][0] == speaker2_splitted[0][0] and speaker1_splitted[-1] == speaker2_splitted[-1]:
             return speaker2
     return speaker1
 
