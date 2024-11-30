@@ -41,7 +41,7 @@ ministries = {'התשתיות הלאומיות', 'התשתיות', 'המשטרה
               'המדע והטכנולוגיה', 'הפנים', 'המדע, התרבות והספורט', 'התרבות והספורט', 
               'האנרגיה והמים', 'לענייני דתות', 'במשרד ראש הממשלה', 
               'לנושאים אסטרטגיים ולענייני מודיעין', 'לקליטת העלייה', 'לאזרחים ותיקים', 
-              'במשרד', 'הביטחון', 'המודיעין', 'התקשורת'}
+              'במשרד', 'הביטחון', 'המודיעין', 'התקשורת', 'התשתיות הלאומיות, האנרגיה והמים'}
 titles_and_symbols = ['<', '>', 'היו"ר', 'היו”ר', 'יו"ר הכנסת', 'יו”ר הכנסת', 
                       'יו"ר ועדת הכנסת', 'יו”ר ועדת הכנסת', 'מ"מ', 'מ”מ', 'סגן', 'סגנית', 
                       'מזכיר הכנסת', 'מזכירת הכנסת', 'תשובת', 'המשנה לראש הממשלה', 'ראש הממשלה', 
@@ -247,6 +247,7 @@ def sentence_handle(protocol, curr_speaker, paragraph_txt):
     for i,letter in enumerate(paragraph_txt): 
         if letter in ['?', '!']:
             if sentence_validity(curr_sentence):
+                curr_sentence = curr_sentence.replace('\"', '"') #to fix the problem where many times '"' appears as '\"' 
                 curr_sentence = sentence_tokenize(curr_sentence)
                 if curr_sentence:
                     sentence = Sentence(protocol.name, protocol.keneset, protocol.type, protocol.number, curr_speaker, curr_sentence)
@@ -267,6 +268,7 @@ def sentence_handle(protocol, curr_speaker, paragraph_txt):
             #case 4: '.' is an end of a sentence
             else:
                 if sentence_validity(curr_sentence):
+                    curr_sentence = curr_sentence.replace('\"', '"')
                     curr_sentence = sentence_tokenize(curr_sentence)
                     if curr_sentence:
                         sentence = Sentence(protocol.name, protocol.keneset, protocol.type, protocol.number, curr_speaker, curr_sentence)
