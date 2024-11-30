@@ -216,7 +216,7 @@ def sentence_validity(sentence):
     return True
 
 def sentence_tokenize(sentence):
-    marks = {',', ';', ':', '(', ')', ' '}
+    marks = {';', '(', ')', ' ', '-', '–'}
     tokenized_sentence = []
     word = ''
     for i,letter in enumerate(sentence):
@@ -226,7 +226,20 @@ def sentence_tokenize(sentence):
                 word = ''
             if letter != ' ':
                 tokenized_sentence.append(letter)
+        #the case when " is not part of the word
         elif letter == '"' and (i == 0 or sentence[i-1] == ' ' or i == len(sentence)-1 or sentence[i+1] == ' '):
+            if word:
+                tokenized_sentence.append(word)
+                tokenized_sentence.append(letter)
+                word = ''
+        #the case when , is not part of a number 
+        elif letter == ',' and (i == 0 or i == len(sentence)-1 or not sentence[i-1].isdigit() or not sentence[i+1].isdigit()):
+            if word:
+                tokenized_sentence.append(word)
+                tokenized_sentence.append(letter)
+                word = ''
+        #the case when : is not part of a term indicating time
+        elif letter == ':' and (i == 0 or i > len(sentence) - 2 or not sentence[i-1].isdigit() or not sentence[i+1].isdigit() or not sentence[i+2].isdigit()):
             if word:
                 tokenized_sentence.append(word)
                 tokenized_sentence.append(letter)
