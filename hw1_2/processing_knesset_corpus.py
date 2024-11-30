@@ -239,7 +239,7 @@ def sentence_tokenize(sentence):
                 tokenized_sentence.append(letter)
                 word = ''
         #the case when : is not part of a term indicating time
-        elif letter == ':' and (i == 0 or i > len(sentence) - 2 or not sentence[i-1].isdigit() or not sentence[i+1].isdigit() or not sentence[i+2].isdigit()):
+        elif letter == ':' and (i == 0 or i > len(sentence) - 3 or not sentence[i-1].isdigit() or not sentence[i+1].isdigit() or not sentence[i+2].isdigit()):
             if word:
                 tokenized_sentence.append(word)
                 tokenized_sentence.append(letter)
@@ -260,13 +260,12 @@ def sentence_handle(protocol, curr_speaker, paragraph_txt):
     for i,letter in enumerate(paragraph_txt): 
         if letter in ['?', '!']:
             if sentence_validity(curr_sentence):
-                curr_sentence = curr_sentence.replace('\"', '"') #to fix the problem where many times '"' appears as '\"' 
                 curr_sentence = sentence_tokenize(curr_sentence)
                 if curr_sentence:
                     sentence = Sentence(protocol.name, protocol.keneset, protocol.type, protocol.number, curr_speaker, curr_sentence)
                     protocol.add_sentence(curr_speaker, sentence)
             curr_sentence = ''
-        elif letter in ['.']:
+        elif letter == '.':
             #case 1: '.' is a decimal point, not considered as an end of a sentence
             if len(curr_sentence) > 0 and i != len(paragraph_txt) - 1 and curr_sentence[-1].isdigit() and paragraph_txt[i+1].isdigit():
                curr_sentence += letter
@@ -281,7 +280,6 @@ def sentence_handle(protocol, curr_speaker, paragraph_txt):
             #case 4: '.' is an end of a sentence
             else:
                 if sentence_validity(curr_sentence):
-                    curr_sentence = curr_sentence.replace('\"', '"')
                     curr_sentence = sentence_tokenize(curr_sentence)
                     if curr_sentence:
                         sentence = Sentence(protocol.name, protocol.keneset, protocol.type, protocol.number, curr_speaker, curr_sentence)
@@ -364,14 +362,7 @@ def jsonl_make(protocols, file):
             for speaker, sentences in protocol.sentences.items():
                 speaker_f = speaker_full_name(speaker)
                 for sentence in sentences:
-                    sentence_data = {
-                        "protocol_name": sentence.protocol_name,
-                        "knesset_number": sentence.keneset,
-                        "protocol_type": sentence.protocol_type,
-                        "protocol_number": sentence.protocol_no,
-                        "speaker_name": speaker_f,
-                        "sentence_text": sentence.text
-                    }
+                    sentence_data = {sentence.text}
                     jsonl_file.write(json.dumps(sentence_data, ensure_ascii=False) + '\n')
 
 import time
@@ -385,7 +376,7 @@ def main():
     #folder_path = sys.argv[1] 
     folder_path = "protocol_for_hw1" 
     #file = sys.argv[2] 
-    file = "corpus3.jsonl"
+    file = "corpus8.jsonl"
     file_names, file_paths, file_contents = read_files(folder_path)
     protocols = []
     for file_name in sorted(file_names): 
@@ -395,7 +386,7 @@ def main():
         protocols.append(protocol)
         extract_relevant_text(file_contents[file_name], protocol)
         protocol.check()
-    #jsonl_make(protocols, file)
+    jsonl_make(protocols, file)
     end_t = time.time()
     print(end_t - start_t)
 
