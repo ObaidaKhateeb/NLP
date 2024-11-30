@@ -180,16 +180,16 @@ def extract_metada_from_content(file_content):
 #Input: .docx file of a protocol
 #Output: index of the first relevant paragraph
 def find_starting_relevant(file_content): 
-    paragraph_idx = 0
-    for paragraph_idx in range(len(file_content.paragraphs)):
-        paragraph_txt = file_content.paragraphs[paragraph_idx].text.strip()
+    default_idx = 0
+    for i in range(len(file_content.paragraphs)):
+        paragraph_txt = file_content.paragraphs[i].text.strip()
         if (paragraph_txt.startswith('היו"ר') or paragraph_txt.startswith('היו”ר') or paragraph_txt.startswith('יו"ר הכנסת') or paragraph_txt.startswith('יו”ר הכנסת') or paragraph_txt.startswith('מ"מ היו"ר') or paragraph_txt.startswith('מ”מ היו”ר')) and paragraph_txt.endswith(':'):
-            return paragraph_idx
+            return i
         elif paragraph_txt.startswith('<< יור >>') and paragraph_txt.endswith('<< יור >>'):
-            return paragraph_idx
+            return i
         elif paragraph_txt.startswith('<היו"ר') and paragraph_txt.endswith(':>'):
-            return paragraph_idx
-    return paragraph_idx
+            return i
+    return default_idx
 
 #helper method for for extract_relevant_text, it identifies the last relevant paragraph
 #Input: .docx file of a protocol
