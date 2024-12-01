@@ -59,12 +59,12 @@ digits_dict = {'אחת': 1, 'שתיים': 2, 'שתים' : 2, 'שלוש': 3, 'א�
 #Input: String of number which can be numeric or as hebrew word
 #Output: Integer equivalent of the number or -1 in case it's not identified as a number
 def convertToInt(word):
-    # case 1: string in numeric form
+    # case 1: number in numeric form
     if word.isdigit():
         return int(word)
     elif word[:-1].isdigit(): #to deal with the cases where the number followed by '<' directly
         return int(word[:-1])
-    #case 3: string in string form 
+    #case 2: number in string form 
     else:
         word_splitted = word.split('-')
         word_splitted = [word[1:] if word[0] in ['ו', 'ה']else word for word in word_splitted]
@@ -83,26 +83,26 @@ def convertToInt(word):
             elif word_splitted[i] == 'עשרה' and i > 0:
                 word_splitted[i-1] += 10
                 word_splitted[i] = 0
-            #option 5: the string didn't identify as a word
+            #option 5: the word didn't identify as a number
             else:
                 return -1
         return sum(word_splitted)
 
 #Input: string which could represent someone's name 
-#Output: the name without the additions and titles 
+#Output: the pure name (without titles, tags, and party name)
 def speakerClean(speaker):
     #remove the party name
     open_brac = speaker.find('(')
     close_brac = speaker.find(')')
-    while open_brac != -1 and close_brac != -1:
-        speaker = speaker[:open_brac] + speaker[close_brac+1:]
+    while open_brac != -1 and close_brac != -1 and open_brac < close_brac: 
+        speaker = speaker[:open_brac] + speaker[close_brac+1:] #remove the brackets and what inside them
         open_brac = speaker.find('(')
         close_brac = speaker.find(')')
     #remove the tag
     open_an_brac = speaker.find('<<')
     close_an_brac = speaker.find('>>')
-    while open_an_brac != -1 and close_an_brac != -1:
-        speaker = speaker[:open_an_brac] + speaker[close_an_brac+1:]
+    while open_an_brac != -1 and close_an_brac != -1 and open_an_brac < close_an_brac:
+        speaker = speaker[:open_an_brac] + speaker[close_an_brac+1:] #remove the tags and what inside them 
         open_an_brac = speaker.find('<<')
         close_an_brac = speaker.find('>>')
     #remove the title and other symbols
@@ -112,10 +112,10 @@ def speakerClean(speaker):
     speaker = speaker.replace('-', ' ')
     #replace multi spaces by one space
     speaker = speaker.replace('     ', ' ').replace('    ', ' ').replace('   ', ' ').replace('  ', ' ')
-    #remove minister titles, these titles are special case because they may be followed by the ministry name 
     speaker = speaker.strip()
+    #remove minister titles, these titles are special case because they may be followed by the ministry name 
     if speaker.find('שר ') == 0 or speaker.find('השר ') == 0 or speaker.find('השרה ') == 0 or speaker.find('שרת ') == 0:
-        speaker = speaker.replace('שר ', '').replace('השר ', '').replace('השרה ', '').replace('שרת ', '')
+        speaker = speaker.replace('השרה ', '').replace('שרת ', '').replace('השר ', '').replace('שר ', '')
         for pattern in patterns:
             ministry_name = re.search(pattern, speaker)
             if ministry_name and (ministry_name.group(0) in ministries or (ministry_name.group(0)[0] == 'ה' and ministry_name.group(0)[1:] in ministries)):
@@ -136,7 +136,7 @@ def extract_metada_from_name(file_name):
 def extract_metada_from_content(file_content):
     for paragraph in file_content.paragraphs:
         paragraph_stripped = paragraph.text.strip()
-        #iterates over the occurrences of the two string until it found a one that's followed by a number
+        #iterates over the occurrences of the two string until a one followed by a number found
         for word in ["הישיבה", "פרוטוקול מס'"]:
             while True:
                 word_idx = paragraph_stripped.find(word)
@@ -216,11 +216,11 @@ def sentence_tokenize(sentence):
             word += letter
         elif letter == '.' and i > 1 and (sentence[i-1].isdigit() or 'א' <= sentence[i-1] <= 'י') and sentence[i-2] == ' ':
             word += letter
-        elif letter in marks:
+        elif letter in marks: #a mark that don't any of the above criteria will be a single token 
             if word:
                 tokenized_sentence.append(word)
                 word = ''
-            if letter != ' ':
+            if letter != ' ': 
                 tokenized_sentence.append(letter)
         else:
             word += letter
@@ -237,16 +237,18 @@ def sentence_handle(protocol, curr_speaker, paragraph_txt):
     #remove tags from sentence 
     open_an_brac = paragraph_txt.find('<')
     close_an_brac = paragraph_txt.find('>')
-    while open_an_brac != -1 and close_an_brac != -1:
+    if close_an_brac != len(paragraph_txt) - 1 and paragraph_txt[close_an_brac + 1] == '>':
+        close_an_brac += 1 #in case it's >> not >
+    while open_an_brac != -1 and close_an_brac != -1 and open_an_brac < close_an_brac: 
         paragraph_txt = paragraph_txt[:open_an_brac] + paragraph_txt[close_an_brac+1:]
         open_an_brac = paragraph_txt.find('<')
-        close_an_brac = paragraph_txt.find('>')
-    curr_sentence = ''
+        close_an_brac = paragraph_txt.rfind('>')
+    curr_sentence = '' #initializing empty sentence 
     for i,letter in enumerate(paragraph_txt): 
         if curr_sentence == '' and letter == ' ': #to avoid a sentence starting with spaces 
             continue
         curr_sentence += letter
-        if letter in ['?', '!']:
+        if letter in ['?', '!']: # ? ! always define end of a sentence 
             if sentence_validity(curr_sentence):
                 curr_sentence = sentence_tokenize(curr_sentence)
                 if curr_sentence:
@@ -329,6 +331,9 @@ def read_files(folder):
     file_contents = {file_name: Document(file_path) for file_name, file_path in file_paths.items()}
     return file_names, file_paths, file_contents
 
+#a function that creates the JSONL file 
+#Input: list of protocols objects and file path where the JSONL file will be saved 
+#Output: JSONL file creation, in which each line contain a sentence and its metadata 
 def jsonl_make(protocols, file):
     with open(file, 'w', encoding = 'utf-8') as jsonl_file:
         for protocol in protocols:
