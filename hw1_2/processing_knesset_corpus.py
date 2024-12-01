@@ -48,7 +48,7 @@ titles_and_symbols = ['<', '>', 'היו"ר', 'היו”ר', 'יו"ר הכנסת'
                       'עו"ד', 'עו”ד', 'ד"ר', 'ד”ר', "פרופ'", 'נצ"מ', 'ניצב']
 invalid_names = {'2', 'ברצוני', 'כרצוני', 'רצוני', 'אני', 'אחרי', 'הצעת', 'המועצה', 'ביום', 
                  'בפסקה', 'פסקה', 'קריאה', 'קריאות', 'האפשרות', 'קוראת', 'קורא', 'הצעת', 'מסקנות', 
-                 'להלן', 'התקיימו', 'רשימת', 'במקום', 'מקריא'}
+                 'להלן', 'התקיימו', 'רשימת', 'במקום', 'מקריא', 'בסעיף'}
 patterns = [r'(\b\w+\b)[,\s]*(\b\w+\b)[,\s]*(\b\w+\b)[,\s]*(\b\w+\b)', 
             r'(\b\w+\b)[,\s]*(\b\w+\b)[,\s]*(\b\w+\b)', r'(\b\w+\b)[,\s]*(\b\w+\b)', r'(\b\w+\b)']
 digits_dict = {'אחת': 1, 'שתיים': 2, 'שתים' : 2, 'שלוש': 3, 'ארבע': 4, 'חמש': 5, 'חמיש': 5, 
@@ -297,7 +297,7 @@ def extract_relevant_text(file_content, protocol):
                 j += 1
             if 'בעד' in file_content.paragraphs[first_idx + j].text and 'נגד' in file_content.paragraphs[first_idx + j+1].text:
                 curr_speaker = None
-        #type 2 of sentences to exclude: those related to 'debate pause'. If it so, consider the paragraph irrelevant until there's a speaker
+        #type 2 of sentences to exclude: those related to 'debate pause'. If it so, consider the text irrelevant until there's a speaker
         if 'הישיבה נפסקה' in paragraph.text:
             curr_speaker = None
         paragraph_txt = paragraph.text.strip()
@@ -358,9 +358,9 @@ def main():
     #else:
     #    print("Creating the corpus ..\n")
     #folder_path = sys.argv[1] 
-    folder_path = "protocol_for_hw1" 
+    folder_path = "sepoctnov24_protocols" 
     #file = sys.argv[2] 
-    file = "habal.jsonl"
+    file = "sepoctnov24.jsonl"
     file_names, file_paths, file_contents = read_files(folder_path)
     protocols = []
     for file_name in sorted(file_names): 
