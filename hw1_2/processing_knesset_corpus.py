@@ -216,34 +216,33 @@ def sentence_validity(sentence):
     return True
 
 def sentence_tokenize(sentence):
-    marks = {';', '(', ')', ' ', '-', '–'}
+    marks = {';', '(', ')', ' ', '-', '–', '!', '?', '.', '"', ',', ':'}
     tokenized_sentence = []
     word = ''
     for i,letter in enumerate(sentence):
-        if letter in marks:
+        #the case when " is part of a word
+        if letter == '"' and i != 0 and i != len(sentence) - 1 and 'א' <= sentence[i-1] <= 'ת' and 'א' <= sentence[i+1] <= 'ת':
+            word += letter
+        #thse case when , is part of a number
+        elif letter == ',' and i != 0 and i != len(sentence) - 1 and sentence[i-1].isdigit() and sentence[i+1].isdigit():
+            word += letter
+        #the case when : is part of a term indicating time
+        elif letter == ':' and i != 0 and i <= len(sentence) - 3 and sentence[i-1].isdigit() and sentence[i+1].isdigit() and sentence[i+2].isdigit():
+            word += letter 
+        #the case when . is decimal point or part of date term
+        elif letter == '.' and i != 0 and i != len(sentence) - 1 and sentence[i-1].isdigit() and sentence[i+1].isdigit():
+            word += letter
+        #the case when . is a period preceded by a letter/number
+        elif letter == '.' and i == 1 and (sentence[i-1].isdigit() or 'א' <= sentence[i-1] <= 'י'):
+            word += letter
+        elif letter == '.' and i > 1 and (sentence[i-1].isdigit() or 'א' <= sentence[i-1] <= 'י') and sentence[i-2] == ' ':
+            word += letter
+        elif letter in marks:
             if word:
                 tokenized_sentence.append(word)
                 word = ''
             if letter != ' ':
                 tokenized_sentence.append(letter)
-        #the case when " is not part of the word
-        elif letter == '"' and (i == 0 or sentence[i-1] == ' ' or i == len(sentence)-1 or sentence[i+1] == ' '):
-            if word:
-                tokenized_sentence.append(word)
-                tokenized_sentence.append(letter)
-                word = ''
-        #the case when , is not part of a number 
-        elif letter == ',' and (i == 0 or i == len(sentence)-1 or not sentence[i-1].isdigit() or not sentence[i+1].isdigit()):
-            if word:
-                tokenized_sentence.append(word)
-                tokenized_sentence.append(letter)
-                word = ''
-        #the case when : is not part of a term indicating time
-        elif letter == ':' and (i == 0 or i > len(sentence) - 3 or not sentence[i-1].isdigit() or not sentence[i+1].isdigit() or not sentence[i+2].isdigit()):
-            if word:
-                tokenized_sentence.append(word)
-                tokenized_sentence.append(letter)
-                word = ''
         else:
             word += letter
     if word:
@@ -258,6 +257,9 @@ def sentence_tokenize(sentence):
 def sentence_handle(protocol, curr_speaker, paragraph_txt):
     curr_sentence = ''
     for i,letter in enumerate(paragraph_txt): 
+        if curr_sentence == '' and letter == ' ': #to avoid a sentence starting with spaces 
+            continue
+        curr_sentence += letter
         if letter in ['?', '!']:
             if sentence_validity(curr_sentence):
                 curr_sentence = sentence_tokenize(curr_sentence)
@@ -268,15 +270,15 @@ def sentence_handle(protocol, curr_speaker, paragraph_txt):
         elif letter == '.':
             #case 1: '.' is a decimal point, not considered as an end of a sentence
             if len(curr_sentence) > 0 and i != len(paragraph_txt) - 1 and curr_sentence[-1].isdigit() and paragraph_txt[i+1].isdigit():
-               curr_sentence += letter
-            #case 2: '.' is a period, precedeed by a number, not considered as an end of a sentence
+               continue
+            #case 2: '.' is a period, preceded by a number, not considered as an end of a sentence
             elif len(curr_sentence) > 2 and curr_sentence[-1].isdigit() and curr_sentence[-2] == ' ' and curr_sentence[-3] in [',' , ':']:
-                curr_sentence += letter
+                continue
             elif len(curr_sentence) == 1 and curr_sentence[-1].isdigit():
-                curr_sentence += letter
-            #case 3: '.' is a period, precedeed by a letter, not considered as an end of a sentence
+                continue
+            #case 3: '.' is a period, preceded by a letter, not considered as an end of a sentence
             elif len(curr_sentence) > 1 and  'א' <= curr_sentence[-1] <= 'י' and curr_sentence[-2] == ' ':
-                curr_sentence += letter
+                continue
             #case 4: '.' is an end of a sentence
             else:
                 if sentence_validity(curr_sentence):
@@ -285,8 +287,13 @@ def sentence_handle(protocol, curr_speaker, paragraph_txt):
                         sentence = Sentence(protocol.name, protocol.keneset, protocol.type, protocol.number, curr_speaker, curr_sentence)
                         protocol.add_sentence(curr_speaker, sentence)
                 curr_sentence = ''
-        elif not (letter == ' ' and curr_sentence == ''): #to avoid a sentence starting with spaces 
-            curr_sentence += letter
+    #handling the remaining text 
+    if sentence_validity(curr_sentence): 
+        curr_sentence = sentence_tokenize(curr_sentence)
+        if curr_sentence:
+            sentence = Sentence(protocol.name, protocol.keneset, protocol.type, protocol.number, curr_speaker, curr_sentence)
+            protocol.add_sentence(curr_speaker, sentence)
+
 
 #extracts the relevant sentences and arranges them according to protocol and speaker
 def extract_relevant_text(file_content, protocol):
@@ -362,7 +369,7 @@ def jsonl_make(protocols, file):
             for speaker, sentences in protocol.sentences.items():
                 speaker_f = speaker_full_name(speaker)
                 for sentence in sentences:
-                    sentence_data = {sentence.text}
+                    sentence_data = {"text": sentence.text}
                     jsonl_file.write(json.dumps(sentence_data, ensure_ascii=False) + '\n')
 
 import time
@@ -376,7 +383,7 @@ def main():
     #folder_path = sys.argv[1] 
     folder_path = "protocol_for_hw1" 
     #file = sys.argv[2] 
-    file = "corpus8.jsonl"
+    file = "corpus9.jsonl"
     file_names, file_paths, file_contents = read_files(folder_path)
     protocols = []
     for file_name in sorted(file_names): 
