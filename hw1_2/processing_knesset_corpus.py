@@ -324,7 +324,7 @@ def extract_relevant_text(file_content, protocol):
 #Input: path to a folder
 #Output: file names, paths, and contents for all .docx files in the folder
 def read_files(folder):
-    file_names = [file for file in os.listdir(folder) if file[-5:] == '.docx']
+    file_names = [file for file in os.listdir(folder) if (file[-5:] == '.docx' or file[-4:] == '.doc')]
     file_paths = {filename: os.path.join(folder, filename) for filename in file_names}
     file_contents = {file_name: Document(file_path) for file_name, file_path in file_paths.items()}
     return file_names, file_paths, file_contents
@@ -353,9 +353,9 @@ def main():
     #else:
     #    print("Creating the corpus ..\n")
     #folder_path = sys.argv[1] 
-    folder_path = "protocol_for_hw1" 
+    folder_path = "sepoctnov24_protocols" 
     #file = sys.argv[2] 
-    file = "corpus10.jsonl"
+    file = "corpus_sepoctnov24.jsonl"
     file_names, file_paths, file_contents = read_files(folder_path)
     protocols = []
     for file_name in sorted(file_names): 
