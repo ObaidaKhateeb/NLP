@@ -49,25 +49,11 @@ titles_and_symbols = ['<', '>', 'היו"ר', 'היו”ר', 'יו"ר הכנסת'
 invalid_names = {'2', 'ברצוני', 'כרצוני', 'רצוני', 'אני', 'אחרי', 'הצעת', 'המועצה', 'ביום', 
                  'בפסקה', 'קריאה', 'קריאות', 'האפשרות', 'קוראת', 'קורא', 'הצעת', 'מסקנות', 
                  'להלן'}
-name_duplicates = {"םשה גפני" : "משה גפני", "1 סאלח טריף" : "סאלח טריף", 
-                   "אופיר פינס" : "אופיר פינס פז", "י יוסף ג'בארין" : "יוסף ג'בארין", 
-                   "אורה עשאהל זילברשטיין" : "אורה עשהאל זילברשטיין", "שלי יחימוביץ'" : "שלי יחימוביץ", 
-                   'שמרית שקד גיטלין' : 'שמרית גיטלין שקד', "חוסנייה ג'בארה" : "חוסניה ג'בארה", 
-                   "חנא סוייד" : "חנא סוויד", "מיכאל נולדמן" : "מיכאל נודלמן", 
-                   "מל פולישוק בלוך" : "מלי פולישוק בלוך", "מריה רבינוביץ'" : "מריה רבינוביץ",
-                   "נאווה רצון" : "נאוה רצון", "נדיה חילו" : "נאדיה חילו", 
-                   "רובי ריבלין:" : "ראובן ריבלין", "רובי ריבלין": "ראובן ריבלין",
-                   "שימרית גיטלין שקד" : "שמרית גיטלין שקד", "אייל בן ראובן" : "איל בן ראובן",
-                   "מרים פרנקל שור" : "מירי פרנקל שור", "בצלאל סמוטריץ'" : "בצלאל סמוטריץ", 
-                   "בועז בועז מקלר" : "בועז מקלר", "יולי יואל אדלשטיין" : "יולי אדלשטיין", 
-                   "יוסף ביילין" : "יוסי ביילין", "רונית אנדרלט" : "רונית אנדוולט", 
-                   "אברהם בייגה שוחט" : "אברהם שוחט"}
 patterns = [r'(\b\w+\b)[,\s]*(\b\w+\b)[,\s]*(\b\w+\b)[,\s]*(\b\w+\b)', 
             r'(\b\w+\b)[,\s]*(\b\w+\b)[,\s]*(\b\w+\b)', r'(\b\w+\b)[,\s]*(\b\w+\b)', r'(\b\w+\b)']
 digits_dict = {'אחת': 1, 'שתיים': 2, 'שתים' : 2, 'שלוש': 3, 'ארבע': 4, 'חמש': 5, 'חמיש': 5, 
                'שש': 6, 'שיש': 6, 'שבע': 7, 'שמונה': 8, 'תשע': 9, 'עשר': 10, 'עשרים': 20, 
                'שמונים': 80, 'מאה': 100, 'מאתיים': 200, 'אלף': 1000}
-speakers_dict = {}
 
 #Helper method for 'extract_metada_from_content'. It checks if the given string represent an integer number, and if yes, it return its integer value
 #Input: String of number which can be numeric or as hebrew word
@@ -318,12 +304,7 @@ def extract_relevant_text(file_content, protocol):
             paragraph_txt_cleaned = speakerClean(paragraph_txt)[:-1].strip()
             first_string = re.search(r'\b\w+\b', paragraph_txt_cleaned)
             if len(paragraph_txt_cleaned.split()) < 6 and first_string and first_string.group(0) not in invalid_names:
-                curr_speaker = paragraph_txt_cleaned if paragraph_txt_cleaned not in name_duplicates else name_duplicates[paragraph_txt_cleaned]
-                curr_speaker_last = curr_speaker.split()[-1]
-                if curr_speaker_last in speakers_dict:
-                    speakers_dict[curr_speaker_last].append(curr_speaker)
-                else:
-                    speakers_dict[curr_speaker_last] = [curr_speaker]
+                curr_speaker = paragraph_txt_cleaned
             elif curr_speaker: #deal with it as speech
                 sentence_handle(protocol, curr_speaker, paragraph_txt)
         elif ':' in paragraph_txt:
@@ -332,28 +313,13 @@ def extract_relevant_text(file_content, protocol):
                 paragraph_txt_cleaned = pot_curr_speaker[:-1].strip()
                 first_string = re.search(r'\b\w+\b', paragraph_txt_cleaned)
                 if len(paragraph_txt_cleaned.split()) < 6 and first_string and first_string.group(0) not in invalid_names:
-                    curr_speaker = paragraph_txt_cleaned if paragraph_txt_cleaned not in name_duplicates else name_duplicates[paragraph_txt_cleaned]
-                    curr_speaker_last = curr_speaker.split()[-1]
-                    if curr_speaker_last in speakers_dict:
-                        speakers_dict[curr_speaker_last].append(curr_speaker)
-                    else:
-                        speakers_dict[curr_speaker_last] = [curr_speaker]
+                    curr_speaker = paragraph_txt_cleaned
                 elif curr_speaker: #deal with it as speech
                     sentence_handle(protocol, curr_speaker, paragraph_txt)
             elif curr_speaker: #else deal with it as a speech 
                 sentence_handle(protocol, curr_speaker, paragraph_txt)
         elif curr_speaker:
             sentence_handle(protocol, curr_speaker, paragraph_txt)
-
-def speaker_full_name(speaker1):
-    speaker1_splitted = speaker1.split()
-    if not len(speaker1_splitted[0]) == 2 or not speaker1_splitted[0][1] == "'" or not len(speaker1_splitted) > 1:
-        return speaker1
-    for speaker2 in speakers_dict[speaker1_splitted[-1]]:
-        speaker2_splitted = speaker2.split()
-        if len(speaker2_splitted[0]) >= 2 and speaker2_splitted[0][1] != "'" and len(speaker2_splitted) > 1 and speaker1_splitted[0][0] == speaker2_splitted[0][0] and speaker1_splitted[-1] == speaker2_splitted[-1]:
-            return speaker2
-    return speaker1
 
 #Input: path to a folder
 #Output: file names, paths, and contents for all .docx files in the folder
@@ -367,9 +333,15 @@ def jsonl_make(protocols, file):
     with open(file, 'w', encoding = 'utf-8') as jsonl_file:
         for protocol in protocols:
             for speaker, sentences in protocol.sentences.items():
-                speaker_f = speaker_full_name(speaker)
                 for sentence in sentences:
-                    sentence_data = {"text": sentence.text}
+                    sentence_data = {
+                        "protocol_name": sentence.protocol_name,
+                        "knesset_number": sentence.keneset,
+                        "protocol_type": sentence.protocol_type,
+                        "protocol_number": sentence.protocol_no,
+                        "speaker_name": sentence.speaker,
+                        "sentence_text": sentence.text
+                    }
                     jsonl_file.write(json.dumps(sentence_data, ensure_ascii=False) + '\n')
 
 import time
@@ -383,7 +355,7 @@ def main():
     #folder_path = sys.argv[1] 
     folder_path = "protocol_for_hw1" 
     #file = sys.argv[2] 
-    file = "corpus9.jsonl"
+    file = "corpus10.jsonl"
     file_names, file_paths, file_contents = read_files(folder_path)
     protocols = []
     for file_name in sorted(file_names): 
