@@ -39,7 +39,7 @@ ministries = {'התשתיות הלאומיות', 'התשתיות', 'המשטרה
               'הבינוי והשיכון', 'העבודה, הרווחה והשירותים החברתיים', 'העבודה והרווחה', 
               'העבודה', 'הרווחה', 'התעשייה והמסחר', 'התעשייה, המסחר והתעסוקה', 'התיירות', 
               'המדע והטכנולוגיה', 'הפנים', 'המדע, התרבות והספורט', 'התרבות והספורט', 
-              'האנרגיה והמים', 'לענייני דתות', 'במשרד ראש הממשלה', 
+              'האנרגיה והמים', 'האנרגיה והתשתיות', 'לענייני דתות', 'במשרד ראש הממשלה', 
               'לנושאים אסטרטגיים ולענייני מודיעין', 'לקליטת העלייה', 'לאזרחים ותיקים', 
               'במשרד', 'הביטחון', 'המודיעין', 'התקשורת', 'התשתיות הלאומיות, האנרגיה והמים'}
 titles_and_symbols = ['<', '>', 'היו"ר', 'היו”ר', 'יו"ר הכנסת', 'יו”ר הכנסת', 
@@ -47,8 +47,8 @@ titles_and_symbols = ['<', '>', 'היו"ר', 'היו”ר', 'יו"ר הכנסת'
                       'מזכיר הכנסת', 'מזכירת הכנסת', 'תשובת', 'המשנה לראש הממשלה', 'ראש הממשלה', 
                       'עו"ד', 'עו”ד', 'ד"ר', 'ד”ר', "פרופ'", 'נצ"מ', 'ניצב']
 invalid_names = {'2', 'ברצוני', 'כרצוני', 'רצוני', 'אני', 'אחרי', 'הצעת', 'המועצה', 'ביום', 
-                 'בפסקה', 'קריאה', 'קריאות', 'האפשרות', 'קוראת', 'קורא', 'הצעת', 'מסקנות', 
-                 'להלן'}
+                 'בפסקה', 'פסקה', 'קריאה', 'קריאות', 'האפשרות', 'קוראת', 'קורא', 'הצעת', 'מסקנות', 
+                 'להלן', 'התקיימו', 'רשימת', 'במקום', 'מקריא'}
 patterns = [r'(\b\w+\b)[,\s]*(\b\w+\b)[,\s]*(\b\w+\b)[,\s]*(\b\w+\b)', 
             r'(\b\w+\b)[,\s]*(\b\w+\b)[,\s]*(\b\w+\b)', r'(\b\w+\b)[,\s]*(\b\w+\b)', r'(\b\w+\b)']
 digits_dict = {'אחת': 1, 'שתיים': 2, 'שתים' : 2, 'שלוש': 3, 'ארבע': 4, 'חמש': 5, 'חמיש': 5, 
@@ -94,12 +94,14 @@ def speakerClean(speaker):
     #remove the party name
     open_brac = speaker.find('(')
     close_brac = speaker.find(')')
-    if open_brac != -1 and close_brac != -1:
+    while open_brac != -1 and close_brac != -1:
         speaker = speaker[:open_brac] + speaker[close_brac+1:]
+        open_brac = speaker.find('(')
+        close_brac = speaker.find(')')
     #remove the tag
     open_an_brac = speaker.find('<<')
     close_an_brac = speaker.find('>>')
-    while(open_an_brac != -1 and close_an_brac != -1):
+    while open_an_brac != -1 and close_an_brac != -1:
         speaker = speaker[:open_an_brac] + speaker[close_an_brac+1:]
         open_an_brac = speaker.find('<<')
         close_an_brac = speaker.find('>>')
@@ -110,24 +112,15 @@ def speakerClean(speaker):
     speaker = speaker.replace('-', ' ')
     #replace multi spaces by one space
     speaker = speaker.replace('     ', ' ').replace('    ', ' ').replace('   ', ' ').replace('  ', ' ')
-    #remove minister titles, these titles are special case because they can be followed by the ministry name 
-    if 'השר ' in speaker or 'שרת ' in speaker or 'השרה ' in speaker:     
-        speaker = speaker.replace('השרה ','').replace('השר ','').replace('שרת ','').replace('שר ','')
-        for pattern in patterns:
-            ministry_name = re.search(pattern, speaker)
-            if ministry_name and ministry_name.group(0) in ministries:
-                speaker = speaker[ministry_name.end():].strip()
-                break
+    #remove minister titles, these titles are special case because they may be followed by the ministry name 
     speaker = speaker.strip()
-    #remove minister title only if it appears in the beginning, this to avoid ditortion of first names ends with this suffix like 'Asher'
-    if 'שר ' in speaker and speaker.find('שר ') == 0: 
-        speaker = speaker.replace('שר ', '')
+    if speaker.find('שר ') == 0 or speaker.find('השר ') == 0 or speaker.find('השרה ') == 0 or speaker.find('שרת ') == 0:
+        speaker = speaker.replace('שר ', '').replace('השר ', '').replace('השרה ', '').replace('שרת ', '')
         for pattern in patterns:
             ministry_name = re.search(pattern, speaker)
-            if ministry_name and ministry_name.group(0) in ministries:
+            if ministry_name and (ministry_name.group(0) in ministries or (ministry_name.group(0)[0] == 'ה' and ministry_name.group(0)[1:] in ministries)):
                 speaker = speaker[ministry_name.end():].strip()
                 break
-        speaker = speaker.strip()
     return speaker
 
 #Input: file/protocol name
@@ -241,6 +234,13 @@ def sentence_tokenize(sentence):
 
 #helper method for for extract_relevant_text that creates a sentence object and add it to the relevant protocol 
 def sentence_handle(protocol, curr_speaker, paragraph_txt):
+    #remove tags from sentence 
+    open_an_brac = paragraph_txt.find('<')
+    close_an_brac = paragraph_txt.find('>')
+    while open_an_brac != -1 and close_an_brac != -1:
+        paragraph_txt = paragraph_txt[:open_an_brac] + paragraph_txt[close_an_brac+1:]
+        open_an_brac = paragraph_txt.find('<')
+        close_an_brac = paragraph_txt.find('>')
     curr_sentence = ''
     for i,letter in enumerate(paragraph_txt): 
         if curr_sentence == '' and letter == ' ': #to avoid a sentence starting with spaces 
@@ -353,9 +353,9 @@ def main():
     #else:
     #    print("Creating the corpus ..\n")
     #folder_path = sys.argv[1] 
-    folder_path = "sepoctnov24_protocols" 
+    folder_path = "protocol_for_hw1" 
     #file = sys.argv[2] 
-    file = "corpus_sepoctnov24.jsonl"
+    file = "habal.jsonl"
     file_names, file_paths, file_contents = read_files(folder_path)
     protocols = []
     for file_name in sorted(file_names): 
