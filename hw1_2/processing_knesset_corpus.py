@@ -41,9 +41,7 @@ titles_and_symbols = ['<', '>', 'היו"ר', 'היו”ר', 'יו"ר הכנסת'
                       'יו"ר ועדת הכנסת', 'יו”ר ועדת הכנסת', 'מ"מ', 'מ”מ', 'סגן', 'סגנית', 
                       'מזכיר הכנסת', 'מזכירת הכנסת', 'תשובת', 'המשנה לראש הממשלה', 'ראש הממשלה', 
                       'עו"ד', 'עו”ד', 'ד"ר', 'ד”ר', "פרופ'", 'נצ"מ', 'ניצב']
-invalid_names = {'2', 'ברצוני', 'כרצוני', 'רצוני', 'אני', 'אחרי', 'הצעת', 'המועצה', 'ביום', 
-                 'בפסקה', 'פסקה', 'קריאה', 'קריאות', 'האפשרות', 'קוראת', 'קורא', 'הצעת', 'מסקנות', 
-                 'להלן', 'התקיימו', 'רשימת', 'במקום', 'מקריא', 'בסעיף', 'התקיים', 'בעניין', 'בפנייה'}
+invalid_names = {'ביום', 'קריאות', 'קריאה'}
 digits_dict = {'אחת': 1, 'שתיים': 2, 'שתים' : 2, 'שלוש': 3, 'ארבע': 4, 'חמש': 5, 'חמיש': 5, 
                'שש': 6, 'שיש': 6, 'שבע': 7, 'שמונה': 8, 'תשע': 9, 'עשר': 10, 'עשרים': 20, 
                'שמונים': 80, 'מאה': 100, 'מאתיים': 200, 'אלף': 1000}
@@ -104,7 +102,7 @@ def speakerClean(speaker):
     #replace the ',' by a space
     speaker = speaker.replace(',', ' ')
     #replace multi spaces by one space
-    speaker = ' '.join(speaker.split()).strip()
+    speaker = ' '.join(speaker.split())
     #strip and remove '-' at the beginning and end of a speaker's name 
     speaker = speaker.strip('-')
     #remove minister titles, these titles are special case because they may be followed by the ministry name 
@@ -112,7 +110,7 @@ def speakerClean(speaker):
         speaker = speaker.replace('השרה ', '').replace('שרת ', '').replace('השר ', '').replace('שר ', '')
         speaker_splitted = speaker.split()
         idx_to_cut = 0
-        while speaker_splitted and speaker_splitted[idx_to_cut] in ministries or (speaker_splitted[idx_to_cut][0] in ['ל', 'ו', 'ה'] and speaker_splitted[idx_to_cut][1:] in ministries):
+        while idx_to_cut < len(speaker_splitted) and speaker_splitted[idx_to_cut] in ministries or (speaker_splitted[idx_to_cut][0] in ['ל', 'ו', 'ה'] and speaker_splitted[idx_to_cut][1:] in ministries):
             idx_to_cut += 1 
         speaker = ' '.join(speaker_splitted[idx_to_cut:])
     return speaker
@@ -120,111 +118,86 @@ def speakerClean(speaker):
 #Input: file/protocol name
 # Output: The keneset number to where the protocol relates, protocol type       
 def extract_metada_from_name(file_name):
-    file_name_splitted = file_name.split('_')
-    keneset_no = int(file_name_splitted[0])
-    protocol_type = 'committee' if file_name_splitted[1][-1] == 'v' else 'plenary' if file_name_splitted[1][-1] == 'm' else None
-    return keneset_no, protocol_type
+    try:
+        file_name_splitted = file_name.split('_')
+        keneset_no = int(file_name_splitted[0])
+        protocol_type = 'committee' if file_name_splitted[1][-1] == 'v' else 'plenary' if file_name_splitted[1][-1] == 'm' else None
+        return keneset_no, protocol_type
+    except (IndexError, ValueError) as e:
+        print(f"Failed to extract metadata from {file_name}: {e}") 
 
 #Input: .docx file of a protocol
 #Output: protocol number if found, -1 otherwise. 
 def extract_metada_from_content(file_content):
-    for paragraph in file_content.paragraphs:
-        paragraph_stripped = paragraph.text.strip()
-        #iterates over the occurrences of the two string until a one followed by a number found
-        for word in ["הישיבה", "פרוטוקול מס'"]:
-            while True:
-                word_idx = paragraph_stripped.find(word)
-                if word_idx != -1:
-                    paragraph_stripped = paragraph_stripped[word_idx+len(word):] #slicing the paragraph to the part after the occurence
-                    paragraph_words = paragraph_stripped.split()
-                    if paragraph_words:
-                        string_to_int = convertToInt(paragraph_words[0]) #if the string followed by a number it should be the first in the new sliced paragraph
-                    else:
-                        continue
-                    if string_to_int != -1: #if a number identified after the string
-                        return string_to_int 
-                    else:
-                        continue 
-                else:
-                    break
+    try:
+        for paragraph in file_content.paragraphs:
+            paragraph_stripped = paragraph.text.strip()
+            #iterates over the occurrences of the two string until a one followed by a number found
+            for word in ["הישיבה", "פרוטוקול מס'"]:
+                while True:
+                    try:
+                        word_idx = paragraph_stripped.find(word)
+                        if word_idx != -1:
+                            paragraph_stripped = paragraph_stripped[word_idx+len(word):] #slicing the paragraph to the part after the occurence
+                            paragraph_words = paragraph_stripped.split()
+                            if paragraph_words:
+                                string_to_int = convertToInt(paragraph_words[0]) #if the string followed by a number it should be the first in the new sliced paragraph
+                            else:
+                                continue
+                            if string_to_int != -1: #if a number identified after the string
+                                return string_to_int 
+                            else:
+                                continue 
+                        else:
+                            break
+                    except Exception as e:
+                        print(f"Error in procssing the paragraph text: {e}")
+    except AttributeError as e:
+        print(f"Invalid file content: {e}")
+    except Exception as e:
+        print(f"Unexpected error")
     return -1
 
-def clean_text(text):
-    """
-    Cleans excessive whitespace from the text.
-    """
-    return ' '.join(text.split()).strip()
-
-
-def extract_hidden_markers(text):
-    """
-    Extracts and handles hidden markers like `<< >>`, `< >`, and nested markers in the text.
-    """
-    # Regex to handle both `< >`, `<< >>`, and combined markers robustly
-    marker_pattern = r"<<[^<>]*?>>"
-    return re.sub(marker_pattern, '', text).strip()
-
+#checks if the paragraph or part of it is underlined
 def is_underlined(paragraph):
-    """
-    Checks if a paragraph or any of its runs are underlined.
-    """
-    # Check paragraph style for underline
+    #checking paragraph style for underline
     par_style = paragraph.style
     while par_style:
         if hasattr(par_style, 'font') and par_style.font.underline:
             return True
         par_style = par_style.base_style
-
-    # Check individual runs for underline
+    #Checking individual runs for underline
     for run in paragraph.runs:
         if run.font and run.font.underline:
             return True
-
-    # No underline found
     return False
 
 #helper method for for extract_relevant_text, it identifies the start of the relevant text
 #Input: .docx file of a protocol
 #Output: index of the first relevant paragraph
 def find_starting_relevant(document):
-    """
-    Dynamically identifies the first relevant paragraph in a `Document` object.
-
-    Args:
-        document (Document): A loaded `Document` object from python-docx.
-
-    Returns:
-        int: Index of the first relevant paragraph, or 0 if none is found.
-    """
+    skip_keywords = {
+    'רישום פרלמנטרי', 'סדר היום', 'מוזמנים', 'משרד האוצר', 'נכחו',
+    'רשמת פרלמנטרית', 'רשמה וערכה', 'ייעוץ משפטי', 'חברי הוועדה',
+    'חברי כנסת', 'יועצת משפטית', 'יועץ משפטי', 'מנהל הוועדה',
+    'מנהלת הוועדה', 'מזכירת הוועדה', 'הגילויים החדשים', 'הצבעה',
+    'קצרנית', 'מנהל/ת הוועדה', 'משרד המשפטים', 'סדר-היום', 'נוכחים',
+    'משתתפים (באמצעים מקוונים)', 'חברי הכנסת', 'משתתפים באמצעים מקוונים', 'מנהלות הוועדה', ':סדר היום', 'סדר היום:',
+    'שינויים', 'הכנסת', 'הכנסת:', 'הכנסה', 'ועדה לדיון', 'הצעת חוק', 'מנהלי הוועדה', 'מנהלי הוועדה:'}
     try:
-        # Define skip keywords
-        skip_keywords = {
-            'רישום פרלמנטרי', 'סדר היום', 'מוזמנים', 'משרד האוצר', 'נכחו',
-            'רשמת פרלמנטרית', 'רשמה וערכה', 'ייעוץ משפטי', 'חברי הוועדה',
-            'חברי כנסת', 'יועצת משפטית', 'יועץ משפטי', 'מנהל הוועדה',
-            'מנהלת הוועדה', 'מזכירת הוועדה', 'הגילויים החדשים', 'הצבעה',
-            'קצרנית', 'מנהל/ת הוועדה', 'משרד המשפטים', 'סדר-היום', 'נוכחים',
-            'משתתפים (באמצעים מקוונים)', 'חברי הכנסת', 'משתתפים באמצעים מקוונים', 'מנהלות הוועדה', ':סדר היום', 'סדר היום:',
-            'שינויים', 'הכנסת', 'הכנסת:', 'הכנסה', 'ועדה לדיון', 'הצעת חוק', 'מנהלי הוועדה', 'מנהלי הוועדה:'
-        }
-
-        # Iterate over paragraphs to find the first relevant speaker
+        #iterating over the paragraph until the new speaker is found 
         for idx, paragraph in enumerate(document.paragraphs):
-            original_text = clean_text(paragraph.text)
-            text = extract_hidden_markers(original_text)
-
-            # Check if the cleaned text still contains any skip keywords
-            if any(keyword in text for keyword in skip_keywords):
+            text = ' '.join(paragraph.text.split()).strip() #getting rid of multi-spaces 
+            text = re.sub(r"<<[^<>]*?>>", '', text).strip() #getting rid of tags 
+            if any(keyword in text for keyword in skip_keywords): #skipping common non-speakers underlined words 
                 continue
 
-            # Check if the paragraph ends with ':' or '>' and is underlined
             if (text.endswith(':') or text.endswith('>')) and is_underlined(paragraph):
                 return idx
 
-        # If no relevant paragraph is found, return 0
-        return 0
+        return 0 
     except Exception as e:
-        print(f"Error in find_starting_relevant: {e}")
+        print(f"Error in finding the first relevant sentence: {e}")
         return 0
 
 
@@ -360,7 +333,7 @@ def extract_relevant_text(file_content, protocol):
             curr_speaker = None
         paragraph_txt = paragraph.text.strip()
         #meeting one of the first two if's making the paragraph as potential speaker's name
-        if paragraph_txt.endswith(':') or paragraph_txt.endswith(':>'):
+        if (paragraph_txt.endswith(':') or paragraph_txt.endswith(':>')) and is_underlined(paragraph):
             paragraph_txt_cleaned = speakerClean(paragraph_txt)[:-1].strip()
             first_string = re.search(r'\b\w+\b', paragraph_txt_cleaned)
             if len(paragraph_txt_cleaned.split()) < 6 and first_string and first_string.group(0) not in invalid_names:
@@ -369,7 +342,7 @@ def extract_relevant_text(file_content, protocol):
                 sentence_handle(protocol, curr_speaker, paragraph_txt)
         elif ':' in paragraph_txt:
             pot_curr_speaker = speakerClean(paragraph_txt)
-            if pot_curr_speaker.endswith(':'):
+            if pot_curr_speaker.endswith(':') and is_underlined(paragraph):
                 paragraph_txt_cleaned = pot_curr_speaker[:-1].strip()
                 first_string = re.search(r'\b\w+\b', paragraph_txt_cleaned)
                 if len(paragraph_txt_cleaned.split()) < 6 and first_string and first_string.group(0) not in invalid_names:
@@ -391,12 +364,14 @@ def read_files(folder):
         for file_name, file_path in file_paths.items():
             try: 
                 file_contents[file_name] = Document(file_path)
-            except:
+            except Exception as e:
                 print(f"Failed to read file {file_name} ")
                 file_names.remove(file_name)
         return file_names, file_contents
     except FileNotFoundError:
         print(f"Folder {folder} is not exist")
+    except Exception as e:
+        print(f"Error: {e}")
 
 #a function that creates the JSONL file 
 #Input: list of protocols objects and file path where the JSONL file will be saved 
@@ -419,15 +394,15 @@ def jsonl_make(protocols, file):
 import time
 def main():
     start_t = time.time()
-    #if len(sys.argv) != 3:
-    #    print("Error: Incorrect # of arguments.\n")
-    #    sys.exit(1)
-    #else:
-    #    print("Creating the corpus ..\n")
-    #folder_path = sys.argv[1] 
-    folder_path = "protocol_for_hw1" 
-    #file = sys.argv[2] 
-    file = "corpus.jsonl"
+    if len(sys.argv) != 3:
+        print("Error: Incorrect # of arguments.\n")
+        sys.exit(1)
+    else:
+        print("Creating the corpus ..\n")
+    folder_path = sys.argv[1] 
+    #folder_path = "protocol_for_hw1" 
+    file = sys.argv[2] 
+    #file = "corpus4.jsonl"
     file_names, file_contents = read_files(folder_path)
     protocols = []
     for file_name in sorted(file_names): 
@@ -436,7 +411,7 @@ def main():
         protocol = Protocol(file_name, keneset_no, protocol_type, protocol_no)
         protocols.append(protocol)
         extract_relevant_text(file_contents[file_name], protocol)
-        protocol.check()
+        #protocol.check()
     jsonl_make(protocols, file)
     end_t = time.time()
     print(end_t - start_t)
