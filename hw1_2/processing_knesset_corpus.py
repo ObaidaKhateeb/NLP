@@ -32,16 +32,11 @@ class Protocol:
         for key in sorted_keys:
             print(key)
 
-ministries = {'התשתיות הלאומיות', 'התשתיות', 'המשטרה', 'לביטחון פנים', 'לביטחון הפנים', 
-              'לאיכות הסביבה', 'להגנת הסביבה', 'החינוך, התרבות והספורט', 'החינוך והתרבות', 
-              'החינוך', 'התחבורה והבטיחות בדרכים', 'התחבורה', 'האוצר', 'הכלכלה והתעשייה', 'הכלכלה והתכנון', 
-              'הכלכלה', 'המשפטים', 'הבריאות', 'החקלאות ופיתוח הכפר', 'החקלאות', 'החוץ', 
-              'הבינוי והשיכון', 'העבודה, הרווחה והשירותים החברתיים', 'העבודה והרווחה', 
-              'העבודה', 'הרווחה', 'התעשייה והמסחר', 'התעשייה, המסחר והתעסוקה', 'התיירות', 
-              'המדע והטכנולוגיה', 'הפנים', 'המדע, התרבות והספורט', 'התרבות והספורט', 
-              'האנרגיה והמים', 'האנרגיה והתשתיות', 'לענייני דתות', 'במשרד ראש הממשלה', 
-              'לנושאים אסטרטגיים ולענייני מודיעין', 'לקליטת העלייה', 'לאזרחים ותיקים', 
-              'במשרד', 'הביטחון', 'המודיעין', 'התקשורת', 'התשתיות הלאומיות, האנרגיה והמים'}
+ministries = {'התשתיות', 'הלאומיות', 'האנרגיה', 'המים', 'המשטרה', 'ביטחון', 'פנים', 'איכות', 'הגנת', 
+              'הסביבה', 'החינוך', 'התרבות', 'הספורט', 'המדע', 'הטכנולוגיה', 'התחבורה', 'הבטיחות', 
+              'בדרכים', 'האוצר', 'הכלכלה', 'התכנון', 'התעשייה', 'המסחר', 'התעסוקה', 'התיירות', 'הבריאות', 'החקלאות', 'פיתוח', 'הכפר', 'הבינוי', 'השיכון', 'העבודה', 'הרווחה', 
+              'השירותים', 'החברתיים', 'לענייני', 'דתות', 'במשרד', 'ראש', 'הממשלה', 'לנושאים', 
+              'אסטרטגיים', 'מודיעין', 'לקליטת', 'העלייה', 'לאזרחים', 'ותיקים', 'התקשורת', 'משפטים', 'חוץ'}
 titles_and_symbols = ['<', '>', 'היו"ר', 'היו”ר', 'יו"ר הכנסת', 'יו”ר הכנסת', 
                       'יו"ר ועדת הכנסת', 'יו”ר ועדת הכנסת', 'מ"מ', 'מ”מ', 'סגן', 'סגנית', 
                       'מזכיר הכנסת', 'מזכירת הכנסת', 'תשובת', 'המשנה לראש הממשלה', 'ראש הממשלה', 
@@ -49,8 +44,6 @@ titles_and_symbols = ['<', '>', 'היו"ר', 'היו”ר', 'יו"ר הכנסת'
 invalid_names = {'2', 'ברצוני', 'כרצוני', 'רצוני', 'אני', 'אחרי', 'הצעת', 'המועצה', 'ביום', 
                  'בפסקה', 'פסקה', 'קריאה', 'קריאות', 'האפשרות', 'קוראת', 'קורא', 'הצעת', 'מסקנות', 
                  'להלן', 'התקיימו', 'רשימת', 'במקום', 'מקריא', 'בסעיף', 'התקיים', 'בעניין', 'בפנייה'}
-patterns = [r'(\b\w+\b)[,\s]*(\b\w+\b)[,\s]*(\b\w+\b)[,\s]*(\b\w+\b)', 
-            r'(\b\w+\b)[,\s]*(\b\w+\b)[,\s]*(\b\w+\b)', r'(\b\w+\b)[,\s]*(\b\w+\b)', r'(\b\w+\b)']
 digits_dict = {'אחת': 1, 'שתיים': 2, 'שתים' : 2, 'שלוש': 3, 'ארבע': 4, 'חמש': 5, 'חמיש': 5, 
                'שש': 6, 'שיש': 6, 'שבע': 7, 'שמונה': 8, 'תשע': 9, 'עשר': 10, 'עשרים': 20, 
                'שמונים': 80, 'מאה': 100, 'מאתיים': 200, 'אלף': 1000}
@@ -109,18 +102,18 @@ def speakerClean(speaker):
     for element in titles_and_symbols:
         speaker = speaker.replace(element, '')
     #replace the '-' by a space
-    speaker = speaker.replace('-', ' ')
+    speaker = speaker.replace('-', ' ').replace(',', ' ')
     #replace multi spaces by one space
-    speaker = speaker.replace('     ', ' ').replace('    ', ' ').replace('   ', ' ').replace('  ', ' ')
+    speaker = ' '.join(speaker.split()).strip()
     speaker = speaker.strip()
     #remove minister titles, these titles are special case because they may be followed by the ministry name 
     if speaker.find('שר ') == 0 or speaker.find('השר ') == 0 or speaker.find('השרה ') == 0 or speaker.find('שרת ') == 0:
         speaker = speaker.replace('השרה ', '').replace('שרת ', '').replace('השר ', '').replace('שר ', '')
-        for pattern in patterns:
-            ministry_name = re.search(pattern, speaker)
-            if ministry_name and (ministry_name.group(0) in ministries or (ministry_name.group(0)[0] == 'ה' and ministry_name.group(0)[1:] in ministries)):
-                speaker = speaker[ministry_name.end():].strip()
-                break
+        speaker_splitted = speaker.split()
+        idx_to_cut = 0
+        while speaker_splitted and speaker_splitted[idx_to_cut] in ministries or (speaker_splitted[idx_to_cut][0] in ['ל', 'ו', 'ה'] and speaker_splitted[idx_to_cut][1:] in ministries):
+            idx_to_cut += 1 
+        speaker = ' '.join(speaker_splitted[idx_to_cut:])
     return speaker
 
 #Input: file/protocol name
@@ -155,10 +148,6 @@ def extract_metada_from_content(file_content):
                     break
     return -1
 
-#helper method for for extract_relevant_text, it identifies the start of the relevant text
-#Input: .docx file of a protocol
-#Output: index of the first relevant paragraph
-
 def clean_text(text):
     """
     Cleans excessive whitespace from the text.
@@ -173,7 +162,6 @@ def extract_hidden_markers(text):
     # Regex to handle both `< >`, `<< >>`, and combined markers robustly
     marker_pattern = r"<<[^<>]*?>>"
     return re.sub(marker_pattern, '', text).strip()
-
 
 def is_underlined(paragraph):
     """
@@ -194,6 +182,9 @@ def is_underlined(paragraph):
     # No underline found
     return False
 
+#helper method for for extract_relevant_text, it identifies the start of the relevant text
+#Input: .docx file of a protocol
+#Output: index of the first relevant paragraph
 def find_starting_relevant(document):
     """
     Dynamically identifies the first relevant paragraph in a `Document` object.
