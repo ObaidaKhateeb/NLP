@@ -158,17 +158,83 @@ def extract_metada_from_content(file_content):
 #helper method for for extract_relevant_text, it identifies the start of the relevant text
 #Input: .docx file of a protocol
 #Output: index of the first relevant paragraph
-def find_starting_relevant(file_content): 
-    default_idx = 0
-    for i in range(len(file_content.paragraphs)):
-        paragraph_txt = file_content.paragraphs[i].text.strip()
-        if (paragraph_txt.startswith('היו"ר') or paragraph_txt.startswith('היו”ר') or paragraph_txt.startswith('יו"ר הכנסת') or paragraph_txt.startswith('יו”ר הכנסת') or paragraph_txt.startswith('מ"מ היו"ר') or paragraph_txt.startswith('מ”מ היו”ר')) and paragraph_txt.endswith(':'):
-            return i
-        elif paragraph_txt.startswith('<< יור >>') and paragraph_txt.endswith('<< יור >>'):
-            return i
-        elif paragraph_txt.startswith('<היו"ר') and paragraph_txt.endswith(':>'):
-            return i
-    return default_idx
+
+def clean_text(text):
+    """
+    Cleans excessive whitespace from the text.
+    """
+    return ' '.join(text.split()).strip()
+
+
+def extract_hidden_markers(text):
+    """
+    Extracts and handles hidden markers like `<< >>`, `< >`, and nested markers in the text.
+    """
+    # Regex to handle both `< >`, `<< >>`, and combined markers robustly
+    marker_pattern = r"<<[^<>]*?>>"
+    return re.sub(marker_pattern, '', text).strip()
+
+
+def is_underlined(paragraph):
+    """
+    Checks if a paragraph or any of its runs are underlined.
+    """
+    # Check paragraph style for underline
+    par_style = paragraph.style
+    while par_style:
+        if hasattr(par_style, 'font') and par_style.font.underline:
+            return True
+        par_style = par_style.base_style
+
+    # Check individual runs for underline
+    for run in paragraph.runs:
+        if run.font and run.font.underline:
+            return True
+
+    # No underline found
+    return False
+
+def find_starting_relevant(document):
+    """
+    Dynamically identifies the first relevant paragraph in a `Document` object.
+
+    Args:
+        document (Document): A loaded `Document` object from python-docx.
+
+    Returns:
+        int: Index of the first relevant paragraph, or 0 if none is found.
+    """
+    try:
+        # Define skip keywords
+        skip_keywords = {
+            'רישום פרלמנטרי', 'סדר היום', 'מוזמנים', 'משרד האוצר', 'נכחו',
+            'רשמת פרלמנטרית', 'רשמה וערכה', 'ייעוץ משפטי', 'חברי הוועדה',
+            'חברי כנסת', 'יועצת משפטית', 'יועץ משפטי', 'מנהל הוועדה',
+            'מנהלת הוועדה', 'מזכירת הוועדה', 'הגילויים החדשים', 'הצבעה',
+            'קצרנית', 'מנהל/ת הוועדה', 'משרד המשפטים', 'סדר-היום', 'נוכחים',
+            'משתתפים (באמצעים מקוונים)', 'חברי הכנסת', 'משתתפים באמצעים מקוונים', 'מנהלות הוועדה', ':סדר היום', 'סדר היום:',
+            'שינויים', 'הכנסת', 'הכנסת:', 'הכנסה', 'ועדה לדיון', 'הצעת חוק', 'מנהלי הוועדה', 'מנהלי הוועדה:'
+        }
+
+        # Iterate over paragraphs to find the first relevant speaker
+        for idx, paragraph in enumerate(document.paragraphs):
+            original_text = clean_text(paragraph.text)
+            text = extract_hidden_markers(original_text)
+
+            # Check if the cleaned text still contains any skip keywords
+            if any(keyword in text for keyword in skip_keywords):
+                continue
+
+            # Check if the paragraph ends with ':' or '>' and is underlined
+            if (text.endswith(':') or text.endswith('>')) and is_underlined(paragraph):
+                return idx
+
+        # If no relevant paragraph is found, return 0
+        return 0
+    except Exception as e:
+        print(f"Error in find_starting_relevant: {e}")
+        return 0
+
 
 #helper method for for extract_relevant_text, it identifies the last relevant paragraph
 #Input: .docx file of a protocol
