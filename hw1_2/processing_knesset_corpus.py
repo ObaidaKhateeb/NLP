@@ -101,11 +101,12 @@ def speakerClean(speaker):
     #remove the title and other symbols
     for element in titles_and_symbols:
         speaker = speaker.replace(element, '')
-    #replace the '-' by a space
-    speaker = speaker.replace('-', ' ').replace(',', ' ')
+    #replace the ',' by a space
+    speaker = speaker.replace(',', ' ')
     #replace multi spaces by one space
     speaker = ' '.join(speaker.split()).strip()
-    speaker = speaker.strip()
+    #strip and remove '-' at the beginning and end of a speaker's name 
+    speaker = speaker.strip('-')
     #remove minister titles, these titles are special case because they may be followed by the ministry name 
     if speaker.find('שר ') == 0 or speaker.find('השר ') == 0 or speaker.find('השרה ') == 0 or speaker.find('שרת ') == 0:
         speaker = speaker.replace('השרה ', '').replace('שרת ', '').replace('השר ', '').replace('שר ', '')
@@ -383,10 +384,19 @@ def extract_relevant_text(file_content, protocol):
 #Input: path to a folder
 #Output: file names, paths, and contents for all .docx files in the folder
 def read_files(folder):
-    file_names = [file for file in os.listdir(folder) if (file[-5:] == '.docx' or file[-4:] == '.doc')]
-    file_paths = {filename: os.path.join(folder, filename) for filename in file_names}
-    file_contents = {file_name: Document(file_path) for file_name, file_path in file_paths.items()}
-    return file_names, file_paths, file_contents
+    try:
+        file_names = [file for file in os.listdir(folder) if (file[-5:] == '.docx' or file[-4:] == '.doc')]
+        file_paths = {filename: os.path.join(folder, filename) for filename in file_names}
+        file_contents = {}
+        for file_name, file_path in file_paths.items():
+            try: 
+                file_contents[file_name] = Document(file_path)
+            except:
+                print(f"Failed to read file {file_name} ")
+                file_names.remove(file_name)
+        return file_names, file_contents
+    except FileNotFoundError:
+        print(f"Folder {folder} is not exist")
 
 #a function that creates the JSONL file 
 #Input: list of protocols objects and file path where the JSONL file will be saved 
@@ -418,7 +428,7 @@ def main():
     folder_path = "protocol_for_hw1" 
     #file = sys.argv[2] 
     file = "corpus.jsonl"
-    file_names, file_paths, file_contents = read_files(folder_path)
+    file_names, file_contents = read_files(folder_path)
     protocols = []
     for file_name in sorted(file_names): 
         keneset_no, protocol_type = extract_metada_from_name(file_name)
