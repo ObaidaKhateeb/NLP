@@ -25,18 +25,19 @@ class Protocol:
             self.sentences[speaker].append(sentence)
         else:
             self.sentences[speaker] = [sentence]
-    def check(self): #function for tests .. will be deleted later 
-        print(self.name)
-        print(len(self.sentences.keys()))
-        sorted_keys = sorted(self.sentences.keys(), key=lambda name: name.split()[-1])
-        for key in sorted_keys:
-            print(key)
 
 ministries = {'התשתיות', 'הלאומיות', 'האנרגיה', 'המים', 'המשטרה', 'ביטחון', 'פנים', 'איכות', 'הגנת', 
               'הסביבה', 'החינוך', 'התרבות', 'הספורט', 'המדע', 'הטכנולוגיה', 'התחבורה', 'הבטיחות', 
-              'בדרכים', 'האוצר', 'הכלכלה', 'התכנון', 'התעשייה', 'המסחר', 'התעסוקה', 'התיירות', 'הבריאות', 'החקלאות', 'פיתוח', 'הכפר', 'הבינוי', 'השיכון', 'העבודה', 'הרווחה', 
+              'בדרכים', 'האוצר', 'הכלכלה', 'התכנון', 'התעשייה', 'המסחר', 'התעסוקה', 'התיירות', 
+              'הבריאות', 'החקלאות', 'פיתוח', 'הכפר', 'הבינוי', 'השיכון', 'העבודה', 'הרווחה', 
               'השירותים', 'החברתיים', 'לענייני', 'דתות', 'במשרד', 'ראש', 'הממשלה', 'לנושאים', 
-              'אסטרטגיים', 'מודיעין', 'לקליטת', 'העלייה', 'לאזרחים', 'ותיקים', 'התקשורת', 'משפטים', 'חוץ'}
+              'אסטרטגיים', 'מודיעין', 'לקליטת', 'עלייה', 'לאזרחים', 'ותיקים', 'התקשורת', 'משפטים', 
+              'חוץ', 'לאומי', 'שוויון', 'חברתי', 'מעמד', 'האישה', 'קידום', 'שירותי', 'דת', 'שיתוף', 
+              'פעולה', 'אזורי', 'ההתיישבות', 'המשימות', 'המזון', 'החדשנות', 'הנגב', 'הגליל', 'החוסן', 
+              'הלאומי', 'הקליטה', 'תפוצות', 'התפוצות', 'המאבק', 'באנטישמיות', 'מורשת', 'חיזוק', 'קידום', 
+              'קהילתי', 'הפריפריה', 'החלופי', 'הדיגיטל', 'ההשכלה', 'הגבוהה', 'המשלימה', 'משאבי', 'החלל', 
+              'רה"מ', 'ירושלים', 'המקשר', 'בין', 'הממשלה', 'לכנסת', 'העורף', 'ההסברה', 'מיעטום', 'חברה', 
+              'גמלאים', 'האמנויות'}
 titles_and_symbols = ['<', '>', 'היו"ר', 'היו”ר', 'יו"ר הכנסת', 'יו”ר הכנסת', 
                       'יו"ר ועדת הכנסת', 'יו”ר ועדת הכנסת', 'מ"מ', 'מ”מ', 'סגן', 'סגנית', 
                       'מזכיר הכנסת', 'מזכירת הכנסת', 'תשובת', 'המשנה לראש הממשלה', 'ראש הממשלה', 
@@ -83,19 +84,9 @@ def convertToInt(word):
 #Output: the pure name (without titles, tags, and party name)
 def speakerClean(speaker):
     #remove the party name
-    open_brac = speaker.find('(')
-    close_brac = speaker.find(')')
-    while open_brac != -1 and close_brac != -1 and open_brac < close_brac: 
-        speaker = speaker[:open_brac] + speaker[close_brac+1:] #remove the brackets and what inside them
-        open_brac = speaker.find('(')
-        close_brac = speaker.find(')')
+    speaker = re.sub(r"\(.*?\)", "", speaker)
     #remove the tag
-    open_an_brac = speaker.find('<<')
-    close_an_brac = speaker.find('>>')
-    while open_an_brac != -1 and close_an_brac != -1 and open_an_brac < close_an_brac:
-        speaker = speaker[:open_an_brac] + speaker[close_an_brac+1:] #remove the tags and what inside them 
-        open_an_brac = speaker.find('<<')
-        close_an_brac = speaker.find('>>')
+    speaker = re.sub(r"<<.*?>>", "", speaker)
     #remove the title and other symbols
     for element in titles_and_symbols:
         speaker = speaker.replace(element, '')
@@ -391,30 +382,23 @@ def jsonl_make(protocols, file):
                     }
                     jsonl_file.write(json.dumps(sentence_data, ensure_ascii=False) + '\n')
 
-import time
 def main():
-    start_t = time.time()
     if len(sys.argv) != 3:
         print("Error: Incorrect # of arguments.\n")
         sys.exit(1)
     else:
         print("Creating the corpus ..\n")
     folder_path = sys.argv[1] 
-    #folder_path = "protocol_for_hw1" 
     file = sys.argv[2] 
-    #file = "corpus4.jsonl"
     file_names, file_contents = read_files(folder_path)
     protocols = []
-    for file_name in sorted(file_names): 
+    for file_name in file_names: 
         keneset_no, protocol_type = extract_metada_from_name(file_name)
         protocol_no = extract_metada_from_content(file_contents[file_name])
         protocol = Protocol(file_name, keneset_no, protocol_type, protocol_no)
         protocols.append(protocol)
         extract_relevant_text(file_contents[file_name], protocol)
-        #protocol.check()
     jsonl_make(protocols, file)
-    end_t = time.time()
-    print(end_t - start_t)
 
 if __name__ == "__main__":
     main()
