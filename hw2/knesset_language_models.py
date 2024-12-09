@@ -201,11 +201,11 @@ def main():
     #output_folder = sys.argv[2] 
     output_folder = 'output'
     lines_list = None
-    with open(file_path, "r", encoding = "utf-8") as file:
+    with open(file_path, 'r', encoding = 'utf-8') as file:
         lines_list =  [json.loads(line) for line in file]
     #Separating the committee and plenary data
-    committee_sentences = [line["sentence_text"] for line in lines_list if line["protocol_type"] == 'committee']
-    plenary_sentences = [line["sentence_text"] for line in lines_list if line["protocol_type"] == 'plenary']
+    committee_sentences = [line['sentence_text'] for line in lines_list if line['protocol_type'] == 'committee']
+    plenary_sentences = [line['sentence_text'] for line in lines_list if line['protocol_type'] == 'plenary']
     committee_model = Trigram_LM(committee_sentences)
     plenary_model = Trigram_LM(plenary_sentences)
     corpus_df = pd.DataFrame(lines_list)
@@ -214,19 +214,28 @@ def main():
     #sections 2.2, 2.3, 2.4: printing the 10 most common collocations with threshold of 5, in each of the corpuses
     with open('knesset_collocations.txt', 'w', encoding = 'utf-8') as file:
         for n in [2,3,4]: #iterate over the longs of 2,3,4
-            file.write(f"{n}-gram collocations:\n")
+            file.write(f'{n}-gram collocations:\n')
             for type_up_name, type in [('Frequency', 'frequency'), ('Tf-IDF', 'tfidf')]:
-                file.write(f"{type_up_name}:\n")
+                file.write(f'{type_up_name}:\n')
                 for corpus_name, corpus_df in [('Committee corpus', committee_df), ('Plenary corpus', plenary_df)]:
-                    file.write(f"{corpus_name}:\n")
+                    file.write(f'{corpus_name}:\n')
                     collocations = get_k_n_t_collocations(10, n, 5, corpus_df, type)
                     for collocation in collocations:
-                        file.write(f"{collocation}\n")
-                    file.write("\n")
-            file.write("\n")
-    #section 3.2:
+                        file.write(f'{collocation}\n')
+                    file.write('\n')
+            file.write('\n')
+    #section 3.2: choosing 10 random messages from committee corpus and masking 10% of their tokens
     sentences_indexes = random.sample(range(len(committee_df)), 10)
-    sentences_to_mask = []
+    sentences_to_mask = [committee_df[idx]['sentence_text'] for idx in sentences_indexes]
+    with open('original_sampled_sents.txt', 'w', encoding = 'utf-8') as file:
+        for sentence in sentences_to_mask:
+            file.write(sentence+ '\n')
+    sentences_after_mask = mask_tokens_in_sentences(sentences_to_mask, 10)
+    with open('masked_sampled_sents.txt', 'w', encoding = 'utf-8') as file:
+        for sentence in sentences_after_mask:
+            file.write(sentence+ '\n')
+    
+    
 
 
     #checks 
