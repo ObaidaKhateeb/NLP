@@ -71,10 +71,10 @@ class Trigram_LM:
                 numerator = self.bigrams[(s[i-1])][s[i]] + 1
             else:
                 numerator = 1
-            prob += 0.3 * numerator / denominator
+            prob += 0.2 * numerator / denominator
             #computing the probability of s[i]
             numerator = self.unigrams[s[i]] + 1 if s[i] in self.unigrams else 1
-            prob += 0.1 * numerator / (self.tokens_count + self.unique_tokens_count)
+            prob += 0.2 * numerator / (self.tokens_count + self.unique_tokens_count)
             total_prob *= prob
         return total_prob
     def generate_next_token(self, s):
@@ -177,6 +177,7 @@ def get_k_n_t_collocations(k, n, t, corpus, type):
         collocations_to_return.append(joined_collocation)
     return collocations_to_return
 
+#A method that masks (x/100)
 def mask_tokens_in_sentences(sentences, x):
     masked_sentences = []
     for sentence in sentences:
@@ -236,26 +237,39 @@ def main():
             file.write(sentence+ '\n')
     #section 3.3: predicting the masked tokens using the committee model and computing the probability of the sentences
     sentences_after_mask_solve = sentences_after_mask[:]
+    subsentences_after_mask_solve = []
     with open('sampled_sents_results.txt', 'w', encoding = 'utf-8') as file:
         for i in range(10):
             file.write(f'original_sentence: {sentences_to_mask[i]}\n')
             file.write(f'masked_sentence: {sentences_after_mask[i]}\n')
             plenary_tokens = []
+            subsentences = [] #for section 3.4
             masked_idx = sentences_after_mask_solve[i].find('[*]')
             while(masked_idx != -1):
                 next_token, _ = plenary_model.generate_next_token(sentences_after_mask_solve[i][:masked_idx])
                 sentences_after_mask_solve[i] = sentences_after_mask_solve[i][:masked_idx] + next_token + sentences_after_mask_solve[i][masked_idx + 3:]
                 plenary_tokens.append(next_token)
+                subsentences.append(sentences_after_mask_solve[i][:masked_idx] + next_token)
                 masked_idx = sentences_after_mask_solve[i].find('[*]')
+            subsentences_after_mask_solve.append(subsentences)
             file.write(f'plenary_sentence: {sentences_after_mask_solve[i]}\n')
             plenary_tokens = ','.join(plenary_tokens)
             file.write(f'plenary_tokens: {plenary_tokens}\n')
             file.write(f'probability of plenary sentence in plenary corpus: {plenary_model.calculate_prob_of_sentence(sentences_after_mask_solve[i]):.2f}\n')
             file.write(f'probability of plenary sentence in committee corpus: {committee_model.calculate_prob_of_sentence(sentences_after_mask_solve[i]):.2f}\n')
-    #section 3.4:
+    #section 3.4: computing perplexity of the masked tokens in the sentences using the trigram perplexity formula
     with open('perplexity_result.txt', 'w', encoding = 'utf-8') as file:
         for i in range(10):
-            pass
+            perplexity = 1
+            if not subsentences_after_mask_solve[i]: #the case when no masked tokens, due to the sentence being short and 10% of it is rounded to 0
+                file.write('None\n')
+            else:
+                for subsentence in subsentences_after_mask_solve[i]: #iterate over the masked tokens
+                    perplexity *= (1 / plenary_model.calculate_prob_of_sentence(subsentence)) # perplexity *= 1/P(masked token | subsentence until masked token)
+                perplexity = perplexity ** (1/ len(subsentences_after_mask_solve[i])) #perplexity = perplexity^(1/n)
+                file.write(f'{perplexity:.2f}\n')
+        
+
 
     
 

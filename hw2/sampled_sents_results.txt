@@ -1,60 +1,60 @@
-original_sentence: מודל החל"ת שנותן לאנשים ודאות עד חודש יוני , אושר בוועדה אצלכם .
-masked_sentence: מודל החל"ת שנותן לאנשים ודאות עד חודש יוני [*] אושר בוועדה אצלכם .
-plenary_sentence: מודל החל"ת שנותן לאנשים ודאות עד חודש יוני על אושר בוועדה אצלכם .
-plenary_tokens: על
-probability of plenary sentence in plenary corpus: 0.00
-probability of plenary sentence in committee corpus: 0.00
-original_sentence: הסעיף הזה מהווה השלמה לסמכויות של מנהל הסדר .
-masked_sentence: הסעיף הזה מהווה השלמה [*] של מנהל הסדר .
-plenary_sentence: הסעיף הזה מהווה השלמה כך של מנהל הסדר .
-plenary_tokens: כך
-probability of plenary sentence in plenary corpus: 0.00
-probability of plenary sentence in committee corpus: 0.00
-original_sentence: מדובר בדו"ח שנדמה לכאורה שאף פעם לא מוקדם מדי לעסוק בו .
-masked_sentence: מדובר בדו"ח שנדמה לכאורה [*] פעם לא מוקדם מדי לעסוק בו .
-plenary_sentence: מדובר בדו"ח שנדמה לכאורה - פעם לא מוקדם מדי לעסוק בו .
-plenary_tokens: -
-probability of plenary sentence in plenary corpus: 0.00
-probability of plenary sentence in committee corpus: 0.00
-original_sentence: נגמרת שנה והחבר'ה האלה חנוקים והתוצאה היא שהם כל הזמן על סף התפרקות .
-masked_sentence: נגמרת שנה והחבר'ה האלה חנוקים והתוצאה היא שהם כל הזמן על [*] התפרקות .
-plenary_sentence: נגמרת שנה והחבר'ה האלה חנוקים והתוצאה היא שהם כל הזמן על . התפרקות .
-plenary_tokens: .
-probability of plenary sentence in plenary corpus: 0.00
-probability of plenary sentence in committee corpus: 0.00
-original_sentence: גם לנושים יש זכויות ואנחנו רוצים לשמור על הנושים , במיוחד שגם הנושים עצמם יכולים להיות חברות ועסקים שיכולים להיפגע אם לא יגבו את החובות .
-masked_sentence: גם [*] יש זכויות ואנחנו רוצים לשמור על הנושים , במיוחד שגם הנושים עצמם יכולים להיות חברות ועסקים שיכולים להיפגע אם לא יגבו את [*] [*]
-plenary_sentence: גם , יש זכויות ואנחנו רוצים לשמור על הנושים , במיוחד שגם הנושים עצמם יכולים להיות חברות ועסקים שיכולים להיפגע אם לא יגבו את . עלא
-plenary_tokens: ,,.,עלא
-probability of plenary sentence in plenary corpus: 0.00
-probability of plenary sentence in committee corpus: 0.00
-original_sentence: מינהל מקרקעי ישראל גובה 10 אחוזים היטלי השבחה כאשר אצלי זה 2,5 אגורות והוא לא מחזיר לי אותן אלא אני צריך לתבוע אותן ולנהל משפטים כדי לקבל את הכסף שלי בחזרה .
-masked_sentence: מינהל מקרקעי ישראל [*] 10 אחוזים היטלי השבחה כאשר אצלי זה 2,5 אגורות והוא לא מחזיר לי אותן אלא אני צריך לתבוע אותן ולנהל משפטים כדי לקבל את [*] [*] בחזרה .
-plenary_sentence: מינהל מקרקעי ישראל . 10 אחוזים היטלי השבחה כאשר אצלי זה 2,5 אגורות והוא לא מחזיר לי אותן אלא אני צריך לתבוע אותן ולנהל משפטים כדי לקבל את . עלא בחזרה .
-plenary_tokens: .,.,עלא
-probability of plenary sentence in plenary corpus: 0.00
-probability of plenary sentence in committee corpus: 0.00
-original_sentence: אנחנו יודעים מה רמת התחלואה גם אם המגמה היא מגמה של עלייה או ירידה , ונקווה שאנחנו עכשיו בשלב שאנחנו הולכים למגמת ירידה .
-masked_sentence: אנחנו [*] מה [*] התחלואה גם אם המגמה היא מגמה של עלייה או ירידה , ונקווה שאנחנו עכשיו בשלב שאנחנו הולכים למגמת ירידה .
-plenary_sentence: אנחנו את מה , התחלואה גם אם המגמה היא מגמה של עלייה או ירידה , ונקווה שאנחנו עכשיו בשלב שאנחנו הולכים למגמת ירידה .
-plenary_tokens: את,,
-probability of plenary sentence in plenary corpus: 0.00
-probability of plenary sentence in committee corpus: 0.00
-original_sentence: אני גר בגוש קטיף .
-masked_sentence: אני גר בגוש קטיף .
-plenary_sentence: אני גר בגוש קטיף .
+original_sentence: אני מבקש שתצא .
+masked_sentence: אני מבקש שתצא .
+plenary_sentence: אני מבקש שתצא .
 plenary_tokens: 
 probability of plenary sentence in plenary corpus: 0.00
 probability of plenary sentence in committee corpus: 0.00
-original_sentence: אבל אי אפשר להוריד בשכר .
-masked_sentence: אבל אי אפשר [*] בשכר .
-plenary_sentence: אבל אי אפשר את בשכר .
-plenary_tokens: את
+original_sentence: כבר עברו שנתיים .
+masked_sentence: כבר עברו שנתיים .
+plenary_sentence: כבר עברו שנתיים .
+plenary_tokens: 
 probability of plenary sentence in plenary corpus: 0.00
 probability of plenary sentence in committee corpus: 0.00
-original_sentence: אבקש לקבל את דעתו של היועץ המשפטי של הוועדה .
-masked_sentence: אבקש לקבל את דעתו של היועץ [*] של הוועדה .
-plenary_sentence: אבקש לקבל את דעתו של היועץ , של הוועדה .
+original_sentence: זה בסדר או שאני לא קורא נכון כי לא למדתי ליבה ?
+masked_sentence: זה בסדר או שאני לא קורא נכון כי לא למדתי ליבה [*]
+plenary_sentence: זה בסדר או שאני לא קורא נכון כי לא למדתי ליבה הפלסטינים
+plenary_tokens: הפלסטינים
+probability of plenary sentence in plenary corpus: 0.00
+probability of plenary sentence in committee corpus: 0.00
+original_sentence: הוא אמר : זה לשיקולך .
+masked_sentence: הוא אמר [*] זה לשיקולך .
+plenary_sentence: הוא אמר , זה לשיקולך .
+plenary_tokens: ,
+probability of plenary sentence in plenary corpus: 0.00
+probability of plenary sentence in committee corpus: 0.00
+original_sentence: תסבירו לנו את ההסכם , אנחנו כבר חצי שעה בלי כלום .
+masked_sentence: תסבירו לנו את [*] , אנחנו כבר חצי שעה בלי כלום .
+plenary_sentence: תסבירו לנו את . , אנחנו כבר חצי שעה בלי כלום .
+plenary_tokens: .
+probability of plenary sentence in plenary corpus: 0.00
+probability of plenary sentence in committee corpus: 0.00
+original_sentence: בכדורגל היה לנו את זה ומנהלי קבוצות הכדורגל שיתפו פעולה גם עם המשטרה וגם עם הוועדה .
+masked_sentence: בכדורגל היה [*] את זה ומנהלי קבוצות הכדורגל שיתפו פעולה [*] עם המשטרה וגם עם הוועדה .
+plenary_sentence: בכדורגל היה , את זה ומנהלי קבוצות הכדורגל שיתפו פעולה - עם המשטרה וגם עם הוועדה .
+plenary_tokens: ,,-
+probability of plenary sentence in plenary corpus: 0.00
+probability of plenary sentence in committee corpus: 0.00
+original_sentence: למה מורידים מהחרדים אני יודע , אבל למה אתם מורידים ?
+masked_sentence: למה מורידים מהחרדים אני [*] , אבל למה אתם מורידים ?
+plenary_sentence: למה מורידים מהחרדים אני , , אבל למה אתם מורידים ?
+plenary_tokens: ,
+probability of plenary sentence in plenary corpus: 0.00
+probability of plenary sentence in committee corpus: 0.00
+original_sentence: אם עולה לי שקל לייצר את זה , ובאה הכנסת ואומרת : תייצר את זה בחצי שקל – אי - אפשר לייצר את זה בחצי שקל , אז כל מוצר כזה אני מפסיד חצי .
+masked_sentence: [*] עולה לי שקל לייצר את זה [*] ובאה הכנסת ואומרת : תייצר את זה בחצי שקל – [*] - אפשר לייצר את זה [*] שקל , אז כל מוצר כזה אני מפסיד חצי .
+plenary_sentence: , עולה לי שקל לייצר את זה . ובאה הכנסת ואומרת : תייצר את זה בחצי שקל – , - אפשר לייצר את זה . שקל , אז כל מוצר כזה אני מפסיד חצי .
+plenary_tokens: ,,.,,,.
+probability of plenary sentence in plenary corpus: 0.00
+probability of plenary sentence in committee corpus: 0.00
+original_sentence: את זה אני דורש ממשרד התחבורה .
+masked_sentence: את זה אני [*] ממשרד התחבורה .
+plenary_sentence: את זה אני , ממשרד התחבורה .
+plenary_tokens: ,
+probability of plenary sentence in plenary corpus: 0.00
+probability of plenary sentence in committee corpus: 0.00
+original_sentence: אתה יכול להגיד מה לעשות ?
+masked_sentence: אתה יכול להגיד מה [*] ?
+plenary_sentence: אתה יכול להגיד מה , ?
 plenary_tokens: ,
 probability of plenary sentence in plenary corpus: 0.00
 probability of plenary sentence in committee corpus: 0.00
