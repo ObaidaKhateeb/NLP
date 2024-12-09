@@ -61,7 +61,7 @@ class Trigram_LM:
                 numerator = self.trigrams[(s[i-2], s[i-1])][s[i]] + 1
             else:
                 numerator = 1
-            prob += 0.6 * numerator / denominator
+            prob += 1.00 * numerator / denominator
             #computing the probability of the bigrams s[i-1] s[i]
             if (s[i-1]) in self.bigrams:
                 denominator = sum(self.bigrams[(s[i-1])].values()) + self.unique_tokens_count
@@ -71,16 +71,16 @@ class Trigram_LM:
                 numerator = self.bigrams[(s[i-1])][s[i]] + 1
             else:
                 numerator = 1
-            prob += 0.2 * numerator / denominator
+            prob += 0.00 * numerator / denominator
             #computing the probability of s[i]
             numerator = self.unigrams[s[i]] + 1 if s[i] in self.unigrams else 1
-            prob += 0.2 * numerator / (self.tokens_count + self.unique_tokens_count)
-            total_prob *= prob
+            prob += 0.00 * numerator / (self.tokens_count + self.unique_tokens_count)
+            total_prob += math.log(prob)
         return total_prob
     def generate_next_token(self, s):
         s = s.split()
         next_token = None
-        next_token_prob = -1
+        next_token_prob = float('-inf')
         if len(s) == 0 and ('s_0', 's_1') in self.trigrams:
             for token in self.trigrams[('s_0', 's_1')]:
                     token_prob = self.calculate_prob_of_sentence(token)
@@ -247,7 +247,12 @@ def main():
             masked_idx = sentences_after_mask_solve[i].find('[*]')
             while(masked_idx != -1):
                 next_token, _ = plenary_model.generate_next_token(sentences_after_mask_solve[i][:masked_idx])
-                sentences_after_mask_solve[i] = sentences_after_mask_solve[i][:masked_idx] + next_token + sentences_after_mask_solve[i][masked_idx + 3:]
+                try:
+                    sentences_after_mask_solve[i] = sentences_after_mask_solve[i][:masked_idx] + next_token + sentences_after_mask_solve[i][masked_idx + 3:]
+                except: #temporal for checking the error
+                    print(sentences_after_mask_solve[i][:masked_idx])
+                    print(next_token)
+                    print(sentences_after_mask_solve[i][masked_idx + 3:])
                 plenary_tokens.append(next_token)
                 subsentences.append(sentences_after_mask_solve[i][:masked_idx] + next_token)
                 masked_idx = sentences_after_mask_solve[i].find('[*]')
@@ -269,11 +274,6 @@ def main():
                 perplexity = perplexity ** (1/ len(subsentences_after_mask_solve[i])) #perplexity = perplexity^(1/n)
                 file.write(f'{perplexity:.2f}\n')
         
-
-
-    
-
-
     #checks 
     sentence_prob = committee_model.calculate_prob_of_sentence('אחמד טיבי')
     print(sentence_prob)
@@ -282,6 +282,9 @@ def main():
     relevant_sentences = get_k_n_t_collocations(5, 5, 5, committee_df, 'frequency')
     for i in range(len(relevant_sentences)):
         print (relevant_sentences[i])
+    original_sentences = ['הוא אמר : זה לשיקולך', 'ציב שירות המדינה – לא מנכ"ל משרד , לא מנהל בית ספר , לא מנהל בית חולים – נציב שירות המדינה , ואין הסמכות כלפי מטה בזה – זכאי לקבל דיווח על פתיחה בחקירה נגד עובד מדינה או עובד שכפוף לחוק המשמעת בשביל לבחון את סמכותו על - פי דין להשעות את אותו עובד .', '"אתם יודעים מה זה להחזיק ילדים בגנים פרטיים ?', 'היא מנהלת את פרויקט שיקום עוטף עזה במאות מיליונים , שפועל למיטב הכרתי – אני אולי לא אובייקטיבי – אבל הפרק הזה פועל היטב .', 'על פי חוק התכנון והבנייה .', 'האמת היא , שזה לא חייב להוריד את המחיר .', 'זה מזכיר לי את הפעם שהפגנתי מול משרד הביטחון בתל - אביב בתקופת הסכמי אוסלו , והמשטרה הדפה אותי .', 'אני פותח את הדיון במליאת הכנסת ביום המיוחד הזה , שיוחד לשפה הערבית , וזה מאורע שלא היה כמותו .', '"התוכנית הוכנה בשיתוף פעולה ובתיאום בין כל הגורמים השותפים למאבקנו , המאבק בתאונות הדרכים ."', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+    masked_sentences = ['הוא אמר [*] זה לשיקולך', 'ציב שירות המדינה – לא מנכ"ל משרד , לא מנהל בית [*] , לא מנהל בית [*] – נציב שירות [*] , ואין הסמכות כלפי מטה בזה – זכאי לקבל דיווח על פתיחה בחקירה נגד עובד מדינה או עובד שכפוף לחוק המשמעת בשביל לבחון את סמכותו על - פי דין להשעות את אותו עובד .', '"אתם יודעים [*] זה להחזיק ילדים בגנים פרטיים ?', 'היא מנהלת את פרויקט שיקום עוטף [*] במאות [*] , שפועל למיטב הכרתי – אני אולי לא אובייקטיבי – אבל הפרק הזה פועל [*] .', 'על פי [*] התכנון והבנייה .', 'האמת היא , שזה לא חייב להוריד את [*] .', 'זה מזכיר לי את הפעם שהפגנתי מול משרד הביטחון בתל - [*] בתקופת הסכמי [*] , והמשטרה הדפה אותי .', 'אני פותח את הדיון במליאת [*] ביום המיוחד הזה , שיוחד לשפה הערבית , וזה מאורע שלא היה כמותו .', '"התוכנית הוכנה בשיתוף [*] ובתיאום בין כל הגורמים השותפים למאבקנו , המאבק בתאונות [*] ."', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+
 
 if __name__ == "__main__":
     main()

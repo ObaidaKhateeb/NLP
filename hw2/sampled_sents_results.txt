@@ -1,60 +1,60 @@
-original_sentence: אני מבקש שתצא .
-masked_sentence: אני מבקש שתצא .
-plenary_sentence: אני מבקש שתצא .
-plenary_tokens: 
-probability of plenary sentence in plenary corpus: 0.00
-probability of plenary sentence in committee corpus: 0.00
-original_sentence: כבר עברו שנתיים .
-masked_sentence: כבר עברו שנתיים .
-plenary_sentence: כבר עברו שנתיים .
-plenary_tokens: 
-probability of plenary sentence in plenary corpus: 0.00
-probability of plenary sentence in committee corpus: 0.00
-original_sentence: זה בסדר או שאני לא קורא נכון כי לא למדתי ליבה ?
-masked_sentence: זה בסדר או שאני לא קורא נכון כי לא למדתי ליבה [*]
-plenary_sentence: זה בסדר או שאני לא קורא נכון כי לא למדתי ליבה הפלסטינים
-plenary_tokens: הפלסטינים
-probability of plenary sentence in plenary corpus: 0.00
-probability of plenary sentence in committee corpus: 0.00
-original_sentence: הוא אמר : זה לשיקולך .
-masked_sentence: הוא אמר [*] זה לשיקולך .
-plenary_sentence: הוא אמר , זה לשיקולך .
+original_sentence: הסקירה הקצרה שנתתי היא סקירה שרק מסברת את האוזן ואומרת , שמעבר להוראה פורמלית של הספרות , המודעות לקריאה היא גדולה מאוד .
+masked_sentence: הסקירה הקצרה שנתתי היא סקירה שרק מסברת את האוזן ואומרת , שמעבר להוראה [*] של הספרות , המודעות לקריאה היא גדולה [*] .
+plenary_sentence: הסקירה הקצרה שנתתי היא סקירה שרק מסברת את האוזן ואומרת , שמעבר להוראה עבודת של הספרות , המודעות לקריאה היא גדולה כאלה .
+plenary_tokens: עבודת,כאלה
+probability of plenary sentence in plenary corpus: -253.84
+probability of plenary sentence in committee corpus: -244.90
+original_sentence: גם את הכבוד שרחשת לקהילה שלך , לחברה שלך .
+masked_sentence: גם את הכבוד שרחשת לקהילה שלך , [*] שלך .
+plenary_sentence: גם את הכבוד שרחשת לקהילה שלך , , שלך .
 plenary_tokens: ,
-probability of plenary sentence in plenary corpus: 0.00
-probability of plenary sentence in committee corpus: 0.00
-original_sentence: תסבירו לנו את ההסכם , אנחנו כבר חצי שעה בלי כלום .
-masked_sentence: תסבירו לנו את [*] , אנחנו כבר חצי שעה בלי כלום .
-plenary_sentence: תסבירו לנו את . , אנחנו כבר חצי שעה בלי כלום .
+probability of plenary sentence in plenary corpus: -100.44
+probability of plenary sentence in committee corpus: -97.44
+original_sentence: אנחנו התכוונו שרק מה שמנינו ספציפית יחול מהכלים שיש לנאמן .
+masked_sentence: אנחנו התכוונו שרק מה שמנינו ספציפית יחול מהכלים [*] לנאמן .
+plenary_sentence: אנחנו התכוונו שרק מה שמנינו ספציפית יחול מהכלים אני לנאמן .
+plenary_tokens: אני
+probability of plenary sentence in plenary corpus: -116.05
+probability of plenary sentence in committee corpus: -111.53
+original_sentence: המשמעות היא ברורה , הר הבית כולו הוא מקום שמתאים להיות מסגד אחד ויש להעלים כל שריד קדום יותר של תרבות אחרת .
+masked_sentence: המשמעות היא ברורה , הר הבית כולו הוא מקום שמתאים [*] מסגד אחד ויש להעלים כל שריד קדום יותר [*] תרבות אחרת .
+plenary_sentence: המשמעות היא ברורה , הר הבית כולו הוא מקום שמתאים שלו מסגד אחד ויש להעלים כל שריד קדום יותר פחות תרבות אחרת .
+plenary_tokens: שלו,פחות
+probability of plenary sentence in plenary corpus: -250.80
+probability of plenary sentence in committee corpus: -242.41
+original_sentence: אתם אף פעם לא נתתם לשנות .
+masked_sentence: אתם אף [*] לא נתתם לשנות .
+plenary_sentence: אתם אף לא לא נתתם לשנות .
+plenary_tokens: לא
+probability of plenary sentence in plenary corpus: -73.13
+probability of plenary sentence in committee corpus: -70.11
+original_sentence: אני אומר את הדברים האלה בלשון המעטה .
+masked_sentence: [*] אומר את הדברים האלה בלשון המעטה .
+plenary_sentence: , אומר את הדברים האלה בלשון המעטה .
+plenary_tokens: ,
+probability of plenary sentence in plenary corpus: -79.73
+probability of plenary sentence in committee corpus: -77.23
+original_sentence: רוצה לומר ששר הפנים רשאי לעגן ולומר שבמחלקה לענייני א' או במחלקה לענייני ב' חייב יהיה לעמוד בן מיעוטים או אישה או נכה וכן הלאה ברשויות המקומיות .
+masked_sentence: רוצה [*] ששר הפנים רשאי לעגן ולומר שבמחלקה לענייני א' [*] במחלקה [*] ב' חייב יהיה לעמוד בן מיעוטים או אישה או נכה וכן הלאה ברשויות המקומיות .
+plenary_sentence: רוצה מוסר ששר הפנים רשאי לעגן ולומר שבמחלקה לענייני א' , במחלקה שוטרים ב' חייב יהיה לעמוד בן מיעוטים או אישה או נכה וכן הלאה ברשויות המקומיות .
+plenary_tokens: מוסר,,,שוטרים
+probability of plenary sentence in plenary corpus: -302.03
+probability of plenary sentence in committee corpus: -291.83
+original_sentence: בנוסף , שאלתי את שר המדע אם הוא יכול להבטיח לי שגם בזמן ההליך המשפטי התוכנית לא תיפגע והאנשים לא ייפגעו , והוא אמר שהוא מבטיח .
+masked_sentence: בנוסף , שאלתי את שר המדע אם [*] יכול להבטיח לי שגם בזמן ההליך המשפטי התוכנית [*] תיפגע והאנשים לא [*] , והוא אמר שהוא מבטיח .
+plenary_sentence: בנוסף , שאלתי את שר המדע אם , יכול להבטיח לי שגם בזמן ההליך המשפטי התוכנית , תיפגע והאנשים לא . , והוא אמר שהוא מבטיח .
+plenary_tokens: ,,,,.
+probability of plenary sentence in plenary corpus: -297.07
+probability of plenary sentence in committee corpus: -284.56
+original_sentence: עד כמה שאני מבין , על פי התקנות המקוריות , התובע רשאי להגיש פנייה לוועדת ערר במידה והוא לא מרוצה מהתוצאה תוך שלושים יום מיום קבלת ההחלטה .
+masked_sentence: עד כמה [*] מבין , על פי התקנות המקוריות , התובע רשאי להגיש פנייה לוועדת ערר במידה והוא [*] מרוצה מהתוצאה תוך שלושים יום מיום [*] ההחלטה .
+plenary_sentence: עד כמה , מבין , על פי התקנות המקוריות , התובע רשאי להגיש פנייה לוועדת ערר במידה והוא : מרוצה מהתוצאה תוך שלושים יום מיום אמון ההחלטה .
+plenary_tokens: ,,:,אמון
+probability of plenary sentence in plenary corpus: -301.92
+probability of plenary sentence in committee corpus: -291.89
+original_sentence: איתרע מזלם של אנשי הטלוויזיה החינוכית שרק הם הגיעו לדיון הזה .
+masked_sentence: איתרע מזלם של [*] הטלוויזיה החינוכית שרק הם הגיעו לדיון הזה .
+plenary_sentence: איתרע מזלם של . הטלוויזיה החינוכית שרק הם הגיעו לדיון הזה .
 plenary_tokens: .
-probability of plenary sentence in plenary corpus: 0.00
-probability of plenary sentence in committee corpus: 0.00
-original_sentence: בכדורגל היה לנו את זה ומנהלי קבוצות הכדורגל שיתפו פעולה גם עם המשטרה וגם עם הוועדה .
-masked_sentence: בכדורגל היה [*] את זה ומנהלי קבוצות הכדורגל שיתפו פעולה [*] עם המשטרה וגם עם הוועדה .
-plenary_sentence: בכדורגל היה , את זה ומנהלי קבוצות הכדורגל שיתפו פעולה - עם המשטרה וגם עם הוועדה .
-plenary_tokens: ,,-
-probability of plenary sentence in plenary corpus: 0.00
-probability of plenary sentence in committee corpus: 0.00
-original_sentence: למה מורידים מהחרדים אני יודע , אבל למה אתם מורידים ?
-masked_sentence: למה מורידים מהחרדים אני [*] , אבל למה אתם מורידים ?
-plenary_sentence: למה מורידים מהחרדים אני , , אבל למה אתם מורידים ?
-plenary_tokens: ,
-probability of plenary sentence in plenary corpus: 0.00
-probability of plenary sentence in committee corpus: 0.00
-original_sentence: אם עולה לי שקל לייצר את זה , ובאה הכנסת ואומרת : תייצר את זה בחצי שקל – אי - אפשר לייצר את זה בחצי שקל , אז כל מוצר כזה אני מפסיד חצי .
-masked_sentence: [*] עולה לי שקל לייצר את זה [*] ובאה הכנסת ואומרת : תייצר את זה בחצי שקל – [*] - אפשר לייצר את זה [*] שקל , אז כל מוצר כזה אני מפסיד חצי .
-plenary_sentence: , עולה לי שקל לייצר את זה . ובאה הכנסת ואומרת : תייצר את זה בחצי שקל – , - אפשר לייצר את זה . שקל , אז כל מוצר כזה אני מפסיד חצי .
-plenary_tokens: ,,.,,,.
-probability of plenary sentence in plenary corpus: 0.00
-probability of plenary sentence in committee corpus: 0.00
-original_sentence: את זה אני דורש ממשרד התחבורה .
-masked_sentence: את זה אני [*] ממשרד התחבורה .
-plenary_sentence: את זה אני , ממשרד התחבורה .
-plenary_tokens: ,
-probability of plenary sentence in plenary corpus: 0.00
-probability of plenary sentence in committee corpus: 0.00
-original_sentence: אתה יכול להגיד מה לעשות ?
-masked_sentence: אתה יכול להגיד מה [*] ?
-plenary_sentence: אתה יכול להגיד מה , ?
-plenary_tokens: ,
-probability of plenary sentence in plenary corpus: 0.00
-probability of plenary sentence in committee corpus: 0.00
+probability of plenary sentence in plenary corpus: -132.67
+probability of plenary sentence in committee corpus: -126.93
