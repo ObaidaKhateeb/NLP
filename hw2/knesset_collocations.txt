@@ -24,7 +24,7 @@ Plenary corpus:
 אינו נוכח
 אדוני היושב
 
-Tfidf:
+Tf-IDF:
 Committee corpus:
 - ראש
 נושא חדש
@@ -76,7 +76,7 @@ Plenary corpus:
 יושב - ראש
 , אדוני היושב
 
-Tfidf:
+Tf-IDF:
 Committee corpus:
 " לאטמה "
 אני נועל את
@@ -128,7 +128,7 @@ Plenary corpus:
 ראש , חברי הכנסת
 חברי חברי הכנסת ,
 
-Tfidf:
+Tf-IDF:
 Committee corpus:
 אני נועל את הישיבה
 אני פותח את הישיבה

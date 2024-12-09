@@ -2,6 +2,7 @@ import json
 import math 
 import sys
 import pandas as pd
+import random
 
 class Trigram_LM:
     def __init__(self, sentences):
@@ -133,6 +134,8 @@ def get_k_n_t_collocations(k, n, t, corpus, type):
     for idx, row in corpus.iterrows():
         sentence_splitted = row['sentence_text'].split()
         protocol = row['protocol_number']
+        if protocol not in protocols: 
+            protocols[protocol] = {}
         for i in range(n, len(sentence_splitted)):
             collocation = tuple(sentence_splitted[i-n : i])
             #handling the number of appereance of the collocation by protocol 
@@ -144,13 +147,10 @@ def get_k_n_t_collocations(k, n, t, corpus, type):
             else:
                 collocations[collocation] = {protocol : 1}
             #handling the number of collocation in each protocol 
-            if protocol in protocols:
-                if collocation in protocols[protocol]:
-                    protocols[protocol][collocation] += 1
-                else:
-                    protocols[protocol][collocation] = 1
+            if collocation in protocols[protocol]:
+                protocols[protocol][collocation] += 1
             else:
-                protocols[protocol] = {collocation : 1}
+                protocols[protocol][collocation] = 1
     #keeping only the collocations that appears at lest t times 
     relevant_collocations = {}
     for collocation in collocations:
@@ -165,17 +165,30 @@ def get_k_n_t_collocations(k, n, t, corpus, type):
         for collocation in relevant_collocations:
             collocations_by_tfidf[collocation] = 0 
             for protocol in collocations[collocation]:
-                tf = collocations[collocation][protocol] / sum(protocols[protocol].values())
-                idf = math.log(len(protocols.keys()) / len(collocations[collocation].keys()))
+                tf = collocations[collocation][protocol] / sum(protocols[protocol].values()) #computing tf  
+                idf = math.log(len(protocols.keys()) / len(collocations[collocation].keys())) #computing idf
                 collocations_by_tfidf[collocation] += tf * idf 
-            collocations_by_tfidf[collocation] /= len(protocols.keys())
+            collocations_by_tfidf[collocation] /= len(protocols.keys()) #dividing by the overall number of protocols so we get the averaged tfidf
         sorted_collocations = [collocation for collocation, _ in sorted(collocations_by_tfidf.items(), key=lambda x: x[1], reverse=True)]
-    #choosing the k most common collocations and joining them 
+    #choosing the k most common collocations and returning them as sentences
     collocations_to_return = []
     for collocation in sorted_collocations[:min(k, len(sorted_collocations))]:
         joined_collocation = ' '.join(collocation)
         collocations_to_return.append(joined_collocation)
     return collocations_to_return
+
+def mask_tokens_in_sentences(sentences, x):
+    masked_sentences = []
+    for sentence in sentences:
+        sentence_splitted = sentence.split()
+        tokens_to_mask = round((x/100)*len(sentence_splitted)) #computing the number of tokens to mask
+        indexes_to_replace = random.sample(range(len(sentence_splitted)), tokens_to_mask) #choosing "tokens_to_mask" random indexes to mask
+        for idx in indexes_to_replace:
+            sentence_splitted[idx] = '[*]'
+        new_sentence = ' '.join(sentence_splitted)
+        masked_sentences.append(new_sentence)
+    return masked_sentences
+
 
 def main():
     #if len(sys.argv) != 3:
@@ -198,20 +211,23 @@ def main():
     corpus_df = pd.DataFrame(lines_list)
     committee_df = corpus_df[corpus_df['protocol_type'] == 'committee']
     plenary_df = corpus_df[corpus_df['protocol_type'] == 'plenary']
-    #
-    output = 'knesset_collocations.txt'
-    with open(output, 'w', encoding = 'utf-8') as file:
-        for n in [2,3,4]:
+    #sections 2.2, 2.3, 2.4: printing the 10 most common collocations with threshold of 5, in each of the corpuses
+    with open('knesset_collocations.txt', 'w', encoding = 'utf-8') as file:
+        for n in [2,3,4]: #iterate over the longs of 2,3,4
             file.write(f"{n}-gram collocations:\n")
-            for type in ['frequency', 'tfidf']:
-                file.write(f"{type.capitalize()}:\n")
-                for corpus_name, corpus_df in [("Committee corpus", committee_df), ("Plenary corpus", plenary_df)]:
+            for type_up_name, type in [('Frequency', 'frequency'), ('Tf-IDF', 'tfidf')]:
+                file.write(f"{type_up_name}:\n")
+                for corpus_name, corpus_df in [('Committee corpus', committee_df), ('Plenary corpus', plenary_df)]:
                     file.write(f"{corpus_name}:\n")
                     collocations = get_k_n_t_collocations(10, n, 5, corpus_df, type)
                     for collocation in collocations:
                         file.write(f"{collocation}\n")
                     file.write("\n")
             file.write("\n")
+    #section 3.2:
+    sentences_indexes = random.sample(range(len(committee_df)), 10)
+    sentences_to_mask = []
+
 
     #checks 
     sentence_prob = committee_model.calculate_prob_of_sentence('אחמד טיבי')
