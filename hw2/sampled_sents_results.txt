@@ -1,0 +1,60 @@
+original_sentence: מודל החל"ת שנותן לאנשים ודאות עד חודש יוני , אושר בוועדה אצלכם .
+masked_sentence: מודל החל"ת שנותן לאנשים ודאות עד חודש יוני [*] אושר בוועדה אצלכם .
+plenary_sentence: מודל החל"ת שנותן לאנשים ודאות עד חודש יוני על אושר בוועדה אצלכם .
+plenary_tokens: על
+probability of plenary sentence in plenary corpus: 0.00
+probability of plenary sentence in committee corpus: 0.00
+original_sentence: הסעיף הזה מהווה השלמה לסמכויות של מנהל הסדר .
+masked_sentence: הסעיף הזה מהווה השלמה [*] של מנהל הסדר .
+plenary_sentence: הסעיף הזה מהווה השלמה כך של מנהל הסדר .
+plenary_tokens: כך
+probability of plenary sentence in plenary corpus: 0.00
+probability of plenary sentence in committee corpus: 0.00
+original_sentence: מדובר בדו"ח שנדמה לכאורה שאף פעם לא מוקדם מדי לעסוק בו .
+masked_sentence: מדובר בדו"ח שנדמה לכאורה [*] פעם לא מוקדם מדי לעסוק בו .
+plenary_sentence: מדובר בדו"ח שנדמה לכאורה - פעם לא מוקדם מדי לעסוק בו .
+plenary_tokens: -
+probability of plenary sentence in plenary corpus: 0.00
+probability of plenary sentence in committee corpus: 0.00
+original_sentence: נגמרת שנה והחבר'ה האלה חנוקים והתוצאה היא שהם כל הזמן על סף התפרקות .
+masked_sentence: נגמרת שנה והחבר'ה האלה חנוקים והתוצאה היא שהם כל הזמן על [*] התפרקות .
+plenary_sentence: נגמרת שנה והחבר'ה האלה חנוקים והתוצאה היא שהם כל הזמן על . התפרקות .
+plenary_tokens: .
+probability of plenary sentence in plenary corpus: 0.00
+probability of plenary sentence in committee corpus: 0.00
+original_sentence: גם לנושים יש זכויות ואנחנו רוצים לשמור על הנושים , במיוחד שגם הנושים עצמם יכולים להיות חברות ועסקים שיכולים להיפגע אם לא יגבו את החובות .
+masked_sentence: גם [*] יש זכויות ואנחנו רוצים לשמור על הנושים , במיוחד שגם הנושים עצמם יכולים להיות חברות ועסקים שיכולים להיפגע אם לא יגבו את [*] [*]
+plenary_sentence: גם , יש זכויות ואנחנו רוצים לשמור על הנושים , במיוחד שגם הנושים עצמם יכולים להיות חברות ועסקים שיכולים להיפגע אם לא יגבו את . עלא
+plenary_tokens: ,,.,עלא
+probability of plenary sentence in plenary corpus: 0.00
+probability of plenary sentence in committee corpus: 0.00
+original_sentence: מינהל מקרקעי ישראל גובה 10 אחוזים היטלי השבחה כאשר אצלי זה 2,5 אגורות והוא לא מחזיר לי אותן אלא אני צריך לתבוע אותן ולנהל משפטים כדי לקבל את הכסף שלי בחזרה .
+masked_sentence: מינהל מקרקעי ישראל [*] 10 אחוזים היטלי השבחה כאשר אצלי זה 2,5 אגורות והוא לא מחזיר לי אותן אלא אני צריך לתבוע אותן ולנהל משפטים כדי לקבל את [*] [*] בחזרה .
+plenary_sentence: מינהל מקרקעי ישראל . 10 אחוזים היטלי השבחה כאשר אצלי זה 2,5 אגורות והוא לא מחזיר לי אותן אלא אני צריך לתבוע אותן ולנהל משפטים כדי לקבל את . עלא בחזרה .
+plenary_tokens: .,.,עלא
+probability of plenary sentence in plenary corpus: 0.00
+probability of plenary sentence in committee corpus: 0.00
+original_sentence: אנחנו יודעים מה רמת התחלואה גם אם המגמה היא מגמה של עלייה או ירידה , ונקווה שאנחנו עכשיו בשלב שאנחנו הולכים למגמת ירידה .
+masked_sentence: אנחנו [*] מה [*] התחלואה גם אם המגמה היא מגמה של עלייה או ירידה , ונקווה שאנחנו עכשיו בשלב שאנחנו הולכים למגמת ירידה .
+plenary_sentence: אנחנו את מה , התחלואה גם אם המגמה היא מגמה של עלייה או ירידה , ונקווה שאנחנו עכשיו בשלב שאנחנו הולכים למגמת ירידה .
+plenary_tokens: את,,
+probability of plenary sentence in plenary corpus: 0.00
+probability of plenary sentence in committee corpus: 0.00
+original_sentence: אני גר בגוש קטיף .
+masked_sentence: אני גר בגוש קטיף .
+plenary_sentence: אני גר בגוש קטיף .
+plenary_tokens: 
+probability of plenary sentence in plenary corpus: 0.00
+probability of plenary sentence in committee corpus: 0.00
+original_sentence: אבל אי אפשר להוריד בשכר .
+masked_sentence: אבל אי אפשר [*] בשכר .
+plenary_sentence: אבל אי אפשר את בשכר .
+plenary_tokens: את
+probability of plenary sentence in plenary corpus: 0.00
+probability of plenary sentence in committee corpus: 0.00
+original_sentence: אבקש לקבל את דעתו של היועץ המשפטי של הוועדה .
+masked_sentence: אבקש לקבל את דעתו של היועץ [*] של הוועדה .
+plenary_sentence: אבקש לקבל את דעתו של היועץ , של הוועדה .
+plenary_tokens: ,
+probability of plenary sentence in plenary corpus: 0.00
+probability of plenary sentence in committee corpus: 0.00

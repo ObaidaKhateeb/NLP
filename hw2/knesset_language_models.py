@@ -226,7 +226,7 @@ def main():
             file.write('\n')
     #section 3.2: choosing 10 random messages from committee corpus and masking 10% of their tokens
     sentences_indexes = random.sample(range(len(committee_df)), 10)
-    sentences_to_mask = [committee_df[idx]['sentence_text'] for idx in sentences_indexes]
+    sentences_to_mask = [committee_df.iloc[idx]['sentence_text'] for idx in sentences_indexes]
     with open('original_sampled_sents.txt', 'w', encoding = 'utf-8') as file:
         for sentence in sentences_to_mask:
             file.write(sentence+ '\n')
@@ -234,7 +234,29 @@ def main():
     with open('masked_sampled_sents.txt', 'w', encoding = 'utf-8') as file:
         for sentence in sentences_after_mask:
             file.write(sentence+ '\n')
-    
+    #section 3.3: predicting the masked tokens using the committee model and computing the probability of the sentences
+    sentences_after_mask_solve = sentences_after_mask[:]
+    with open('sampled_sents_results.txt', 'w', encoding = 'utf-8') as file:
+        for i in range(10):
+            file.write(f'original_sentence: {sentences_to_mask[i]}\n')
+            file.write(f'masked_sentence: {sentences_after_mask[i]}\n')
+            plenary_tokens = []
+            masked_idx = sentences_after_mask_solve[i].find('[*]')
+            while(masked_idx != -1):
+                next_token, _ = plenary_model.generate_next_token(sentences_after_mask_solve[i][:masked_idx])
+                sentences_after_mask_solve[i] = sentences_after_mask_solve[i][:masked_idx] + next_token + sentences_after_mask_solve[i][masked_idx + 3:]
+                plenary_tokens.append(next_token)
+                masked_idx = sentences_after_mask_solve[i].find('[*]')
+            file.write(f'plenary_sentence: {sentences_after_mask_solve[i]}\n')
+            plenary_tokens = ','.join(plenary_tokens)
+            file.write(f'plenary_tokens: {plenary_tokens}\n')
+            file.write(f'probability of plenary sentence in plenary corpus: {plenary_model.calculate_prob_of_sentence(sentences_after_mask_solve[i]):.2f}\n')
+            file.write(f'probability of plenary sentence in committee corpus: {committee_model.calculate_prob_of_sentence(sentences_after_mask_solve[i]):.2f}\n')
+    #section 3.4:
+    with open('perplexity_result.txt', 'w', encoding = 'utf-8') as file:
+        for i in range(10):
+            pass
+
     
 
 
