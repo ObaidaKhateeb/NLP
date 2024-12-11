@@ -1,60 +1,60 @@
-original_sentence: אני רוצה לומר קודם כל שגם אני כמו חיים אורון רוצה שהאלמנים יקבלו את כספם .
-masked_sentence: אני רוצה לומר קודם כל שגם אני [*] חיים אורון רוצה שהאלמנים יקבלו את [*] .
-plenary_sentence: אני רוצה לומר קודם כל שגם אני רוצה חיים אורון רוצה שהאלמנים יקבלו את זה .
-plenary_tokens: רוצה,זה
-probability of plenary sentence in plenary corpus: -142.69
-probability of plenary sentence in committee corpus: -132.53
-original_sentence: תערוכה מקצועית שעומדת כרגע בפתח היא תערוכת מזון של יצואנים ישראלים , מדובר במיליארדי שקלים .
-masked_sentence: תערוכה מקצועית שעומדת כרגע בפתח היא [*] מזון של יצואנים ישראלים , מדובר במיליארדי [*] .
-plenary_sentence: תערוכה מקצועית שעומדת כרגע בפתח היא לא מזון של יצואנים ישראלים , מדובר במיליארדי , .
-plenary_tokens: לא,,
-probability of plenary sentence in plenary corpus: -171.94
-probability of plenary sentence in committee corpus: -159.32
-original_sentence: לעזוב בלי להעזיב .
-masked_sentence: לעזוב בלי להעזיב .
-plenary_sentence: לעזוב בלי להעזיב .
-plenary_tokens: 
-probability of plenary sentence in plenary corpus: -44.76
-probability of plenary sentence in committee corpus: -41.63
-original_sentence: לומר היום שאנחנו כובש , כשעל - פי כתבי המשפט הבין - לאומי הזכויות הן של העם היהודי , זה נראה לי משונה ביותר .
-masked_sentence: לומר היום שאנחנו כובש , כשעל - פי כתבי [*] הבין - לאומי הזכויות הן של העם [*] , זה נראה לי משונה ביותר .
-plenary_sentence: לומר היום שאנחנו כובש , כשעל - פי כתבי אישום הבין - לאומי הזכויות הן של העם היהודי , זה נראה לי משונה ביותר .
-plenary_tokens: אישום,היהודי
-probability of plenary sentence in plenary corpus: -244.48
-probability of plenary sentence in committee corpus: -233.80
-original_sentence: הדבר הנוסף הוא הסיווג במס הכנסה ומע"מ כמוסד כספי שלוקח על כל שקל שאנחנו מוציאים עוד 17 אחוזים .
-masked_sentence: הדבר הנוסף הוא הסיווג במס הכנסה [*] כמוסד כספי שלוקח על כל שקל שאנחנו [*] עוד 17 אחוזים .
-plenary_sentence: הדבר הנוסף הוא הסיווג במס הכנסה ( כמוסד כספי שלוקח על כל שקל שאנחנו לא עוד 17 אחוזים .
-plenary_tokens: (,לא
-probability of plenary sentence in plenary corpus: -194.51
-probability of plenary sentence in committee corpus: -185.33
-original_sentence: המקומות היחידים שיש מקום לפרסום הוא כאשר הם מוגדרים כבעיה , וזו טעות מלכתחילה לטעמי .
-masked_sentence: המקומות [*] שיש מקום לפרסום הוא כאשר הם מוגדרים [*] , וזו טעות מלכתחילה לטעמי .
-plenary_sentence: המקומות האלה שיש מקום לפרסום הוא כאשר הם מוגדרים , , וזו טעות מלכתחילה לטעמי .
-plenary_tokens: האלה,,
-probability of plenary sentence in plenary corpus: -172.36
-probability of plenary sentence in committee corpus: -163.19
-original_sentence: חברים , אמנם זה קצת שונה מקריית שמונה , יש פרוטוקול , זה לא עניין .
-masked_sentence: [*] [*] אמנם זה קצת שונה מקריית שמונה , יש פרוטוקול , זה לא עניין .
-plenary_sentence: אני רוצה אמנם זה קצת שונה מקריית שמונה , יש פרוטוקול , זה לא עניין .
-plenary_tokens: אני,רוצה
-probability of plenary sentence in plenary corpus: -143.63
-probability of plenary sentence in committee corpus: -132.87
-original_sentence: לפי מפת ההטבות לפריפריה .
-masked_sentence: לפי מפת ההטבות לפריפריה .
-plenary_sentence: לפי מפת ההטבות לפריפריה .
-plenary_tokens: 
-probability of plenary sentence in plenary corpus: -50.93
-probability of plenary sentence in committee corpus: -47.84
-original_sentence: למשל , אם המדינה היתה רוצה לוותר על שטח שהחוק הישראלי חל בו – על זה יש כל מיני מגבלות .
-masked_sentence: למשל , אם המדינה היתה רוצה לוותר על שטח שהחוק הישראלי חל בו – על זה יש [*] מיני [*] .
-plenary_sentence: למשל , אם המדינה היתה רוצה לוותר על שטח שהחוק הישראלי חל בו – על זה יש לנו מיני דברים .
-plenary_tokens: לנו,דברים
-probability of plenary sentence in plenary corpus: -206.72
-probability of plenary sentence in committee corpus: -191.34
-original_sentence: השרה בזכות דיבור , בבקשה לתת לה לדבר .
-masked_sentence: השרה בזכות דיבור , בבקשה לתת [*] לדבר .
-plenary_sentence: השרה בזכות דיבור , בבקשה לתת את לדבר .
-plenary_tokens: את
-probability of plenary sentence in plenary corpus: -90.39
-probability of plenary sentence in committee corpus: -86.91
+original_sentence: 5 מיליוני שקלים לתקצוב ספריות קיימות , עוד 3.
+masked_sentence: 5 מיליוני שקלים לתקצוב ספריות [*] , עוד 3.
+plenary_sentence: 5 מיליוני שקלים לתקצוב ספריות , , עוד 3.
+plenary_tokens: ,
+probability of plenary sentence in plenary corpus: -87.40
+probability of plenary sentence in committee corpus: -84.92
+original_sentence: עכשיו כל עם ישראל מתגייס בתרומות ובסיוע לכל הנפגעים , ובצדק .
+masked_sentence: עכשיו כל עם ישראל מתגייס בתרומות ובסיוע לכל הנפגעים [*] ובצדק .
+plenary_sentence: עכשיו כל עם ישראל מתגייס בתרומות ובסיוע לכל הנפגעים , ובצדק .
+plenary_tokens: ,
+probability of plenary sentence in plenary corpus: -122.14
+probability of plenary sentence in committee corpus: -115.14
+original_sentence: אבל זה חוזר אלינו וחוזר אליהם – פינג פונג שלא היה בעבר – אבל באמת רק יעצים את הביקורת : הקמתם ועדה ציבורית ונתתם לה את הסמכויות , אבל כשמקבלים החלטה שלא נראית לכם במאה אחוז אז אתם משתמשים בזכות הווטו שלכם ולמעשה הופכים אותה לחותמת גומי .
+masked_sentence: אבל זה חוזר [*] [*] אליהם – פינג פונג [*] היה בעבר – אבל באמת רק יעצים את הביקורת [*] הקמתם ועדה ציבורית ונתתם לה את הסמכויות , אבל כשמקבלים החלטה שלא [*] לכם במאה אחוז אז אתם משתמשים בזכות הווטו שלכם ולמעשה הופכים אותה לחותמת גומי .
+plenary_sentence: אבל זה חוזר על - אליהם – פינג פונג , היה בעבר – אבל באמת רק יעצים את הביקורת , הקמתם ועדה ציבורית ונתתם לה את הסמכויות , אבל כשמקבלים החלטה שלא יהיה לכם במאה אחוז אז אתם משתמשים בזכות הווטו שלכם ולמעשה הופכים אותה לחותמת גומי .
+plenary_tokens: על,-,,,,,יהיה
+probability of plenary sentence in plenary corpus: -495.15
+probability of plenary sentence in committee corpus: -462.32
+original_sentence: רגע , מה עמדת משרד האוצר ?
+masked_sentence: רגע , מה עמדת [*] האוצר ?
+plenary_sentence: רגע , מה עמדת משרד האוצר ?
+plenary_tokens: משרד
+probability of plenary sentence in plenary corpus: -64.86
+probability of plenary sentence in committee corpus: -58.71
+original_sentence: השאלה היא האם במגזר הפרטי והציבורי אנחנו נתייחס למזמין שירות כוח אדם כאל מזמין שירותים אחרים .
+masked_sentence: השאלה היא האם במגזר הפרטי והציבורי אנחנו נתייחס למזמין שירות כוח אדם כאל [*] [*] אחרים .
+plenary_sentence: השאלה היא האם במגזר הפרטי והציבורי אנחנו נתייחס למזמין שירות כוח אדם כאל , אני אחרים .
+plenary_tokens: ,,אני
+probability of plenary sentence in plenary corpus: -172.92
+probability of plenary sentence in committee corpus: -155.86
+original_sentence: לסעיף 345 יש שתי הסתייגויות של יעל גרמן בשם כל סיעת יש עתיד .
+masked_sentence: לסעיף 345 יש שתי הסתייגויות של יעל גרמן בשם [*] סיעת יש עתיד .
+plenary_sentence: לסעיף 345 יש שתי הסתייגויות של יעל גרמן בשם הממשלה סיעת יש עתיד .
+plenary_tokens: הממשלה
+probability of plenary sentence in plenary corpus: -145.24
+probability of plenary sentence in committee corpus: -140.73
+original_sentence: אבל אין ספק שעיבוד הטראומה הוא הרבה יותר קשה כשהכל תלוי באוויר ומתחדש כל הזמן .
+masked_sentence: אבל אין ספק [*] הטראומה [*] הרבה יותר קשה כשהכל תלוי באוויר ומתחדש כל הזמן .
+plenary_sentence: אבל אין ספק , הטראומה הזאת הרבה יותר קשה כשהכל תלוי באוויר ומתחדש כל הזמן .
+plenary_tokens: ,,הזאת
+probability of plenary sentence in plenary corpus: -154.04
+probability of plenary sentence in committee corpus: -146.72
+original_sentence: אין דרך לממש את הסכומים האלה בלי שיתוף פעולה של אוצר התיישבות היהודים , של ההסתדרות הציונית , שהיא זאת שצריכה לקבלת את ההחלטה , או דרך בית המשפט או בדרך של החלטה , אפילו חקיקה של הכנסת .
+masked_sentence: אין דרך לממש את הסכומים האלה בלי שיתוף [*] [*] אוצר התיישבות היהודים , של ההסתדרות הציונית , שהיא [*] שצריכה לקבלת את ההחלטה , או דרך בית המשפט או בדרך של החלטה , [*] חקיקה של הכנסת .
+plenary_sentence: אין דרך לממש את הסכומים האלה בלי שיתוף פעולה עם אוצר התיישבות היהודים , של ההסתדרות הציונית , שהיא לא שצריכה לקבלת את ההחלטה , או דרך בית המשפט או בדרך של החלטה , אני חקיקה של הכנסת .
+plenary_tokens: פעולה,עם,לא,אני
+probability of plenary sentence in plenary corpus: -388.33
+probability of plenary sentence in committee corpus: -355.92
+original_sentence: זה עדיין לא מחייב אלא אתה רואה שיש כאן משהו שהוא לא מחוץ לכיוון לחלוטין , שאתה בא רק כדי לקבל את ההגנה .
+masked_sentence: זה עדיין לא [*] אלא אתה רואה שיש כאן משהו שהוא [*] מחוץ לכיוון לחלוטין , שאתה בא רק כדי לקבל את ההגנה .
+plenary_sentence: זה עדיין לא , אלא אתה רואה שיש כאן משהו שהוא לא מחוץ לכיוון לחלוטין , שאתה בא רק כדי לקבל את ההגנה .
+plenary_tokens: ,,לא
+probability of plenary sentence in plenary corpus: -230.25
+probability of plenary sentence in committee corpus: -215.48
+original_sentence: כלומר , לפני חודשיים היה מקרה דומה .
+masked_sentence: כלומר , לפני חודשיים היה מקרה דומה [*]
+plenary_sentence: כלומר , לפני חודשיים היה מקרה דומה ,
+plenary_tokens: ,
+probability of plenary sentence in plenary corpus: -75.03
+probability of plenary sentence in committee corpus: -70.94

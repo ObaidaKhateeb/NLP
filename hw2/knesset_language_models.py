@@ -29,7 +29,6 @@ class Trigram_LM:
     #A method that creates a dictionary of bigrams frequencies out of the given sentences. 
     #Input: List of tokenized sentences. 
     #Output: Dictionary of bigrams, each with its frequency. 
-
     def _bigrams_create(self, sentences):
         bigrams_dict = {}
         for sentence in sentences: 
@@ -332,12 +331,12 @@ def main():
     for i in range(len(relevant_sentences)):
         print (relevant_sentences[i])
     #checking masking: 
-    original_sentences_indexes = random.sample(range(len(committee_df)), 100)
+    original_sentences_indexes = random.sample(range(len(committee_df)), 500)
     original_sentences = [committee_df.iloc[idx]['sentence_text'] for idx in original_sentences_indexes]
     sentences_after_mask = mask_tokens_in_sentences(original_sentences, 10)
-    for idx1 in range(20, -1, -1):
+    for idx1 in range(1, 20):
         lambda1 = 0.05* idx1
-        for idx2 in [20 - idx1 - 2, 20-idx1 - 0.2, 20-idx1 - 0.02, 20-idx1 - 0.002, 20-idx1 - 0.0002, 20-idx1 - 0.00002]:
+        for idx2 in [20-idx1 - 0.002, 20-idx1 - 0.0002, 20-idx1 - 0.00002]:
             if idx2 < 0.000001:
                 continue
             lambda2 = 0.05*idx2
