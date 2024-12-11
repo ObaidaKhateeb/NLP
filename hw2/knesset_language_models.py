@@ -203,6 +203,8 @@ def main():
     file_path = 'knesset_corpus.json'
     #output_folder = sys.argv[2] 
     output_folder = 'output'
+
+    #reading the JSON file 
     try:
         corpus_df = pd.read_json(file_path, lines=True, encoding='utf-8')
     except FileNotFoundError:
@@ -211,7 +213,8 @@ def main():
     except ValueError:
         print(f'Error: The file {file_path} is not JSON valid file')
         return
-    #Separating the committee and plenary data
+    
+    #Separating the committee and plenary data and exctracting the sentences related to each 
     try:
         committee_df = corpus_df[corpus_df['protocol_type'] == 'committee']
         plenary_df = corpus_df[corpus_df['protocol_type'] == 'plenary']
@@ -220,6 +223,8 @@ def main():
         return 
     committee_sentences = committee_df['sentence_text'].tolist()
     plenary_sentences = plenary_df['sentence_text'].tolist()
+
+    #Creating instances of languages model
     try:
         committee_model = Trigram_LM(committee_sentences)
     except Exception as e:
@@ -230,62 +235,93 @@ def main():
     except Exception as e:
         print(f'Error: Failed to create trigram model: plenary_model: {e}')
         return 
+    
     #sections 2.2, 2.3, 2.4: printing the 10 most common collocations with threshold of 5, in each of the corpuses
-    # with open('knesset_collocations.txt', 'w', encoding = 'utf-8') as file:
-    #     for n in [2,3,4]: #iterate over the longs of 2,3,4
-    #         file.write(f'{n}-gram collocations:\n')
-    #         for type_up_name, type in [('Frequency', 'frequency'), ('Tf-IDF', 'tfidf')]:
-    #             file.write(f'{type_up_name}:\n')
-    #             for corpus_name, corpus_df in [('Committee corpus', committee_df), ('Plenary corpus', plenary_df)]:
-    #                 file.write(f'{corpus_name}:\n')
-    #                 collocations = get_k_n_t_collocations(10, n, 5, corpus_df, type)
-    #                 for collocation in collocations:
-    #                     file.write(f'{collocation}\n')
-    #                 file.write('\n')
-    #         file.write('\n')
+    try:
+        with open('knesset_collocations.txt', 'w', encoding = 'utf-8') as file:
+            for n in [2,3,4]: #iterate over the longs of 2,3,4
+                file.write(f'{n}-gram collocations:\n')
+                for type_up_name, type in [('Frequency', 'frequency'), ('Tf-IDF', 'tfidf')]:
+                    file.write(f'{type_up_name}:\n')
+                    for corpus_name, corpus_df in [('Committee corpus', committee_df), ('Plenary corpus', plenary_df)]:
+                        file.write(f'{corpus_name}:\n')
+                        collocations = get_k_n_t_collocations(10, n, 5, corpus_df, type)
+                        for collocation in collocations:
+                            file.write(f'{collocation}\n')
+                        file.write('\n')
+                file.write('\n')
+    except IOError as e:
+        print(f'Error: Failed to write to "knesset_collocations.txt": {e}')
+
     #section 3.2: choosing 10 random messages from committee corpus and masking 10% of their tokens
-    # sentences_indexes = random.sample(range(len(committee_df)), 10)
-    # sentences_to_mask = [committee_df.iloc[idx]['sentence_text'] for idx in sentences_indexes]
-    # with open('original_sampled_sents.txt', 'w', encoding = 'utf-8') as file:
-    #     for sentence in sentences_to_mask:
-    #         file.write(sentence+ '\n')
-    # sentences_after_mask = mask_tokens_in_sentences(sentences_to_mask, 10)
-    # with open('masked_sampled_sents.txt', 'w', encoding = 'utf-8') as file:
-    #     for sentence in sentences_after_mask:
-    #         file.write(sentence+ '\n')
+    try:
+        sentences_indexes = random.sample(range(len(committee_df)), 10) #choosing 10 random indexes 
+    except ValueError as e: #e.g., the case where number of sentences is less than 10 
+        print(f'Error: Failed to sample sentences: {e}')
+        sentences_indexes = []
+    try: 
+        sentences_to_mask = [committee_df.iloc[idx]['sentence_text'] for idx in sentences_indexes] #extracting the sentences in the previously chosen indexes
+    except KeyError as e:
+        print(f'Error: No "sentence_text" column in "sentences_to_mask" DataFrame: {e}')
+        sentences_to_mask = []
+    try:
+        with open('original_sampled_sents.txt', 'w', encoding = 'utf-8') as file:
+            for sentence in sentences_to_mask:
+                file.write(sentence+ '\n')
+    except IOError as e:
+        print(f'Error: Failed to write to "original_sampled_sents.txt": {e}')
+    sentences_after_mask = mask_tokens_in_sentences(sentences_to_mask, 10)
+    try:
+        with open('masked_sampled_sents.txt', 'w', encoding = 'utf-8') as file:
+            for sentence in sentences_after_mask:
+                file.write(sentence+ '\n')
+    except IOError as e:
+        print(f'Error: Failed to write to "masked_sampled_sents.txt": {e}')
+
     #section 3.3: predicting the masked tokens using the committee model and computing the probability of the sentences
-    # sentences_after_mask_solve = sentences_after_mask[:]
-    # subsentences_after_mask_solve = []
-    # with open('sampled_sents_results.txt', 'w', encoding = 'utf-8') as file:
-    #     for i in range(10):
-    #         file.write(f'original_sentence: {sentences_to_mask[i]}\n')
-    #         file.write(f'masked_sentence: {sentences_after_mask[i]}\n')
-    #         plenary_tokens = []
-    #         subsentences = [] #for section 3.4
-    #         masked_idx = sentences_after_mask_solve[i].find('[*]')
-    #         while(masked_idx != -1):
-    #             next_token, _ = plenary_model.generate_next_token(sentences_after_mask_solve[i][:masked_idx])
-    #             sentences_after_mask_solve[i] = sentences_after_mask_solve[i][:masked_idx] + next_token + sentences_after_mask_solve[i][masked_idx + 3:]
-    #             plenary_tokens.append(next_token)
-    #             subsentences.append(sentences_after_mask_solve[i][:masked_idx] + next_token)
-    #             masked_idx = sentences_after_mask_solve[i].find('[*]')
-    #         subsentences_after_mask_solve.append(subsentences)
-    #         file.write(f'plenary_sentence: {sentences_after_mask_solve[i]}\n')
-    #         plenary_tokens = ','.join(plenary_tokens)
-    #         file.write(f'plenary_tokens: {plenary_tokens}\n')
-    #         file.write(f'probability of plenary sentence in plenary corpus: {plenary_model.calculate_prob_of_sentence(sentences_after_mask_solve[i]):.2f}\n')
-    #         file.write(f'probability of plenary sentence in committee corpus: {committee_model.calculate_prob_of_sentence(sentences_after_mask_solve[i]):.2f}\n')
+    sentences_after_mask_solve = sentences_after_mask[:]
+    subsentences_after_mask_solve = [] #a list stores the subsentences of each sentences, with each substance ends with a masked token, this will be used in section 3.4
+    try:
+        with open('sampled_sents_results.txt', 'w', encoding = 'utf-8') as file:
+            for i in range(10):
+                file.write(f'original_sentence: {sentences_to_mask[i]}\n')
+                file.write(f'masked_sentence: {sentences_after_mask[i]}\n')
+                plenary_tokens = []
+                subsentences = [] 
+                masked_idx = sentences_after_mask_solve[i].find('[*]')
+                while(masked_idx != -1): #while there's a masked token
+                    next_token, _ = plenary_model.generate_next_token(sentences_after_mask_solve[i][:masked_idx])
+                    sentences_after_mask_solve[i] = sentences_after_mask_solve[i][:masked_idx] + next_token + sentences_after_mask_solve[i][masked_idx + 3:] #replacing the [*] with the token predicted to be the masked one 
+                    plenary_tokens.append(next_token)
+                    subsentences.append(sentences_after_mask_solve[i][:masked_idx] + next_token)
+                    masked_idx = sentences_after_mask_solve[i].find('[*]')
+                subsentences_after_mask_solve.append(subsentences)
+                file.write(f'plenary_sentence: {sentences_after_mask_solve[i]}\n')
+                plenary_tokens = ','.join(plenary_tokens)
+                file.write(f'plenary_tokens: {plenary_tokens}\n')
+                file.write(f'probability of plenary sentence in plenary corpus: {plenary_model.calculate_prob_of_sentence(sentences_after_mask_solve[i]):.2f}\n')
+                file.write(f'probability of plenary sentence in committee corpus: {committee_model.calculate_prob_of_sentence(sentences_after_mask_solve[i]):.2f}\n')
+    except IOError as e:
+        print(f'Error: Failed to write to "sampled_sents_results.txt": {e}')
+
     #section 3.4: computing perplexity of the masked tokens in the sentences using the trigram perplexity formula
-    # with open('perplexity_result.txt', 'w', encoding = 'utf-8') as file:
-    #     for i in range(10):
-    #         perplexity = 1
-    #         if not subsentences_after_mask_solve[i]: #the case when no masked tokens, due to the sentence being short and 10% of it is rounded to 0
-    #             file.write('None\n')
-    #         else:
-    #             for subsentence in subsentences_after_mask_solve[i]: #iterate over the masked tokens
-    #                 perplexity *= (1 / plenary_model.calculate_prob_of_sentence(subsentence)) # perplexity *= 1/P(masked token | subsentence until masked token)
-    #             perplexity = perplexity ** (1/ len(subsentences_after_mask_solve[i])) #perplexity = perplexity^(1/n)
-    #             file.write(f'{perplexity:.2f}\n')
+    try:
+        with open('perplexity_result.txt', 'w', encoding = 'utf-8') as file:
+            for i in range(10):
+                perplexity = 1
+                if not subsentences_after_mask_solve[i]: #the case when no masked tokens, due to the sentence being short and 10% of it is rounded to 0
+                    file.write('None\n')
+                else:
+                    for subsentence in subsentences_after_mask_solve[i]: #iterate over the masked tokens
+                        try:
+                            perplexity *= (1 / plenary_model.calculate_prob_of_sentence(subsentence)) # perplexity *= 1/P(masked token | subsentence until masked token)
+                            perplexity = perplexity ** (1/ len(subsentences_after_mask_solve[i])) #perplexity = perplexity^(1/n)
+                        except ZeroDivisionError:
+                            print('Error: Division by zero while computing perplexity')
+                            perplexity = float('inf')
+                    file.write(f'{perplexity:.2f}\n')
+    except IOError as e:
+        print(f'Error: Failed to write to "perplexity_result.txt": {e}')
         
     #checks 
     sentence_prob = committee_model.calculate_prob_of_sentence('אחמד טיבי')
