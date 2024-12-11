@@ -1,60 +1,60 @@
-original_sentence: הסקירה הקצרה שנתתי היא סקירה שרק מסברת את האוזן ואומרת , שמעבר להוראה פורמלית של הספרות , המודעות לקריאה היא גדולה מאוד .
-masked_sentence: הסקירה הקצרה שנתתי היא סקירה שרק מסברת את האוזן ואומרת , שמעבר להוראה [*] של הספרות , המודעות לקריאה היא גדולה [*] .
-plenary_sentence: הסקירה הקצרה שנתתי היא סקירה שרק מסברת את האוזן ואומרת , שמעבר להוראה עבודת של הספרות , המודעות לקריאה היא גדולה כאלה .
-plenary_tokens: עבודת,כאלה
-probability of plenary sentence in plenary corpus: -253.84
-probability of plenary sentence in committee corpus: -244.90
-original_sentence: גם את הכבוד שרחשת לקהילה שלך , לחברה שלך .
-masked_sentence: גם את הכבוד שרחשת לקהילה שלך , [*] שלך .
-plenary_sentence: גם את הכבוד שרחשת לקהילה שלך , , שלך .
-plenary_tokens: ,
-probability of plenary sentence in plenary corpus: -100.44
-probability of plenary sentence in committee corpus: -97.44
-original_sentence: אנחנו התכוונו שרק מה שמנינו ספציפית יחול מהכלים שיש לנאמן .
-masked_sentence: אנחנו התכוונו שרק מה שמנינו ספציפית יחול מהכלים [*] לנאמן .
-plenary_sentence: אנחנו התכוונו שרק מה שמנינו ספציפית יחול מהכלים אני לנאמן .
-plenary_tokens: אני
-probability of plenary sentence in plenary corpus: -116.05
-probability of plenary sentence in committee corpus: -111.53
-original_sentence: המשמעות היא ברורה , הר הבית כולו הוא מקום שמתאים להיות מסגד אחד ויש להעלים כל שריד קדום יותר של תרבות אחרת .
-masked_sentence: המשמעות היא ברורה , הר הבית כולו הוא מקום שמתאים [*] מסגד אחד ויש להעלים כל שריד קדום יותר [*] תרבות אחרת .
-plenary_sentence: המשמעות היא ברורה , הר הבית כולו הוא מקום שמתאים שלו מסגד אחד ויש להעלים כל שריד קדום יותר פחות תרבות אחרת .
-plenary_tokens: שלו,פחות
-probability of plenary sentence in plenary corpus: -250.80
-probability of plenary sentence in committee corpus: -242.41
-original_sentence: אתם אף פעם לא נתתם לשנות .
-masked_sentence: אתם אף [*] לא נתתם לשנות .
-plenary_sentence: אתם אף לא לא נתתם לשנות .
-plenary_tokens: לא
-probability of plenary sentence in plenary corpus: -73.13
-probability of plenary sentence in committee corpus: -70.11
-original_sentence: אני אומר את הדברים האלה בלשון המעטה .
-masked_sentence: [*] אומר את הדברים האלה בלשון המעטה .
-plenary_sentence: , אומר את הדברים האלה בלשון המעטה .
-plenary_tokens: ,
-probability of plenary sentence in plenary corpus: -79.73
-probability of plenary sentence in committee corpus: -77.23
-original_sentence: רוצה לומר ששר הפנים רשאי לעגן ולומר שבמחלקה לענייני א' או במחלקה לענייני ב' חייב יהיה לעמוד בן מיעוטים או אישה או נכה וכן הלאה ברשויות המקומיות .
-masked_sentence: רוצה [*] ששר הפנים רשאי לעגן ולומר שבמחלקה לענייני א' [*] במחלקה [*] ב' חייב יהיה לעמוד בן מיעוטים או אישה או נכה וכן הלאה ברשויות המקומיות .
-plenary_sentence: רוצה מוסר ששר הפנים רשאי לעגן ולומר שבמחלקה לענייני א' , במחלקה שוטרים ב' חייב יהיה לעמוד בן מיעוטים או אישה או נכה וכן הלאה ברשויות המקומיות .
-plenary_tokens: מוסר,,,שוטרים
-probability of plenary sentence in plenary corpus: -302.03
-probability of plenary sentence in committee corpus: -291.83
-original_sentence: בנוסף , שאלתי את שר המדע אם הוא יכול להבטיח לי שגם בזמן ההליך המשפטי התוכנית לא תיפגע והאנשים לא ייפגעו , והוא אמר שהוא מבטיח .
-masked_sentence: בנוסף , שאלתי את שר המדע אם [*] יכול להבטיח לי שגם בזמן ההליך המשפטי התוכנית [*] תיפגע והאנשים לא [*] , והוא אמר שהוא מבטיח .
-plenary_sentence: בנוסף , שאלתי את שר המדע אם , יכול להבטיח לי שגם בזמן ההליך המשפטי התוכנית , תיפגע והאנשים לא . , והוא אמר שהוא מבטיח .
-plenary_tokens: ,,,,.
-probability of plenary sentence in plenary corpus: -297.07
-probability of plenary sentence in committee corpus: -284.56
-original_sentence: עד כמה שאני מבין , על פי התקנות המקוריות , התובע רשאי להגיש פנייה לוועדת ערר במידה והוא לא מרוצה מהתוצאה תוך שלושים יום מיום קבלת ההחלטה .
-masked_sentence: עד כמה [*] מבין , על פי התקנות המקוריות , התובע רשאי להגיש פנייה לוועדת ערר במידה והוא [*] מרוצה מהתוצאה תוך שלושים יום מיום [*] ההחלטה .
-plenary_sentence: עד כמה , מבין , על פי התקנות המקוריות , התובע רשאי להגיש פנייה לוועדת ערר במידה והוא : מרוצה מהתוצאה תוך שלושים יום מיום אמון ההחלטה .
-plenary_tokens: ,,:,אמון
-probability of plenary sentence in plenary corpus: -301.92
-probability of plenary sentence in committee corpus: -291.89
-original_sentence: איתרע מזלם של אנשי הטלוויזיה החינוכית שרק הם הגיעו לדיון הזה .
-masked_sentence: איתרע מזלם של [*] הטלוויזיה החינוכית שרק הם הגיעו לדיון הזה .
-plenary_sentence: איתרע מזלם של . הטלוויזיה החינוכית שרק הם הגיעו לדיון הזה .
-plenary_tokens: .
-probability of plenary sentence in plenary corpus: -132.67
-probability of plenary sentence in committee corpus: -126.93
+original_sentence: אני רוצה לומר קודם כל שגם אני כמו חיים אורון רוצה שהאלמנים יקבלו את כספם .
+masked_sentence: אני רוצה לומר קודם כל שגם אני [*] חיים אורון רוצה שהאלמנים יקבלו את [*] .
+plenary_sentence: אני רוצה לומר קודם כל שגם אני רוצה חיים אורון רוצה שהאלמנים יקבלו את זה .
+plenary_tokens: רוצה,זה
+probability of plenary sentence in plenary corpus: -142.69
+probability of plenary sentence in committee corpus: -132.53
+original_sentence: תערוכה מקצועית שעומדת כרגע בפתח היא תערוכת מזון של יצואנים ישראלים , מדובר במיליארדי שקלים .
+masked_sentence: תערוכה מקצועית שעומדת כרגע בפתח היא [*] מזון של יצואנים ישראלים , מדובר במיליארדי [*] .
+plenary_sentence: תערוכה מקצועית שעומדת כרגע בפתח היא לא מזון של יצואנים ישראלים , מדובר במיליארדי , .
+plenary_tokens: לא,,
+probability of plenary sentence in plenary corpus: -171.94
+probability of plenary sentence in committee corpus: -159.32
+original_sentence: לעזוב בלי להעזיב .
+masked_sentence: לעזוב בלי להעזיב .
+plenary_sentence: לעזוב בלי להעזיב .
+plenary_tokens: 
+probability of plenary sentence in plenary corpus: -44.76
+probability of plenary sentence in committee corpus: -41.63
+original_sentence: לומר היום שאנחנו כובש , כשעל - פי כתבי המשפט הבין - לאומי הזכויות הן של העם היהודי , זה נראה לי משונה ביותר .
+masked_sentence: לומר היום שאנחנו כובש , כשעל - פי כתבי [*] הבין - לאומי הזכויות הן של העם [*] , זה נראה לי משונה ביותר .
+plenary_sentence: לומר היום שאנחנו כובש , כשעל - פי כתבי אישום הבין - לאומי הזכויות הן של העם היהודי , זה נראה לי משונה ביותר .
+plenary_tokens: אישום,היהודי
+probability of plenary sentence in plenary corpus: -244.48
+probability of plenary sentence in committee corpus: -233.80
+original_sentence: הדבר הנוסף הוא הסיווג במס הכנסה ומע"מ כמוסד כספי שלוקח על כל שקל שאנחנו מוציאים עוד 17 אחוזים .
+masked_sentence: הדבר הנוסף הוא הסיווג במס הכנסה [*] כמוסד כספי שלוקח על כל שקל שאנחנו [*] עוד 17 אחוזים .
+plenary_sentence: הדבר הנוסף הוא הסיווג במס הכנסה ( כמוסד כספי שלוקח על כל שקל שאנחנו לא עוד 17 אחוזים .
+plenary_tokens: (,לא
+probability of plenary sentence in plenary corpus: -194.51
+probability of plenary sentence in committee corpus: -185.33
+original_sentence: המקומות היחידים שיש מקום לפרסום הוא כאשר הם מוגדרים כבעיה , וזו טעות מלכתחילה לטעמי .
+masked_sentence: המקומות [*] שיש מקום לפרסום הוא כאשר הם מוגדרים [*] , וזו טעות מלכתחילה לטעמי .
+plenary_sentence: המקומות האלה שיש מקום לפרסום הוא כאשר הם מוגדרים , , וזו טעות מלכתחילה לטעמי .
+plenary_tokens: האלה,,
+probability of plenary sentence in plenary corpus: -172.36
+probability of plenary sentence in committee corpus: -163.19
+original_sentence: חברים , אמנם זה קצת שונה מקריית שמונה , יש פרוטוקול , זה לא עניין .
+masked_sentence: [*] [*] אמנם זה קצת שונה מקריית שמונה , יש פרוטוקול , זה לא עניין .
+plenary_sentence: אני רוצה אמנם זה קצת שונה מקריית שמונה , יש פרוטוקול , זה לא עניין .
+plenary_tokens: אני,רוצה
+probability of plenary sentence in plenary corpus: -143.63
+probability of plenary sentence in committee corpus: -132.87
+original_sentence: לפי מפת ההטבות לפריפריה .
+masked_sentence: לפי מפת ההטבות לפריפריה .
+plenary_sentence: לפי מפת ההטבות לפריפריה .
+plenary_tokens: 
+probability of plenary sentence in plenary corpus: -50.93
+probability of plenary sentence in committee corpus: -47.84
+original_sentence: למשל , אם המדינה היתה רוצה לוותר על שטח שהחוק הישראלי חל בו – על זה יש כל מיני מגבלות .
+masked_sentence: למשל , אם המדינה היתה רוצה לוותר על שטח שהחוק הישראלי חל בו – על זה יש [*] מיני [*] .
+plenary_sentence: למשל , אם המדינה היתה רוצה לוותר על שטח שהחוק הישראלי חל בו – על זה יש לנו מיני דברים .
+plenary_tokens: לנו,דברים
+probability of plenary sentence in plenary corpus: -206.72
+probability of plenary sentence in committee corpus: -191.34
+original_sentence: השרה בזכות דיבור , בבקשה לתת לה לדבר .
+masked_sentence: השרה בזכות דיבור , בבקשה לתת [*] לדבר .
+plenary_sentence: השרה בזכות דיבור , בבקשה לתת את לדבר .
+plenary_tokens: את
+probability of plenary sentence in plenary corpus: -90.39
+probability of plenary sentence in committee corpus: -86.91
