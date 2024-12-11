@@ -1,4 +1,4 @@
-2-gram collocations:
+Two-gram collocations:
 Frequency:
 Committee corpus:
 את זה
@@ -24,7 +24,7 @@ Plenary corpus:
 אינו נוכח
 אדוני היושב
 
-Tf-IDF:
+TF-IDF:
 Committee corpus:
 - ראש
 נושא חדש
@@ -49,8 +49,7 @@ Plenary corpus:
 – אינו
 ; הצעת
 
-
-3-gram collocations:
+Three-gram collocations:
 Frequency:
 Committee corpus:
 , אני לא
@@ -76,7 +75,7 @@ Plenary corpus:
 יושב - ראש
 , אדוני היושב
 
-Tf-IDF:
+TF-IDF:
 Committee corpus:
 " לאטמה "
 אני נועל את
@@ -101,8 +100,7 @@ Plenary corpus:
 , התשס"ה -
 , התש"ס –
 
-
-4-gram collocations:
+Four-gram collocations:
 Frequency:
 Committee corpus:
 אדוני היושב - ראש
@@ -128,7 +126,7 @@ Plenary corpus:
 ראש , חברי הכנסת
 חברי חברי הכנסת ,
 
-Tf-IDF:
+TF-IDF:
 Committee corpus:
 אני נועל את הישיבה
 אני פותח את הישיבה
@@ -152,5 +150,4 @@ Plenary corpus:
 2006 , מאת חברי
 2006 , מאת חברת
 , התש"ס – 2000
-
 

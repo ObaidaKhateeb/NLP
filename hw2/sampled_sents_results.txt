@@ -1,60 +1,60 @@
-original_sentence: 5 מיליוני שקלים לתקצוב ספריות קיימות , עוד 3.
-masked_sentence: 5 מיליוני שקלים לתקצוב ספריות [*] , עוד 3.
-plenary_sentence: 5 מיליוני שקלים לתקצוב ספריות , , עוד 3.
+original_sentence: לעניות דעתי – וחלקו עליי – אין זה מן הראוי שחבר כנסת יישב בראש עמותה שמקבלת אישור כזה .
+masked_sentence: לעניות דעתי – [*] עליי – אין זה מן הראוי שחבר כנסת יישב בראש עמותה [*] אישור כזה .
+plenary_sentence: לעניות דעתי – אינו עליי – אין זה מן הראוי שחבר כנסת יישב בראש עמותה שלא אישור כזה .
+plenary_tokens: אינו,שלא
+probability of plenary sentence in plenary corpus: -194.76
+probability of plenary sentence in committee corpus: -190.23
+original_sentence: אנחנו פתחנו את הדיון , יש לנו שני נושאים על סדר היום : 1.
+masked_sentence: אנחנו פתחנו את הדיון , יש [*] שני נושאים על סדר היום : 1.
+plenary_sentence: אנחנו פתחנו את הדיון , יש לנו שני נושאים על סדר היום : 1.
+plenary_tokens: לנו
+probability of plenary sentence in plenary corpus: -130.90
+probability of plenary sentence in committee corpus: -117.31
+original_sentence: אין זכות קנויה במסים , אתה בוודאי יודע .
+masked_sentence: אין זכות קנויה במסים [*] אתה בוודאי יודע .
+plenary_sentence: אין זכות קנויה במסים , אתה בוודאי יודע .
 plenary_tokens: ,
-probability of plenary sentence in plenary corpus: -87.40
-probability of plenary sentence in committee corpus: -84.92
-original_sentence: עכשיו כל עם ישראל מתגייס בתרומות ובסיוע לכל הנפגעים , ובצדק .
-masked_sentence: עכשיו כל עם ישראל מתגייס בתרומות ובסיוע לכל הנפגעים [*] ובצדק .
-plenary_sentence: עכשיו כל עם ישראל מתגייס בתרומות ובסיוע לכל הנפגעים , ובצדק .
+probability of plenary sentence in plenary corpus: -86.94
+probability of plenary sentence in committee corpus: -81.79
+original_sentence: אם אני לא יודע כמה עובדים יש , איך אני אדע כמה מהם בדואים ?
+masked_sentence: אם אני לא יודע כמה עובדים יש , איך אני [*] כמה מהם [*] ?
+plenary_sentence: אם אני לא יודע כמה עובדים יש , איך אני רוצה כמה מהם , ?
+plenary_tokens: רוצה,,
+probability of plenary sentence in plenary corpus: -130.06
+probability of plenary sentence in committee corpus: -123.78
+original_sentence: אין לי מספרים להגיד לך .
+masked_sentence: אין לי מספרים [*] לך .
+plenary_sentence: אין לי מספרים , לך .
 plenary_tokens: ,
-probability of plenary sentence in plenary corpus: -122.14
-probability of plenary sentence in committee corpus: -115.14
-original_sentence: אבל זה חוזר אלינו וחוזר אליהם – פינג פונג שלא היה בעבר – אבל באמת רק יעצים את הביקורת : הקמתם ועדה ציבורית ונתתם לה את הסמכויות , אבל כשמקבלים החלטה שלא נראית לכם במאה אחוז אז אתם משתמשים בזכות הווטו שלכם ולמעשה הופכים אותה לחותמת גומי .
-masked_sentence: אבל זה חוזר [*] [*] אליהם – פינג פונג [*] היה בעבר – אבל באמת רק יעצים את הביקורת [*] הקמתם ועדה ציבורית ונתתם לה את הסמכויות , אבל כשמקבלים החלטה שלא [*] לכם במאה אחוז אז אתם משתמשים בזכות הווטו שלכם ולמעשה הופכים אותה לחותמת גומי .
-plenary_sentence: אבל זה חוזר על - אליהם – פינג פונג , היה בעבר – אבל באמת רק יעצים את הביקורת , הקמתם ועדה ציבורית ונתתם לה את הסמכויות , אבל כשמקבלים החלטה שלא יהיה לכם במאה אחוז אז אתם משתמשים בזכות הווטו שלכם ולמעשה הופכים אותה לחותמת גומי .
-plenary_tokens: על,-,,,,,יהיה
-probability of plenary sentence in plenary corpus: -495.15
-probability of plenary sentence in committee corpus: -462.32
-original_sentence: רגע , מה עמדת משרד האוצר ?
-masked_sentence: רגע , מה עמדת [*] האוצר ?
-plenary_sentence: רגע , מה עמדת משרד האוצר ?
-plenary_tokens: משרד
-probability of plenary sentence in plenary corpus: -64.86
-probability of plenary sentence in committee corpus: -58.71
-original_sentence: השאלה היא האם במגזר הפרטי והציבורי אנחנו נתייחס למזמין שירות כוח אדם כאל מזמין שירותים אחרים .
-masked_sentence: השאלה היא האם במגזר הפרטי והציבורי אנחנו נתייחס למזמין שירות כוח אדם כאל [*] [*] אחרים .
-plenary_sentence: השאלה היא האם במגזר הפרטי והציבורי אנחנו נתייחס למזמין שירות כוח אדם כאל , אני אחרים .
-plenary_tokens: ,,אני
-probability of plenary sentence in plenary corpus: -172.92
-probability of plenary sentence in committee corpus: -155.86
-original_sentence: לסעיף 345 יש שתי הסתייגויות של יעל גרמן בשם כל סיעת יש עתיד .
-masked_sentence: לסעיף 345 יש שתי הסתייגויות של יעל גרמן בשם [*] סיעת יש עתיד .
-plenary_sentence: לסעיף 345 יש שתי הסתייגויות של יעל גרמן בשם הממשלה סיעת יש עתיד .
-plenary_tokens: הממשלה
-probability of plenary sentence in plenary corpus: -145.24
-probability of plenary sentence in committee corpus: -140.73
-original_sentence: אבל אין ספק שעיבוד הטראומה הוא הרבה יותר קשה כשהכל תלוי באוויר ומתחדש כל הזמן .
-masked_sentence: אבל אין ספק [*] הטראומה [*] הרבה יותר קשה כשהכל תלוי באוויר ומתחדש כל הזמן .
-plenary_sentence: אבל אין ספק , הטראומה הזאת הרבה יותר קשה כשהכל תלוי באוויר ומתחדש כל הזמן .
-plenary_tokens: ,,הזאת
-probability of plenary sentence in plenary corpus: -154.04
-probability of plenary sentence in committee corpus: -146.72
-original_sentence: אין דרך לממש את הסכומים האלה בלי שיתוף פעולה של אוצר התיישבות היהודים , של ההסתדרות הציונית , שהיא זאת שצריכה לקבלת את ההחלטה , או דרך בית המשפט או בדרך של החלטה , אפילו חקיקה של הכנסת .
-masked_sentence: אין דרך לממש את הסכומים האלה בלי שיתוף [*] [*] אוצר התיישבות היהודים , של ההסתדרות הציונית , שהיא [*] שצריכה לקבלת את ההחלטה , או דרך בית המשפט או בדרך של החלטה , [*] חקיקה של הכנסת .
-plenary_sentence: אין דרך לממש את הסכומים האלה בלי שיתוף פעולה עם אוצר התיישבות היהודים , של ההסתדרות הציונית , שהיא לא שצריכה לקבלת את ההחלטה , או דרך בית המשפט או בדרך של החלטה , אני חקיקה של הכנסת .
-plenary_tokens: פעולה,עם,לא,אני
-probability of plenary sentence in plenary corpus: -388.33
-probability of plenary sentence in committee corpus: -355.92
-original_sentence: זה עדיין לא מחייב אלא אתה רואה שיש כאן משהו שהוא לא מחוץ לכיוון לחלוטין , שאתה בא רק כדי לקבל את ההגנה .
-masked_sentence: זה עדיין לא [*] אלא אתה רואה שיש כאן משהו שהוא [*] מחוץ לכיוון לחלוטין , שאתה בא רק כדי לקבל את ההגנה .
-plenary_sentence: זה עדיין לא , אלא אתה רואה שיש כאן משהו שהוא לא מחוץ לכיוון לחלוטין , שאתה בא רק כדי לקבל את ההגנה .
-plenary_tokens: ,,לא
-probability of plenary sentence in plenary corpus: -230.25
-probability of plenary sentence in committee corpus: -215.48
-original_sentence: כלומר , לפני חודשיים היה מקרה דומה .
-masked_sentence: כלומר , לפני חודשיים היה מקרה דומה [*]
-plenary_sentence: כלומר , לפני חודשיים היה מקרה דומה ,
+probability of plenary sentence in plenary corpus: -55.00
+probability of plenary sentence in committee corpus: -52.68
+original_sentence: ההסתייגות לגבי הסעיף הזה לא רשומה .
+masked_sentence: ההסתייגות לגבי הסעיף [*] לא רשומה .
+plenary_sentence: ההסתייגות לגבי הסעיף השני לא רשומה .
+plenary_tokens: השני
+probability of plenary sentence in plenary corpus: -71.64
+probability of plenary sentence in committee corpus: -69.01
+original_sentence: אמרת שיהיו שם רכזים .
+masked_sentence: אמרת שיהיו שם רכזים .
+plenary_sentence: אמרת שיהיו שם רכזים .
+plenary_tokens: 
+probability of plenary sentence in plenary corpus: -52.44
+probability of plenary sentence in committee corpus: -49.21
+original_sentence: אנחנו לא רואים שיש סיכוי שזה יקרה .
+masked_sentence: אנחנו לא רואים שיש סיכוי שזה יקרה [*]
+plenary_sentence: אנחנו לא רואים שיש סיכוי שזה יקרה ,
 plenary_tokens: ,
-probability of plenary sentence in plenary corpus: -75.03
-probability of plenary sentence in committee corpus: -70.94
+probability of plenary sentence in plenary corpus: -71.87
+probability of plenary sentence in committee corpus: -65.90
+original_sentence: הרב רביץ , אנא תן לשרת החינוך להגיד את דבריה .
+masked_sentence: הרב רביץ , אנא תן לשרת [*] להגיד את דבריה .
+plenary_sentence: הרב רביץ , אנא תן לשרת את להגיד את דבריה .
+plenary_tokens: את
+probability of plenary sentence in plenary corpus: -113.00
+probability of plenary sentence in committee corpus: -106.97
+original_sentence: שוב , כמו שציפי אמרה , במיוחד כשמדברים על פתיחה של הטיסות ב - 16 באוגוסט ואף אחד לא צוחק .
+masked_sentence: שוב , כמו שציפי אמרה , במיוחד כשמדברים על פתיחה [*] הטיסות ב - 16 באוגוסט ואף אחד לא [*] .
+plenary_sentence: שוב , כמו שציפי אמרה , במיוחד כשמדברים על פתיחה באש הטיסות ב - 16 באוגוסט ואף אחד לא , .
+plenary_tokens: באש,,
+probability of plenary sentence in plenary corpus: -205.80
+probability of plenary sentence in committee corpus: -191.12

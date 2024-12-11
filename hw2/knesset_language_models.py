@@ -238,9 +238,9 @@ def main():
     #sections 2.2, 2.3, 2.4: printing the 10 most common collocations with threshold of 5, in each of the corpuses
     try:
         with open('knesset_collocations.txt', 'w', encoding = 'utf-8') as file:
-            for n in [2,3,4]: #iterate over the longs of 2,3,4
-                file.write(f'{n}-gram collocations:\n')
-                for type_up_name, type in [('Frequency', 'frequency'), ('Tf-IDF', 'tfidf')]:
+            for n,n_str in [(2,'Two'),(3,'Three'),(4,'Four')]: #iterate over the longs of 2,3,4
+                file.write(f'{n_str}-gram collocations:\n')
+                for type_up_name, type in [('Frequency', 'frequency'), ('TF-IDF', 'tfidf')]:
                     file.write(f'{type_up_name}:\n')
                     for corpus_name, corpus_df in [('Committee corpus', committee_df), ('Plenary corpus', plenary_df)]:
                         file.write(f'{corpus_name}:\n')
@@ -248,7 +248,6 @@ def main():
                         for collocation in collocations:
                             file.write(f'{collocation}\n')
                         file.write('\n')
-                file.write('\n')
     except IOError as e:
         print(f'Error: Failed to write to "knesset_collocations.txt": {e}')
 
@@ -373,13 +372,13 @@ def main():
                     next_token, probability = plenary_model.generate_next_token(sentence[:masked_idx])
                     if sentence[:masked_idx] + next_token == original_sentences[i][:masked_idx + len(next_token)]:
                         hits += 1
-                        print(f"TRUE token : {next_token}, probability = {probability}")
+                        #print(f"TRUE token : {next_token}, probability = {probability}")
                         dup_sentence = dup_sentence[:masked_idx] + next_token + dup_sentence[masked_idx + 3:]
                         if next_token == ',':
                             comma_hits += 1
                     else:
                         misses += 1
-                        print(f"FALSE token : {next_token}, probability = {probability}")
+                        #print(f"FALSE token : {next_token}, probability = {probability}")
                         dup_sentence = original_sentences[i]
                         if next_token == ',':
                             comma_misses += 1
