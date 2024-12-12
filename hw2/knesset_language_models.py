@@ -178,7 +178,7 @@ def mask_tokens_in_sentences(sentences, x):
     masked_sentences = []
     for sentence in sentences:
         sentence_splitted = sentence.split()
-        tokens_to_mask = round((x/100)*len(sentence_splitted)) #computing the number of tokens to mask, rounding when the number is not integer
+        tokens_to_mask = max(round((x/100)*len(sentence_splitted)), 1) #computing the number of tokens to mask, rounding when the number is not integer, the max is to avoid rounding 0.5 to 0. 
         indexes_to_replace = random.sample(range(len(sentence_splitted)), tokens_to_mask) #choosing "tokens_to_mask" random indexes to mask
         for idx in indexes_to_replace:
             sentence_splitted[idx] = '[*]'
@@ -199,7 +199,7 @@ def main():
     #else:
     #    print("Creating the output ..\n")
     #file_path = sys.argv[1] 
-    file_path = 'knesset_corpus.json'
+    file_path = 'knesset_corpus.jsonl'
     #output_folder = sys.argv[2] 
     output_folder = 'output'
 
@@ -279,7 +279,7 @@ def main():
 
     #section 3.3: predicting the masked tokens using the committee model and computing the probability of the sentences
     sentences_after_mask_solve = []
-    sentences_masked_indexes = [] #a list stores the subsentences of each sentences, with each substance ends with a masked token, this will be used in section 3.4
+    sentences_masked_indexes = [] #a list stores the masked tokens indexes for each sentences, this will be used in section 3.4
     try:
         with open('sampled_sents_results.txt', 'w', encoding = 'utf-8') as file:
             for i in range(10):
@@ -294,7 +294,7 @@ def main():
                     sentence[j] = next_token #replacing the [*] with the token predicted to be the masked one 
                     plenary_tokens.append(next_token)
                 sentences_after_mask_solve.append(' '.join(sentence))
-                file.write(f'plenary_sentence: {sentences_after_mask_solve}\n')
+                file.write(f'plenary_sentence: {sentences_after_mask_solve[-1]}\n')
                 plenary_tokens = ','.join(plenary_tokens)
                 file.write(f'plenary_tokens: {plenary_tokens}\n')
                 file.write(f'probability of plenary sentence in plenary corpus: {plenary_model.calculate_prob_of_sentence(sentences_after_mask_solve[i]):.2f}\n')
@@ -307,18 +307,14 @@ def main():
         with open('perplexity_result.txt', 'w', encoding = 'utf-8') as file:
             for i in range(10):
                 perplexity = 1
-                if not sentences_masked_indexes[i]: #the case when no masked tokens, due to the sentence being short and 10% of it is rounded to 0
-                    file.write('None\n')
-                else:
-                    for idx in sentences_masked_indexes[i]: #iterate over the masked tokens
-                        subsentence = sentences_after_mask_solve[i].split()[:idx+1]
-                        if len(subsentence) > 3:
-                            subsentence = subsentence[-3:]
-                        subsentence = ' '.join(subsentence)
-                        subsentence_prob = 2 ** (plenary_model.calculate_prob_of_sentence(subsentence))
-                        perplexity *= (1 / subsentence_prob) # perplexity *= 1/P(masked token | subsentence until masked token)
-                    perplexity = perplexity ** (1/ len(sentences_masked_indexes[i])) #perplexity = perplexity^(1/n)
-                    file.write(f'{perplexity:.2f}\n')
+                for idx in sentences_masked_indexes[i]: #iterate over the masked tokens
+                    subsentence = sentences_after_mask[i].split()[:idx+1]
+                    if len(subsentence) > 3:
+                        subsentence = subsentence[-3:]
+                    subsentence = ' '.join(subsentence)
+                    perplexity *= (1 / plenary_model.calculate_prob_of_sentence(subsentence)) # perplexity *= 1/P(masked token | subsentence until masked token)
+                perplexity = perplexity ** (1/ len(sentences_masked_indexes[i])) #perplexity = perplexity^(1/n)
+                file.write(f'{perplexity:.2f}\n')
     except IOError as e:
         print(f'Error: Failed to write to "perplexity_result.txt": {e}')
         
@@ -331,9 +327,11 @@ def main():
     for i in range(len(relevant_sentences)):
         print (relevant_sentences[i])
     #checking masking: 
-    original_sentences_indexes = random.sample(range(len(committee_df)), 500)
+    original_sentences_indexes = random.sample(range(len(committee_df)), 2000)
     original_sentences = [committee_df.iloc[idx]['sentence_text'] for idx in original_sentences_indexes]
+    print(original_sentences)
     sentences_after_mask = mask_tokens_in_sentences(original_sentences, 10)
+    print(sentences_after_mask)
     for idx1 in range(1, 20):
         lambda1 = 0.05* idx1
         for idx2 in [20-idx1 - 0.002, 20-idx1 - 0.0002, 20-idx1 - 0.00002]:
