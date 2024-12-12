@@ -92,7 +92,7 @@ class Trigram_LM:
                 prob += lambda3 * numerator / (self.tokens_count + self.unique_tokens_count)
             except ZeroDivisionError:
                 raise ValueError('Error: Tokens count is zero, no training data added')
-            total_prob += math.log(prob)
+            total_prob += math.log2(prob)
         return total_prob
     
     #A method that predict the token with the highest probability to be the next of a given sentence.
@@ -112,7 +112,7 @@ class Trigram_LM:
             if token_prob > next_token_prob:
                 next_token_prob = token_prob
                 next_token = token
-        return (next_token, math.exp(next_token_prob)) #exp of log of the probability will return the probability itself as required 
+        return (next_token, next_token_prob) #exp of log of the probability will return the probability itself as required 
 
 #Extracts and return collection of collocations based on a given parameters. 
 #Input: number of collocations to return - k, length of the collocations - n, min number of occurence for a collocation - t, dataframe of corpus, ranking criterion - type
@@ -156,7 +156,7 @@ def get_k_n_t_collocations(k, n, t, corpus, type):
             collocations_by_tfidf[collocation] = 0 
             for protocol in collocations[collocation]:
                 tf = collocations[collocation][protocol] / sum(protocols[protocol].values()) #computing tf  
-                idf = math.log(len(protocols.keys()) / len(collocations[collocation].keys())) #computing idf
+                idf = math.log2(len(protocols.keys()) / len(collocations[collocation].keys())) #computing idf
                 collocations_by_tfidf[collocation] += tf * idf 
             collocations_by_tfidf[collocation] /= len(protocols.keys()) #dividing by the overall number of protocols so we get the averaged tfidf
         sorted_collocations = [collocation for collocation, _ in sorted(collocations_by_tfidf.items(), key=lambda x: x[1], reverse=True)] #sort by tfidf value 
@@ -220,8 +220,12 @@ def main():
     except KeyError as e:
         print(f'Error: The column "protocol_type" is missing in the data: {e}')
         return 
-    committee_sentences = committee_df['sentence_text'].tolist()
-    plenary_sentences = plenary_df['sentence_text'].tolist()
+    try:
+        committee_sentences = committee_df['sentence_text'].tolist()
+        plenary_sentences = plenary_df['sentence_text'].tolist()
+    except KeyError as e:
+        print(f'Error: The column "sentence_text" is missing in the data: {e}')
+        return  
 
     #Creating instances of languages model
     try:
@@ -251,17 +255,14 @@ def main():
     except IOError as e:
         print(f'Error: Failed to write to "knesset_collocations.txt": {e}')
 
-    #section 3.2: choosing 10 random messages from committee corpus and masking 10% of their tokens
+    #section 3.2: choosing 10 random messages, that are least 5 tokens long, from committee corpus and masking 10% of their tokens
     try:
-        sentences_indexes = random.sample(range(len(committee_df)), 10) #choosing 10 random indexes 
+        long_sentences = [sentence for sentence in committee_sentences if sentence.count(' ') >= 4]
+        sentences_indexes = random.sample(range(len(long_sentences)), 10) #choosing 10 random indexes 
     except ValueError as e: #e.g., the case where number of sentences is less than 10 
         print(f'Error: Failed to sample sentences: {e}')
         sentences_indexes = []
-    try: 
-        sentences_to_mask = [committee_df.iloc[idx]['sentence_text'] for idx in sentences_indexes] #extracting the sentences in the previously chosen indexes
-    except KeyError as e:
-        print(f'Error: No "sentence_text" column in "sentences_to_mask" DataFrame: {e}')
-        sentences_to_mask = []
+    sentences_to_mask = [long_sentences[idx] for idx in sentences_indexes] #extracting the sentences in the previously chosen indexes
     try:
         with open('original_sampled_sents.txt', 'w', encoding = 'utf-8') as file:
             for sentence in sentences_to_mask:
@@ -314,7 +315,7 @@ def main():
                         if len(subsentence) > 3:
                             subsentence = subsentence[-3:]
                         subsentence = ' '.join(subsentence)
-                        subsentence_prob = math.exp(plenary_model.calculate_prob_of_sentence(subsentence))
+                        subsentence_prob = 2 ** (plenary_model.calculate_prob_of_sentence(subsentence))
                         perplexity *= (1 / subsentence_prob) # perplexity *= 1/P(masked token | subsentence until masked token)
                     perplexity = perplexity ** (1/ len(sentences_masked_indexes[i])) #perplexity = perplexity^(1/n)
                     file.write(f'{perplexity:.2f}\n')
