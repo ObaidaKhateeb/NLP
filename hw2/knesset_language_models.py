@@ -61,6 +61,7 @@ class Trigram_LM:
     #Input: Sentence. 
     #Output: log probability of the sentence. 
     def calculate_prob_of_sentence(self, s):
+        lambda1, lambda2, lambda3 = 0.9, 0.0999, 0.0001
         s = ['s_0', 's_1'] + s.split()
         total_prob = 0
         for i in range(2, len(s)):
@@ -187,22 +188,13 @@ def mask_tokens_in_sentences(sentences, x):
         masked_sentences.append(new_sentence)
     return masked_sentences
 
-#global for check
-lambda1 = 0.9
-lambda2 = 0.0999
-lambda3 = 0.0001
-
 def main():
-    global lambda1, lambda2, lambda3
-    #if len(sys.argv) != 3:
-    #    print("Error: Incorrect # of arguments.\n")
-    #    sys.exit(1)
-    #else:
-    #    print("Creating the output ..\n")
-    #file_path = sys.argv[1] 
-    file_path = 'knesset_corpus.jsonl'
-    #output_folder = sys.argv[2] 
-    output_folder = 'output'
+    if len(sys.argv) != 3:
+        sys.exit(1)
+    file_path = sys.argv[1] 
+    #file_path = 'knesset_corpus.jsonl'
+    output_folder = sys.argv[2] 
+    #output_folder = 'output'
 
     #reading the JSON file 
     try:
@@ -306,6 +298,7 @@ def main():
     #section 3.4: computing perplexity of the masked tokens in the sentences using the trigram perplexity formula
     try:
         with open('perplexity_result.txt', 'w', encoding = 'utf-8') as file:
+            perplexity_average = 0
             for i in range(10):
                 perplexity = 0
                 for idx in sentences_masked_indexes[i]: #iterate over the masked tokens
@@ -315,74 +308,10 @@ def main():
                     subsentence = ' '.join(subsentence)
                     perplexity -= plenary_model.calculate_prob_of_sentence(subsentence) # perplexity *= 1/P(masked token | subsentence until masked token)
                 perplexity *= (1/ len(sentences_masked_indexes[i])) #perplexity = perplexity^(1/n)
-                perplexity_average = perplexity / 10
-                file.write(f'{perplexity_average:.2f}\n')
+                perplexity_average += perplexity / 10
+            file.write(f'{perplexity_average:.2f}\n')
     except IOError as e:
         print(f'Error: Failed to write to "perplexity_result.txt": {e}')
-        
-    #checks 
-    sentence_prob = committee_model.calculate_prob_of_sentence('אחמד טיבי')
-    print(sentence_prob)
-    next_word = committee_model.generate_next_token('אחמד')
-    print(next_word)
-    relevant_sentences = get_k_n_t_collocations(5, 5, 5, committee_df, 'frequency')
-    for i in range(len(relevant_sentences)):
-        print (relevant_sentences[i])
-    #checking masking: 
-    #original_sentences_indexes = random.sample(range(len(committee_df)), 2000)
-    #original_sentences = [committee_df.iloc[idx]['sentence_text'] for idx in original_sentences_indexes]
-    #sentences_after_mask = mask_tokens_in_sentences(original_sentences, 10)
-    for idx1 in range(20, -1, -1):
-        lambda1 = 0.05* idx1
-        for idx2 in [20-idx1 - 0.002, 20-idx1 - 0.0002, 20-idx1 - 0.00002]:
-            if idx2 < 0.000001:
-                continue
-            lambda2 = 0.05*idx2
-            lambda3 = 1 - lambda1 - lambda2
-            print(f"lambda1 = {lambda1:.2f}, lambda2 = {lambda2}, lambda3 = {lambda3}")
-            hits = 0
-            misses = 0
-            comma_hits = 0
-            comma_misses = 0
-            # original_sentences = ['הוא אמר : זה לשיקולך', 
-            #                     'נציב שירות המדינה – לא מנכ"ל משרד , לא מנהל בית ספר , לא מנהל בית חולים – נציב שירות המדינה , ואין הסמכות כלפי מטה בזה – זכאי לקבל דיווח על פתיחה בחקירה נגד עובד מדינה או עובד שכפוף לחוק המשמעת בשביל לבחון את סמכותו על - פי דין להשעות את אותו עובד .', 
-            #                     '"אתם יודעים מה זה להחזיק ילדים בגנים פרטיים ?', 
-            #                     'היא מנהלת את פרויקט שיקום עוטף עזה במאות מיליונים , שפועל למיטב הכרתי – אני אולי לא אובייקטיבי – אבל הפרק הזה פועל היטב .', 
-            #                     'על פי חוק התכנון והבנייה .', 
-            #                     'האמת היא , שזה לא חייב להוריד את המחיר .', 
-            #                     'זה מזכיר לי את הפעם שהפגנתי מול משרד הביטחון בתל - אביב בתקופת הסכמי אוסלו , והמשטרה הדפה אותי .', 
-            #                     'אני פותח את הדיון במליאת הכנסת ביום המיוחד הזה , שיוחד לשפה הערבית , וזה מאורע שלא היה כמותו .', 
-            #                     'התוכנית הוכנה בשיתוף פעולה ובתיאום בין כל הגורמים השותפים למאבקנו , המאבק בתאונות הדרכים .',
-            #                     'אני רוצה לקבל חוות דעת .'
-            #                     'אני קורא אותך לסדר פעם ראשונה .'
-            #                     'הנתונים הם לא נתונים שלנו , הם נתונים של המוסד לביטוח לאומי , שאומרים שזה בסך הכול 6.', 
-            #                     'אני מתכבד לפתוח את ישיבת הכנסת .', 
-            #                     'חבר הכנסת אחמד טיבי , בבקשה .'
-            #                     'האם ממשלה זו לא יוצרת את בעיית האבטלה במגזר הערבי ואת בעיית העוני ואת בעיית הכפרים הלא - מוכרים ?', 
-            #                     'מה שאמר עמיר פרץ זה נכון .', 
-            #                     'אדוני היושב - ראש , אני מודה לך על שאפשרת לי .']
-            # masked_sentences = ['הוא אמר [*] זה לשיקולך', 'ציב שירות המדינה – לא מנכ"ל משרד , לא מנהל בית [*] , לא מנהל בית [*] – נציב שירות [*] , ואין הסמכות כלפי מטה בזה – זכאי לקבל דיווח על פתיחה בחקירה נגד עובד מדינה או עובד שכפוף לחוק המשמעת בשביל לבחון את סמכותו על - פי דין להשעות את אותו עובד .', '"אתם יודעים [*] זה להחזיק ילדים בגנים פרטיים ?', 'היא מנהלת את פרויקט שיקום עוטף [*] במאות [*] , שפועל למיטב הכרתי – אני אולי לא אובייקטיבי – אבל הפרק הזה פועל [*] .', 'על פי [*] התכנון והבנייה .', 'האמת היא , שזה לא חייב להוריד את [*] .', 'זה מזכיר לי את הפעם שהפגנתי מול משרד הביטחון בתל - [*] בתקופת הסכמי [*] , והמשטרה הדפה אותי .', 'אני פותח את הדיון במליאת [*] ביום המיוחד הזה , שיוחד לשפה הערבית , וזה מאורע שלא היה כמותו .', 'התוכנית הוכנה בשיתוף [*] ובתיאום בין כל הגורמים השותפים למאבקנו , המאבק בתאונות [*] .', 'אני רוצה לקבל חוות [*] .', 'אני קורא אותך לסדר [*] ראשונה .', 'הנתונים הם לא נתונים שלנו , הם נתונים של המוסד לביטוח [*] , שאומרים שזה בסך הכול 6.', 'אני מתכבד לפתוח את [*] הכנסת .', 'חבר הכנסת אחמד [*] , בבקשה .', 'האם ממשלה זו לא יוצרת את בעיית האבטלה במגזר [*] ואת בעיית העוני ואת בעיית הכפרים הלא [*] מוכרים ?', 'מה שאמר עמיר [*] זה נכון .', 'אדוני [*] - ראש , אני מודה [*] על שאפשרת לי .']
-            # masked_tokens = [[':'], ['ספר', 'חולים', 'המדינה'], ['מה'], ['עזה', 'מיליונים', 'היטב'], ['חוק'], ['המחיר'], ['אביב', 'אוסלו'], ['הכנסת'], ['פעולה', 'הדרכים'], ['דעת'], ['פעם'], ['לאומי'], ['ישיבת'], ['טיבי'], ['הערבי', '-'], ['פרץ'], ['היושב', 'לך']]
-            for i,sentence in enumerate(sentences_after_mask):
-                #token_idx = 0
-                dup_sentence = sentence[:]
-                masked_idx = dup_sentence.find('[*]')
-                if(masked_idx != -1):
-                    next_token, probability = plenary_model.generate_next_token(sentence[:masked_idx])
-                    if sentence[:masked_idx] + next_token == original_sentences[i][:masked_idx + len(next_token)]:
-                        hits += 1
-                        #print(f"TRUE token : {next_token}, probability = {probability}")
-                        if next_token == ',':
-                            comma_hits += 1
-                    else:
-                        misses += 1
-                        #print(f"FALSE token : {next_token}, probability = {probability}")
-                        if next_token == ',':
-                            comma_misses += 1
-                    #dup_sentence = dup_sentence[masked_idx + 3:]
-                    #token_idx += 1
-            print(f"hits = {hits}, misses = {misses}, success rate = {hits/(hits+misses)}\n")
-            print(f"comma hits = {comma_hits}, comma misses = {comma_misses}\n")
-            
+
 if __name__ == "__main__":
     main()
