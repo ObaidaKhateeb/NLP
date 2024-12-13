@@ -315,7 +315,8 @@ def main():
                     subsentence = ' '.join(subsentence)
                     perplexity -= plenary_model.calculate_prob_of_sentence(subsentence) # perplexity *= 1/P(masked token | subsentence until masked token)
                 perplexity *= (1/ len(sentences_masked_indexes[i])) #perplexity = perplexity^(1/n)
-                file.write(f'{perplexity:.2f}\n')
+                perplexity_average = perplexity / 10
+                file.write(f'{perplexity_average:.2f}\n')
     except IOError as e:
         print(f'Error: Failed to write to "perplexity_result.txt": {e}')
         
