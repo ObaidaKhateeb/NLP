@@ -1,60 +1,60 @@
-original_sentence: אני חושב שזה עניין שהוא לא נכון .
-masked_sentence: אני חושב שזה עניין שהוא לא [*] .
-plenary_sentence: אני חושב שזה עניין שהוא לא , .
+original_sentence: לא , אין לה ייצוג בהצעת החוק - אני מדבר על הצעת החוק שהבאנו כדי לתקן את המצב - וש"ס כסיעה גדולה בת 17 חברים תבעה באופן נחרץ ייצוג בוועדת הכספים , ובכך תיפתר הבעיה .
+masked_sentence: לא , אין לה ייצוג [*] החוק - אני מדבר על הצעת החוק שהבאנו כדי לתקן את [*] [*] וש"ס כסיעה גדולה בת 17 חברים תבעה באופן נחרץ ייצוג בוועדת הכספים , ובכך תיפתר [*] .
+plenary_sentence: לא , אין לה ייצוג הולם החוק - אני מדבר על הצעת החוק שהבאנו כדי לתקן את זה , וש"ס כסיעה גדולה בת 17 חברים תבעה באופן נחרץ ייצוג בוועדת הכספים , ובכך תיפתר , .
+plenary_tokens: הולם,זה,,,,
+probability of plenary sentence in plenary corpus: -489.25
+probability of plenary sentence in committee corpus: -466.51
+original_sentence: מהנתונים שלנו , 60% מבוקש למזון .
+masked_sentence: מהנתונים שלנו , 60% [*] למזון .
+plenary_sentence: מהנתונים שלנו , 60% , למזון .
 plenary_tokens: ,
-probability of plenary sentence in plenary corpus: -90.20
-probability of plenary sentence in committee corpus: -85.74
-original_sentence: גם בשם יש עתיד .
-masked_sentence: [*] בשם יש עתיד .
-plenary_sentence: אני בשם יש עתיד .
-plenary_tokens: אני
-probability of plenary sentence in plenary corpus: -66.90
-probability of plenary sentence in committee corpus: -63.22
-original_sentence: אני רוצה להסביר לכם שאחד הדברים שאנחנו שמים לב בין הבנקים זה קודם כל שכל בנק מבקש משהו אחר וזה מתוך התנהלות שאין מסמך אחיד שאומר שזה מה שאתה צריך לתת לבנק .
-masked_sentence: אני רוצה להסביר לכם [*] הדברים שאנחנו שמים [*] בין הבנקים זה קודם [*] שכל בנק מבקש משהו אחר וזה מתוך התנהלות שאין מסמך אחיד שאומר שזה מה שאתה צריך לתת לבנק .
-plenary_sentence: אני רוצה להסביר לכם , הדברים שאנחנו שמים , בין הבנקים זה קודם כול שכל בנק מבקש משהו אחר וזה מתוך התנהלות שאין מסמך אחיד שאומר שזה מה שאתה צריך לתת לבנק .
-plenary_tokens: ,,,,כול
-probability of plenary sentence in plenary corpus: -477.68
-probability of plenary sentence in committee corpus: -444.64
-original_sentence: מה זאת ההשתלחות הזאת ?
-masked_sentence: [*] זאת ההשתלחות הזאת ?
-plenary_sentence: אני זאת ההשתלחות הזאת ?
-plenary_tokens: אני
-probability of plenary sentence in plenary corpus: -68.34
-probability of plenary sentence in committee corpus: -65.45
-original_sentence: יוצאים במכרז , מפסיקים התקשרות עם הקודמים טרם הודעה על תוצאות המכרז .
-masked_sentence: יוצאים במכרז , מפסיקים התקשרות עם הקודמים [*] הודעה על תוצאות המכרז .
-plenary_sentence: יוצאים במכרז , מפסיקים התקשרות עם הקודמים , הודעה על תוצאות המכרז .
-plenary_tokens: ,
-probability of plenary sentence in plenary corpus: -202.59
-probability of plenary sentence in committee corpus: -188.50
-original_sentence: אתם מנסים להגיע אל המרכזים האלה ?
-masked_sentence: אתם מנסים להגיע [*] המרכזים האלה ?
-plenary_sentence: אתם מנסים להגיע להסכמה המרכזים האלה ?
-plenary_tokens: להסכמה
-probability of plenary sentence in plenary corpus: -102.74
-probability of plenary sentence in committee corpus: -97.69
-original_sentence: רגע , ואם זה לא כולל קטעי קישור , לא צריך תחנת שירות ?
-masked_sentence: רגע , ואם זה לא כולל קטעי קישור [*] לא צריך תחנת שירות ?
-plenary_sentence: רגע , ואם זה לא כולל קטעי קישור , לא צריך תחנת שירות ?
-plenary_tokens: ,
-probability of plenary sentence in plenary corpus: -189.42
-probability of plenary sentence in committee corpus: -171.62
-original_sentence: בשביל סיבות אני צריכה לעשות מחקר , זה אני לא יודעת לומר .
-masked_sentence: בשביל סיבות אני צריכה לעשות מחקר [*] זה אני לא יודעת לומר .
-plenary_sentence: בשביל סיבות אני צריכה לעשות מחקר , זה אני לא יודעת לומר .
-plenary_tokens: ,
-probability of plenary sentence in plenary corpus: -181.41
-probability of plenary sentence in committee corpus: -166.39
-original_sentence: יש פה החלטה שהיא בעייתית מאוד מהותית – אני לא רואה מה מותר ועדת קליטה ועלייה וועדת מדע מהוועדה לזכויות הילד או הוועדה לבחינת העובדים הזרים מבחינת כמות העבודה , חשיבות הנושא ודחיפות הנושאים שעל הפרק .
-masked_sentence: יש פה החלטה [*] בעייתית מאוד מהותית – אני לא רואה מה מותר ועדת קליטה ועלייה [*] מדע מהוועדה לזכויות הילד [*] הוועדה לבחינת העובדים הזרים מבחינת כמות העבודה , חשיבות [*] ודחיפות הנושאים שעל הפרק .
-plenary_sentence: יש פה החלטה של בעייתית מאוד מהותית – אני לא רואה מה מותר ועדת קליטה ועלייה , מדע מהוועדה לזכויות הילד , הוועדה לבחינת העובדים הזרים מבחינת כמות העבודה , חשיבות רבה ודחיפות הנושאים שעל הפרק .
-plenary_tokens: של,,,,,רבה
-probability of plenary sentence in plenary corpus: -539.90
-probability of plenary sentence in committee corpus: -508.04
-original_sentence: אנחנו צריכים להראות נוכחות , גם אם אנחנו לא עובדים .
-masked_sentence: אנחנו צריכים להראות נוכחות [*] גם אם אנחנו לא עובדים .
-plenary_sentence: אנחנו צריכים להראות נוכחות , גם אם אנחנו לא עובדים .
-plenary_tokens: ,
-probability of plenary sentence in plenary corpus: -137.17
-probability of plenary sentence in committee corpus: -127.88
+probability of plenary sentence in plenary corpus: -104.88
+probability of plenary sentence in committee corpus: -98.52
+original_sentence: כל ההסתייגויות שלי מהותיות , ואני מבקש להצביע על כל ההסתייגויות , ואני מבקש להצביע גם על כל ההסתייגויות במליאה .
+masked_sentence: כל ההסתייגויות שלי מהותיות , ואני מבקש להצביע [*] כל [*] , ואני מבקש להצביע גם על כל ההסתייגויות במליאה .
+plenary_sentence: כל ההסתייגויות שלי מהותיות , ואני מבקש להצביע על כל כך , ואני מבקש להצביע גם על כל ההסתייגויות במליאה .
+plenary_tokens: על,כך
+probability of plenary sentence in plenary corpus: -268.04
+probability of plenary sentence in committee corpus: -263.37
+original_sentence: יש אנשים שמוכנים לשלם יותר , רק שייתן להם פתרון בנתב"ג , העיקר לא לפספס את הטיסה .
+masked_sentence: יש אנשים שמוכנים לשלם יותר , רק שייתן [*] פתרון בנתב"ג , העיקר [*] לפספס את הטיסה .
+plenary_sentence: יש אנשים שמוכנים לשלם יותר , רק שייתן , פתרון בנתב"ג , העיקר לא לפספס את הטיסה .
+plenary_tokens: ,,לא
+probability of plenary sentence in plenary corpus: -263.19
+probability of plenary sentence in committee corpus: -247.08
+original_sentence: אנחנו רוצים לקצר מ - 5 ל - 4 .
+masked_sentence: אנחנו רוצים לקצר מ [*] 5 ל - 4 .
+plenary_sentence: אנחנו רוצים לקצר מ - 5 ל - 4 .
+plenary_tokens: -
+probability of plenary sentence in plenary corpus: -129.67
+probability of plenary sentence in committee corpus: -118.35
+original_sentence: כי כאשר מדובר באחריות של מספר גופים , מספר משרדי ממשלה וגופי חירום אחרים , אנחנו חושבים , וגם כך המדינה חושבת , שאי אפשר לעשות את זה בלי העברה של מדרג הסמכויות , של תחומי האחריות של כל אחד ממשרדי הממשלה וכל אחד מהגופים שמטפלים בחירום בעורף , אבל הסדרה חקיקתית .
+masked_sentence: כי כאשר מדובר [*] של מספר גופים , מספר משרדי ממשלה [*] חירום אחרים , אנחנו חושבים , וגם כך המדינה חושבת , שאי אפשר לעשות את [*] בלי [*] של מדרג הסמכויות , [*] תחומי האחריות של כל אחד ממשרדי הממשלה וכל אחד מהגופים שמטפלים בחירום בעורף , אבל הסדרה חקיקתית .
+plenary_sentence: כי כאשר מדובר על של מספר גופים , מספר משרדי ממשלה , חירום אחרים , אנחנו חושבים , וגם כך המדינה חושבת , שאי אפשר לעשות את זה בלי שום של מדרג הסמכויות , אני תחומי האחריות של כל אחד ממשרדי הממשלה וכל אחד מהגופים שמטפלים בחירום בעורף , אבל הסדרה חקיקתית .
+plenary_tokens: על,,,זה,שום,אני
+probability of plenary sentence in plenary corpus: -757.72
+probability of plenary sentence in committee corpus: -709.54
+original_sentence: הוא נשאר בלי כלום .
+masked_sentence: הוא נשאר בלי [*] .
+plenary_sentence: הוא נשאר בלי שום .
+plenary_tokens: שום
+probability of plenary sentence in plenary corpus: -68.07
+probability of plenary sentence in committee corpus: -64.26
+original_sentence: הוועדה רשמה לפניה שבעקבות הערתך , נשמעה תשובה של נציג המשרד , יובל מלמד , שאכן ההגדרות שיש בחוק איסור אלימות בספורט , הוא באמת איננו עושה אבחנה , ועובדים על שינוי החקיקה שם בחוק ההוא .
+masked_sentence: הוועדה [*] [*] שבעקבות הערתך , נשמעה תשובה של נציג המשרד , יובל מלמד , שאכן ההגדרות שיש בחוק איסור אלימות בספורט , הוא באמת איננו עושה [*] , ועובדים על שינוי החקיקה שם בחוק [*] .
+plenary_sentence: הוועדה , אני שבעקבות הערתך , נשמעה תשובה של נציג המשרד , יובל מלמד , שאכן ההגדרות שיש בחוק איסור אלימות בספורט , הוא באמת איננו עושה את , ועובדים על שינוי החקיקה שם בחוק ההסדרים .
+plenary_tokens: ,,אני,את,ההסדרים
+probability of plenary sentence in plenary corpus: -552.99
+probability of plenary sentence in committee corpus: -507.99
+original_sentence: כולנו הרי משתמשים ולכולם יש אימהות וסבתות שמשתמשים בעובדים זרים .
+masked_sentence: כולנו [*] משתמשים ולכולם יש אימהות וסבתות שמשתמשים בעובדים זרים .
+plenary_sentence: כולנו יודעים משתמשים ולכולם יש אימהות וסבתות שמשתמשים בעובדים זרים .
+plenary_tokens: יודעים
+probability of plenary sentence in plenary corpus: -165.88
+probability of plenary sentence in committee corpus: -157.01
+original_sentence: אדוני היושב ראש , אתה הובלת את החוק , והודיתי לך על זה בעל פה ובכתב , וחיכינו בסבלנות רבה .
+masked_sentence: אדוני היושב ראש , אתה הובלת את החוק , והודיתי [*] על זה בעל פה ובכתב , וחיכינו בסבלנות [*] .
+plenary_sentence: אדוני היושב ראש , אתה הובלת את החוק , והודיתי , על זה בעל פה ובכתב , וחיכינו בסבלנות , .
+plenary_tokens: ,,,
+probability of plenary sentence in plenary corpus: -276.95
+probability of plenary sentence in committee corpus: -262.18

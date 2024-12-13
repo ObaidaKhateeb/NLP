@@ -178,7 +178,8 @@ def mask_tokens_in_sentences(sentences, x):
     masked_sentences = []
     for sentence in sentences:
         sentence_splitted = sentence.split()
-        tokens_to_mask = max(round((x/100)*len(sentence_splitted)), 1) #computing the number of tokens to mask, rounding when the number is not integer, the max is to avoid rounding 0.5 to 0. 
+        tokens_to_mask = (x/100)*len(sentence_splitted)
+        tokens_to_mask = round(tokens_to_mask) if tokens_to_mask != 0.5 else 1 #computing the number of tokens to mask, rounding when the number is not integer, in addition, 0.5 rounded to 1 instead of 0. 
         indexes_to_replace = random.sample(range(len(sentence_splitted)), tokens_to_mask) #choosing "tokens_to_mask" random indexes to mask
         for idx in indexes_to_replace:
             sentence_splitted[idx] = '[*]'
@@ -256,8 +257,8 @@ def main():
         print(f'Error: Failed to write to "knesset_collocations.txt": {e}')
 
     #section 3.2: choosing 10 random messages, that are least 5 tokens long, from committee corpus and masking 10% of their tokens
+    long_sentences = [sentence for sentence in committee_sentences if sentence.count(' ') >= 4]
     try:
-        long_sentences = [sentence for sentence in committee_sentences if sentence.count(' ') >= 4]
         sentences_indexes = random.sample(range(len(long_sentences)), 10) #choosing 10 random indexes 
     except ValueError as e: #e.g., the case where number of sentences is less than 10 
         print(f'Error: Failed to sample sentences: {e}')
@@ -306,14 +307,14 @@ def main():
     try:
         with open('perplexity_result.txt', 'w', encoding = 'utf-8') as file:
             for i in range(10):
-                perplexity = 1
+                perplexity = 0
                 for idx in sentences_masked_indexes[i]: #iterate over the masked tokens
                     subsentence = sentences_after_mask[i].split()[:idx+1]
                     if len(subsentence) > 3:
                         subsentence = subsentence[-3:]
                     subsentence = ' '.join(subsentence)
-                    perplexity *= (1 / plenary_model.calculate_prob_of_sentence(subsentence)) # perplexity *= 1/P(masked token | subsentence until masked token)
-                perplexity = perplexity ** (1/ len(sentences_masked_indexes[i])) #perplexity = perplexity^(1/n)
+                    perplexity -= plenary_model.calculate_prob_of_sentence(subsentence) # perplexity *= 1/P(masked token | subsentence until masked token)
+                perplexity *= (1/ len(sentences_masked_indexes[i])) #perplexity = perplexity^(1/n)
                 file.write(f'{perplexity:.2f}\n')
     except IOError as e:
         print(f'Error: Failed to write to "perplexity_result.txt": {e}')
@@ -327,12 +328,10 @@ def main():
     for i in range(len(relevant_sentences)):
         print (relevant_sentences[i])
     #checking masking: 
-    original_sentences_indexes = random.sample(range(len(committee_df)), 2000)
-    original_sentences = [committee_df.iloc[idx]['sentence_text'] for idx in original_sentences_indexes]
-    print(original_sentences)
-    sentences_after_mask = mask_tokens_in_sentences(original_sentences, 10)
-    print(sentences_after_mask)
-    for idx1 in range(1, 20):
+    #original_sentences_indexes = random.sample(range(len(committee_df)), 2000)
+    #original_sentences = [committee_df.iloc[idx]['sentence_text'] for idx in original_sentences_indexes]
+    #sentences_after_mask = mask_tokens_in_sentences(original_sentences, 10)
+    for idx1 in range(20, -1, -1):
         lambda1 = 0.05* idx1
         for idx2 in [20-idx1 - 0.002, 20-idx1 - 0.0002, 20-idx1 - 0.00002]:
             if idx2 < 0.000001:
@@ -367,22 +366,19 @@ def main():
                 #token_idx = 0
                 dup_sentence = sentence[:]
                 masked_idx = dup_sentence.find('[*]')
-                while(masked_idx != -1):
+                if(masked_idx != -1):
                     next_token, probability = plenary_model.generate_next_token(sentence[:masked_idx])
                     if sentence[:masked_idx] + next_token == original_sentences[i][:masked_idx + len(next_token)]:
                         hits += 1
                         #print(f"TRUE token : {next_token}, probability = {probability}")
-                        dup_sentence = dup_sentence[:masked_idx] + next_token + dup_sentence[masked_idx + 3:]
                         if next_token == ',':
                             comma_hits += 1
                     else:
                         misses += 1
                         #print(f"FALSE token : {next_token}, probability = {probability}")
-                        dup_sentence = original_sentences[i]
                         if next_token == ',':
                             comma_misses += 1
                     #dup_sentence = dup_sentence[masked_idx + 3:]
-                    masked_idx = dup_sentence.find('[*]')
                     #token_idx += 1
             print(f"hits = {hits}, misses = {misses}, success rate = {hits/(hits+misses)}\n")
             print(f"comma hits = {comma_hits}, comma misses = {comma_misses}\n")
