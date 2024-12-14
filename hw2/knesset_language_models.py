@@ -190,13 +190,13 @@ def mask_tokens_in_sentences(sentences, x):
     return masked_sentences
 
 def main():
-    if len(sys.argv) != 3:
-        sys.exit(1)
-    file_path = sys.argv[1] 
-    #file_path = 'knesset_corpus.jsonl'
-    output_folder = sys.argv[2] 
-    #output_folder = 'output'
-    os.makedirs("example_dir", exist_ok=True)
+    #if len(sys.argv) != 3:
+    #    sys.exit(1)
+    #file_path = sys.argv[1] 
+    file_path = 'knesset_corpus.jsonl'
+    #output_folder = sys.argv[2] 
+    output_folder = 'outputu'
+    #os.makedirs("example_dir", exist_ok=True)
     #reading the JSON file 
     try:
         corpus_df = pd.read_json(file_path, lines=True, encoding='utf-8')
@@ -302,13 +302,40 @@ def main():
             perplexity_average = 0
             for i in range(10):
                 perplexity = 0
+                sentence = ['s_0', 's_1'] + sentences_after_mask[i].split()     
                 for idx in sentences_masked_indexes[i]: #iterate over the masked tokens
-                    subsentence = sentences_after_mask[i].split()[:idx+1]
-                    if len(subsentence) > 3:
-                        subsentence = subsentence[-3:]
-                    subsentence = ' '.join(subsentence)
-                    perplexity -= plenary_model.calculate_prob_of_sentence(subsentence) # perplexity *= 1/P(masked token | subsentence until masked token)
+                    lambda1, lambda2, lambda3 = 0.9, 0.0999, 0.0001
+                    prob = 0
+                    denominator = numerator = 0
+                    #computing the probability of the trigram s[i-2] s[i-1] s[i]
+                    if (sentence[idx], sentence[idx+1]) in plenary_model.bigrams:
+                        denominator = plenary_model.bigrams[(sentence[idx], sentence[idx+1])] + plenary_model.unique_tokens_count
+                    else:
+                        denominator = plenary_model.unique_tokens_count
+                    if (sentence[idx], sentence[idx+1], sentence[idx+2]) in plenary_model.trigrams:
+                        numerator = plenary_model.trigrams[(sentence[idx], sentence[idx+1], sentence[idx+2])] + 1
+                    else:
+                        numerator = 1
+                    prob += lambda1 * numerator / denominator
+                    #computing the probability of the bigrams s[i-1] s[i]
+                    if sentence[idx+1] in plenary_model.unigrams:
+                        denominator = plenary_model.unigrams[sentence[idx+1]] + plenary_model.unique_tokens_count
+                    else:
+                        denominator = plenary_model.unique_tokens_count
+                    if (sentence[idx+1], sentence[idx+2]) in plenary_model.bigrams:
+                        numerator = plenary_model.bigrams[(sentence[idx+1], sentence[idx+2])] + 1
+                    else:
+                        numerator = 1
+                    prob += lambda2 * numerator / denominator
+                    #computing the probability of s[i]
+                    numerator = plenary_model.unigrams[sentence[idx+2]] + 1 if sentence[idx+2] in plenary_model.unigrams else 1
+                    try:
+                        prob += lambda3 * numerator / (plenary_model.tokens_count + plenary_model.unique_tokens_count)
+                    except ZeroDivisionError:
+                        raise ValueError('Error: Tokens count is zero, no training data added')
+                    perplexity -= math.log2(prob)
                 perplexity *= (1/ len(sentences_masked_indexes[i])) #perplexity = perplexity^(1/n)
+                print(perplexity)
                 perplexity_average += perplexity / 10
             file.write(f'{perplexity_average:.2f}\n')
     except IOError as e:
