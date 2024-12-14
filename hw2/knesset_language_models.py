@@ -3,6 +3,7 @@ import math
 import sys
 import pandas as pd
 import random
+import os
 
 class Trigram_LM:
     def __init__(self, sentences):
@@ -195,7 +196,7 @@ def main():
     #file_path = 'knesset_corpus.jsonl'
     output_folder = sys.argv[2] 
     #output_folder = 'output'
-
+    os.makedirs("example_dir", exist_ok=True)
     #reading the JSON file 
     try:
         corpus_df = pd.read_json(file_path, lines=True, encoding='utf-8')
@@ -234,7 +235,7 @@ def main():
     
     #sections 2.2, 2.3, 2.4: printing the 10 most common collocations with threshold of 5, in each of the corpuses
     try:
-        with open('knesset_collocations.txt', 'w', encoding = 'utf-8') as file:
+        with open(os.path.join(output_folder, 'knesset_collocations.txt'), 'w', encoding='utf-8') as file:
             for n,n_str in [(2,'Two'),(3,'Three'),(4,'Four')]: #iterate over the longs of 2,3,4
                 file.write(f'{n_str}-gram collocations:\n')
                 for type_up_name, type in [('Frequency', 'frequency'), ('TF-IDF', 'tfidf')]:
@@ -257,14 +258,14 @@ def main():
         sentences_indexes = []
     sentences_to_mask = [long_sentences[idx] for idx in sentences_indexes] #extracting the sentences in the previously chosen indexes
     try:
-        with open('original_sampled_sents.txt', 'w', encoding = 'utf-8') as file:
+        with open(os.path.join(output_folder, 'original_sampled_sents.txt'), 'w', encoding='utf-8') as file:
             for sentence in sentences_to_mask:
                 file.write(sentence+ '\n')
     except IOError as e:
         print(f'Error: Failed to write to "original_sampled_sents.txt": {e}')
     sentences_after_mask = mask_tokens_in_sentences(sentences_to_mask, 10)
     try:
-        with open('masked_sampled_sents.txt', 'w', encoding = 'utf-8') as file:
+        with open(os.path.join(output_folder, 'masked_sampled_sents.txt'), 'w', encoding='utf-8') as file:
             for sentence in sentences_after_mask:
                 file.write(sentence+ '\n')
     except IOError as e:
@@ -274,7 +275,7 @@ def main():
     sentences_after_mask_solve = []
     sentences_masked_indexes = [] #a list stores the masked tokens indexes for each sentences, this will be used in section 3.4
     try:
-        with open('sampled_sents_results.txt', 'w', encoding = 'utf-8') as file:
+        with open(os.path.join(output_folder, 'sampled_sents_results.txt'), 'w', encoding='utf-8') as file:
             for i in range(10):
                 file.write(f'original_sentence: {sentences_to_mask[i]}\n')
                 file.write(f'masked_sentence: {sentences_after_mask[i]}\n')
@@ -297,7 +298,7 @@ def main():
 
     #section 3.4: computing perplexity of the masked tokens in the sentences using the trigram perplexity formula
     try:
-        with open('perplexity_result.txt', 'w', encoding = 'utf-8') as file:
+        with open(os.path.join(output_folder, 'perplexity_result.txt'), 'w', encoding='utf-8') as file:
             perplexity_average = 0
             for i in range(10):
                 perplexity = 0
