@@ -57,44 +57,50 @@ class Trigram_LM:
         if len(unigrams_dict.keys()): #substracting the 's_0' and 's_1' tokens, the 'if' condition added to deal with the edge case where the sentences list is empty
             self.unique_tokens_count -= 2 
         return unigrams_dict
-    
-    #A method that computes the log probability of a sentence based on the trigram formula based on trigrams, bigrams, and unigrams.
+
+    #A helper method for 'calculate_prob_of_sentence'. It computes the log probability of a token based on the trigram formula.
+    #Input: 3-long sentence, in which the intended token is the last token. 
+    #Output: log probability of the token. 
+    def calcualate_prob_of_token(self, s):
+        lambda1, lambda2, lambda3 = 0.9, 0.099, 0.001
+        prob = 0
+        denominator = numerator = 0
+        #computing the probability of the trigram s[i-2] s[i-1] s[i]
+        if (s[0], s[1]) in self.bigrams:
+            denominator = self.bigrams[(s[0], s[1])] + self.unique_tokens_count
+        else:
+            denominator = self.unique_tokens_count
+        if (s[0], s[1], s[2]) in self.trigrams:
+            numerator = self.trigrams[(s[0], s[1], s[2])] + 1
+        else:
+            numerator = 1
+        prob += lambda1 * numerator / denominator
+        #computing the probability of the bigrams s[i-1] s[i]
+        if s[2] in self.unigrams:
+            denominator = self.unigrams[s[2]] + self.unique_tokens_count
+        else:
+            denominator = self.unique_tokens_count
+        if (s[1], s[2]) in self.bigrams:
+            numerator = self.bigrams[(s[1], s[2])] + 1
+        else:
+            numerator = 1
+        prob += lambda2 * numerator / denominator
+        #computing the probability of s[i]
+        numerator = self.unigrams[s[2]] + 1 if s[2] in self.unigrams else 1
+        try:
+            prob += lambda3 * numerator / (self.tokens_count + self.unique_tokens_count)
+        except ZeroDivisionError:
+            raise ValueError('Error: Tokens count is zero, no training data added')
+        return math.log2(prob)
+
+    #A method that computes the log probability of a sentence based on the trigram formula which takes into account trigrams, bigrams, and unigrams.
     #Input: Sentence. 
     #Output: log probability of the sentence. 
     def calculate_prob_of_sentence(self, s):
-        lambda1, lambda2, lambda3 = 0.9, 0.0999, 0.0001
         s = ['s_0', 's_1'] + s.split()
         total_prob = 0
         for i in range(2, len(s)):
-            prob = 0
-            denominator = numerator = 0
-            #computing the probability of the trigram s[i-2] s[i-1] s[i]
-            if (s[i-2], s[i-1]) in self.bigrams:
-                denominator = self.bigrams[(s[i-2], s[i-1])] + self.unique_tokens_count
-            else:
-                denominator = self.unique_tokens_count
-            if (s[i-2], s[i-1], s[i]) in self.trigrams:
-                numerator = self.trigrams[(s[i-2], s[i-1], s[i])] + 1
-            else:
-                numerator = 1
-            prob += lambda1 * numerator / denominator
-            #computing the probability of the bigrams s[i-1] s[i]
-            if s[i-1] in self.unigrams:
-                denominator = self.unigrams[s[i-1]] + self.unique_tokens_count
-            else:
-                denominator = self.unique_tokens_count
-            if (s[i-1], s[i]) in self.bigrams:
-                numerator = self.bigrams[(s[i-1], s[i])] + 1
-            else:
-                numerator = 1
-            prob += lambda2 * numerator / denominator
-            #computing the probability of s[i]
-            numerator = self.unigrams[s[i]] + 1 if s[i] in self.unigrams else 1
-            try:
-                prob += lambda3 * numerator / (self.tokens_count + self.unique_tokens_count)
-            except ZeroDivisionError:
-                raise ValueError('Error: Tokens count is zero, no training data added')
-            total_prob += math.log2(prob)
+            total_prob += self.calcualate_prob_of_token(s[i-2:i+1])
         return total_prob
     
     #A method that predict the token with the highest probability to be the next of a given sentence.
@@ -303,39 +309,13 @@ def main():
             for i in range(10):
                 perplexity = 0
                 sentence = ['s_0', 's_1'] + sentences_after_mask[i].split()     
+                original_sentence = ['s_0', 's_1'] + sentences_to_mask[i].split()
                 for idx in sentences_masked_indexes[i]: #iterate over the masked tokens
-                    lambda1, lambda2, lambda3 = 0.9, 0.0999, 0.0001
-                    prob = 0
-                    denominator = numerator = 0
-                    #computing the probability of the trigram s[i-2] s[i-1] s[i]
-                    if (sentence[idx], sentence[idx+1]) in plenary_model.bigrams:
-                        denominator = plenary_model.bigrams[(sentence[idx], sentence[idx+1])] + plenary_model.unique_tokens_count
-                    else:
-                        denominator = plenary_model.unique_tokens_count
-                    if (sentence[idx], sentence[idx+1], sentence[idx+2]) in plenary_model.trigrams:
-                        numerator = plenary_model.trigrams[(sentence[idx], sentence[idx+1], sentence[idx+2])] + 1
-                    else:
-                        numerator = 1
-                    prob += lambda1 * numerator / denominator
-                    #computing the probability of the bigrams s[i-1] s[i]
-                    if sentence[idx+1] in plenary_model.unigrams:
-                        denominator = plenary_model.unigrams[sentence[idx+1]] + plenary_model.unique_tokens_count
-                    else:
-                        denominator = plenary_model.unique_tokens_count
-                    if (sentence[idx+1], sentence[idx+2]) in plenary_model.bigrams:
-                        numerator = plenary_model.bigrams[(sentence[idx+1], sentence[idx+2])] + 1
-                    else:
-                        numerator = 1
-                    prob += lambda2 * numerator / denominator
-                    #computing the probability of s[i]
-                    numerator = plenary_model.unigrams[sentence[idx+2]] + 1 if sentence[idx+2] in plenary_model.unigrams else 1
-                    try:
-                        prob += lambda3 * numerator / (plenary_model.tokens_count + plenary_model.unique_tokens_count)
-                    except ZeroDivisionError:
-                        raise ValueError('Error: Tokens count is zero, no training data added')
-                    perplexity -= math.log2(prob)
-                perplexity *= (1/ len(sentences_masked_indexes[i])) #perplexity = perplexity^(1/n)
-                print(perplexity)
+                    prob = plenary_model.calcualate_prob_of_token(sentence[idx:idx+3])
+                    perplexity -= prob
+                    sentence[idx + 2] = original_sentence[idx + 2] 
+                perplexity /= len(sentences_masked_indexes[i]) #perplexity = perplexity^(1/n)
+                perplexity = 2 ** perplexity
                 perplexity_average += perplexity / 10
             file.write(f'{perplexity_average:.2f}\n')
     except IOError as e:
