@@ -46,7 +46,7 @@ class Trigram_LM:
     def _unigrams_create(self, sentences):
         unigrams_dict = {}
         for sentence in sentences:
-            for i, token in enumerate(sentence):
+            for i, token in enumerate(sentence[2:]):
                 if token in unigrams_dict:
                     unigrams_dict[token] += 1
                 else:
@@ -62,36 +62,26 @@ class Trigram_LM:
     #Input: 3-long sentence, in which the intended token is the last token. 
     #Output: log probability of the token. 
     def calcualate_prob_of_token(self, s):
+        if self.unique_tokens_count == 0:
+            raise ValueError('Error: The model has no tokens')
         lambda1, lambda2, lambda3 = 0.9, 0.099, 0.001
-        prob = 0
-        denominator = numerator = 0
+        trigram = (s[0], s[1], s[2])
+        bigram = (s[0], s[1])
+        unigram = (s[0])
         #computing the probability of the trigram s[i-2] s[i-1] s[i]
-        if (s[0], s[1]) in self.bigrams:
-            denominator = self.bigrams[(s[0], s[1])] + self.unique_tokens_count
-        else:
-            denominator = self.unique_tokens_count
-        if (s[0], s[1], s[2]) in self.trigrams:
-            numerator = self.trigrams[(s[0], s[1], s[2])] + 1
-        else:
-            numerator = 1
-        prob += lambda1 * numerator / denominator
+        numerator = self.trigrams.get(trigram, 0) + 1
+        denominator = self.bigrams.get(bigram, 0) + self.unique_tokens_count
+        trigram = numerator / denominator
         #computing the probability of the bigrams s[i-1] s[i]
-        if s[2] in self.unigrams:
-            denominator = self.unigrams[s[2]] + self.unique_tokens_count
-        else:
-            denominator = self.unique_tokens_count
-        if (s[1], s[2]) in self.bigrams:
-            numerator = self.bigrams[(s[1], s[2])] + 1
-        else:
-            numerator = 1
-        prob += lambda2 * numerator / denominator
-        #computing the probability of s[i]
-        numerator = self.unigrams[s[2]] + 1 if s[2] in self.unigrams else 1
-        try:
-            prob += lambda3 * numerator / (self.tokens_count + self.unique_tokens_count)
-        except ZeroDivisionError:
-            raise ValueError('Error: Tokens count is zero, no training data added')
-        return math.log2(prob)
+        numerator = self.bigrams.get(bigram, 0) + 1
+        denominator = self.unigrams.get(unigram, 0) + self.unique_tokens_count
+        bigram = numerator / denominator
+        #computing the probability of the unigram s[i]
+        numerator = self.unigrams.get(unigram, 0) + 1
+        denominator = self.tokens_count + self.unique_tokens_count
+        unigram = numerator / denominator
+        prob = lambda1 * trigram + lambda2 * bigram + lambda3 * unigram
+        return math.log(prob)
 
     #A method that computes the log probability of a sentence based on the trigram formula which takes into account trigrams, bigrams, and unigrams.
     #Input: Sentence. 
@@ -201,7 +191,7 @@ def main():
     #file_path = sys.argv[1] 
     file_path = 'knesset_corpus.jsonl'
     #output_folder = sys.argv[2] 
-    output_folder = 'outputu'
+    output_folder = 'output'
     #os.makedirs("example_dir", exist_ok=True)
     #reading the JSON file 
     try:
