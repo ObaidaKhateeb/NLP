@@ -61,7 +61,7 @@ class Trigram_LM:
     #A helper method for 'calculate_prob_of_sentence'. It computes the log probability of a token based on the trigram formula.
     #Input: 3-long sentence, in which the intended token is the last token. 
     #Output: log probability of the token. 
-    def calcualate_prob_of_token(self, s):
+    def calculate_prob_of_token(self, s):
         if self.unique_tokens_count == 0:
             raise ValueError('Error: The model has no tokens')
         lambda1, lambda2, lambda3 = 0.9, 0.099, 0.001
@@ -90,7 +90,7 @@ class Trigram_LM:
         s = ['s_0', 's_1'] + s.split()
         total_prob = 0
         for i in range(2, len(s)):
-            total_prob += self.calcualate_prob_of_token(s[i-2:i+1])
+            total_prob += self.calculate_prob_of_token(s[i-2:i+1])
         return total_prob
     
     #A method that predict the token with the highest probability to be the next of a given sentence.
@@ -301,7 +301,7 @@ def main():
                 sentence = ['s_0', 's_1'] + sentences_after_mask[i].split()     
                 original_sentence = ['s_0', 's_1'] + sentences_to_mask[i].split()
                 for idx in sentences_masked_indexes[i]: #iterate over the masked tokens
-                    prob = plenary_model.calcualate_prob_of_token(sentence[idx:idx+3])
+                    prob = plenary_model.calculate_prob_of_token(sentence[idx:idx+3])
                     perplexity -= prob
                     sentence[idx + 2] = original_sentence[idx + 2] 
                 perplexity /= len(sentences_masked_indexes[i]) #perplexity = perplexity^(1/n)
