@@ -1,6 +1,4 @@
-import json
 import math 
-import sys
 import pandas as pd
 import random
 import os
@@ -64,7 +62,7 @@ class Trigram_LM:
     def calculate_prob_of_token(self, s):
         if self.unique_tokens_count == 0:
             raise ValueError('Error: The model has no tokens')
-        lambda1, lambda2, lambda3 = 0.9, 0.099, 0.001
+        lambda1, lambda2, lambda3 = 0.85, 0.14, 0.01
         trigram = (s[0], s[1], s[2])
         bigram = (s[0], s[1])
         unigram = (s[0])
@@ -298,15 +296,13 @@ def main():
             perplexity_average = 0
             for i in range(10):
                 perplexity = 0
-                sentence = ['s_0', 's_1'] + sentences_after_mask[i].split()     
-                original_sentence = ['s_0', 's_1'] + sentences_to_mask[i].split()
+                sentence = ['s_0', 's_1'] + sentences_after_mask_solve[i].split()     
                 for idx in sentences_masked_indexes[i]: #iterate over the masked tokens
                     prob = plenary_model.calculate_prob_of_token(sentence[idx:idx+3])
                     perplexity -= prob
-                    sentence[idx + 2] = original_sentence[idx + 2] 
-                perplexity /= len(sentences_masked_indexes[i]) #perplexity = perplexity^(1/n)
+                perplexity /= len(sentences_masked_indexes[i]) # dividing by the number of masked tokens 
                 perplexity = 2 ** perplexity
-                perplexity_average += perplexity / 10
+                perplexity_average += perplexity / 10 
             file.write(f'{perplexity_average:.2f}\n')
     except IOError as e:
         print(f'Error: Failed to write to "perplexity_result.txt": {e}')
