@@ -46,7 +46,7 @@ class Trigram_LM:
     def _unigrams_create(self, sentences):
         unigrams_dict = {}
         for sentence in sentences:
-            for i, token in enumerate(sentence[2:]):
+            for i, token in enumerate(sentence[1:]):
                 if token in unigrams_dict:
                     unigrams_dict[token] += 1
                 else:
@@ -100,7 +100,7 @@ class Trigram_LM:
         s = s.split()
         next_token = None
         next_token_prob = float('-inf')
-        for token in self.unigrams: #iterating over the different tokens
+        for token in (key for key in self.unigrams if key != 's_1'): #iterating over the different tokens, excepting 's_1'
             s_new = ' '.join(s) + ' ' + token #add the token to the end of the sentence 
             try:
                 token_prob = self.calculate_prob_of_sentence(s_new) #computing the probability of the sentence with the added token
