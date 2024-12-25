@@ -78,7 +78,6 @@ def tfidf_vector_creator(lines):
 def our_vector_creator(lines):
     all_texts = [line['sentence_text'] for line in lines]
     features = []
-    labels = []
     for line in lines:
         features_vector = []
         sentence_splitted = line['sentence_text'].split()
@@ -103,8 +102,7 @@ def our_vector_creator(lines):
             feature_value = 1 if collocation in sentence_splitted else 0
             features_vector.append(feature_value)
         features.append(features_vector)
-        labels.append(line['speaker_name'])
-    return features, labels
+    return features
 
 
 
@@ -149,6 +147,9 @@ def main():
 
     #Our vector creation (section 3.2)
     features_vectors, labels = our_vector_creator(all_sentences)
+
+    #Labels for the vectors 
+    labels = [line['speaker_name'] for line in all_sentences]
 
 
 if __name__ == '__main__':
