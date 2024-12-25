@@ -114,8 +114,6 @@ def classifier_train_and_evaluate(model, features_vectors, labels):
     report = classification_report(labels, preds)
     return report
 
-#def sentences_classify(model, labels, )
-
 def main():
     file = 'knesset_corpus.jsonl'
     json_lines = json_lines_extract(file)
@@ -165,11 +163,11 @@ def main():
     knn = KNeighborsClassifier(n_neighbors=5)
     logistic_reg = LogisticRegression(max_iter=1000)
 
-    #training the classifiers 
+    #training the classifiers (section 4)
     knn.fit(tfidf_vectors, labels)
     logistic_reg.fit(features_vectors, labels)
 
-    #evaluating the classifiers
+    #evaluating the classifiers (section 4)
     for model in [(knn, 'KNN'), (logistic_reg, 'Logistic Regression')]:
         for feature_vector in [(tfidf_vectors, 'Tf-idf features vector'), (features_vectors, 'Our Features vector')]:
             report = classifier_train_and_evaluate(model[0], feature_vector[0], labels)
