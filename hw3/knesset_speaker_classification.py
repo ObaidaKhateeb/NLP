@@ -4,6 +4,20 @@ import numpy as np
 random.seed(42)
 np.random.seed(42)
 
+class Sentence:
+    def __init__(self, protocol_name, keneset, protocol_type, protocol_no, speaker, text):
+        self.protocol_name = protocol_name
+        self.keneset = keneset
+        self.protocol_type = protocol_type
+        self.protocol_no = protocol_no
+        self.speaker = speaker
+        self.text = text
+
+class speaker:
+    def __init__(self, name, sentences):
+        self.name = name
+        self.sentences = sentences
+
 #A method that extracts the json lines from a JSONL file (section 1)
 def json_lines_extract(file):
     with open(file, 'r', encoding='utf-8') as file:
@@ -78,6 +92,15 @@ def main():
     # print('rivlin_sentences:', len(rivlin_data))
     # print('burg_sentences:', len(burg_data))
     # print('others_sentences:', len(others_data))
+
+    #Creating the sentences and speakers objects (pre-section 3)
+    rivlin_sentences = [Sentence(line['protocol_name'], line['knesset_number'], line['protocol_type'], line['protocol_number'], line['speaker_name'], line['sentence_text']) for line in rivlin_data]
+    rivlin = speaker("ראובן ריבלין", rivlin_sentences)
+    burg_sentences = [Sentence(line['protocol_name'], line['knesset_number'], line['protocol_type'], line['protocol_number'], line['speaker_name'], line['sentence_text']) for line in burg_data]
+    burg = speaker("א' בורג", burg_sentences)
+    others_sentences = [Sentence(line['protocol_name'], line['knesset_number'], line['protocol_type'], line['protocol_number'], line['speaker_name'], line['sentence_text']) for line in others_data]
+    others = speaker("others", others_sentences)
+
 
 if __name__ == '__main__':
     main()
