@@ -2,13 +2,17 @@ import json
 import random 
 import numpy as np
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import cross_val_predict
+from sklearn.metrics import classification_report
 random.seed(42)
 np.random.seed(42)
 
 class Sentence:
-    def __init__(self, protocol_name, keneset, protocol_type, protocol_no, speaker, text):
+    def __init__(self, protocol_name, knesset, protocol_type, protocol_no, speaker, text):
         self.protocol_name = protocol_name
-        self.keneset = keneset
+        self.knesset = knesset
         self.protocol_type = protocol_type
         self.protocol_no = protocol_no
         self.speaker = speaker
@@ -69,25 +73,25 @@ def split_data_by_speaker(json_lines, speaker1, speaker2):
 
 # A method that creates tf-idf vectors (section 3.1)
 def tfidf_vector_creator(lines):
-    all_texts = [line['sentence_text'] for line in lines]
+    all_texts = [line.text for line in lines]
     vectorizer = TfidfVectorizer()
     tfidfVectors = vectorizer.fit_transform(all_texts)
     return tfidfVectors
 
 # A method that creates vector of features (section 3.2)
 def our_vector_creator(lines):
-    all_texts = [line['sentence_text'] for line in lines]
+    all_texts = [line.text for line in lines]
     features = []
     for line in lines:
         features_vector = []
-        sentence_splitted = line['sentence_text'].split()
+        sentence_splitted = line.text.split()
 
         #Feature 1: Knesset number 
-        knesset_number = line['knesset_number']
+        knesset_number = line.knesset
         features_vector.append(knesset_number)
         
         #Feature 2: Protocol type
-        feature_value = 1 if line['protocol_type'] == 'committee' else 0
+        feature_value = 1 if line.protocol_type == 'committee' else 0
         features_vector.append(feature_value)
 
         #Feature 3: Sentence length
@@ -104,7 +108,11 @@ def our_vector_creator(lines):
         features.append(features_vector)
     return features
 
-
+# A method that trains and evaluates the classifier and returns the classification report (section 4)
+def classifier_train_and_evaluate(model, features_vectors, labels):
+    preds = cross_val_predict(model, features_vectors, labels, cv=5)
+    report = classification_report(labels, preds)
+    return report
 
 def main():
     file = 'knesset_corpus.jsonl'
@@ -134,11 +142,11 @@ def main():
     # print('others_sentences:', len(others_data))
 
     #Creating the sentences and speakers objects (pre-section 3)
-    first_sentences = [Sentence(line['protocol_name'], line['knesset_number'], line['protocol_type'], line['protocol_number'], line['speaker_name'], line['sentence_text']) for line in first_data]
+    first_sentences = [Sentence(line['protocol_name'], line['knesset_number'], line['protocol_type'], line['protocol_number'], 'Rivlin', line['sentence_text']) for line in first_data]
     first = speaker("ראובן ריבלין", first_sentences)
-    second_sentences = [Sentence(line['protocol_name'], line['knesset_number'], line['protocol_type'], line['protocol_number'], line['speaker_name'], line['sentence_text']) for line in second_data]
+    second_sentences = [Sentence(line['protocol_name'], line['knesset_number'], line['protocol_type'], line['protocol_number'], 'Burg', line['sentence_text']) for line in second_data]
     second = speaker("א' בורג", second_sentences)
-    others_sentences = [Sentence(line['protocol_name'], line['knesset_number'], line['protocol_type'], line['protocol_number'], line['speaker_name'], line['sentence_text']) for line in others_data]
+    others_sentences = [Sentence(line['protocol_name'], line['knesset_number'], line['protocol_type'], line['protocol_number'], 'Other', line['sentence_text']) for line in others_data]
     others = speaker("others", others_sentences)
 
     #Tf-idf vector creation (section 3.1)
@@ -146,11 +154,19 @@ def main():
     tfidf_vectors = tfidf_vector_creator(all_sentences)
 
     #Our vector creation (section 3.2)
-    features_vectors, labels = our_vector_creator(all_sentences)
+    features_vectors = our_vector_creator(all_sentences)
 
-    #Labels for the vectors 
-    labels = [line['speaker_name'] for line in all_sentences]
+    #Labels for the vectors (section 3.2)
+    labels = [line.speaker for line in all_sentences]
 
+    #initializing, training, and evaluating the classifiers (section 4)
+    knn = KNeighborsClassifier(n_neighbors=5)
+    logistic_reg = LogisticRegression(max_iter=1000)
+    for model in [(knn, 'KNN'), (logistic_reg, 'Logistic Regression')]:
+        for feature_vector in [(tfidf_vectors, 'Tf-idf features vector'), (features_vectors, 'Our Features vector')]:
+            report = classifier_train_and_evaluate(model[0], feature_vector[0], labels)
+            print(f'{model[1]} with {feature_vector[1]} features:')
+            print(report)
 
 if __name__ == '__main__':
     main()
