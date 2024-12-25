@@ -76,7 +76,7 @@ def tfidf_vector_creator(lines):
     all_texts = [line.text for line in lines]
     vectorizer = TfidfVectorizer()
     tfidfVectors = vectorizer.fit_transform(all_texts)
-    return tfidfVectors
+    return vectorizer, tfidfVectors
 
 # A method that creates vector of features (section 3.2)
 def our_vector_creator(lines):
@@ -109,11 +109,11 @@ def our_vector_creator(lines):
     return features
 
 # A method that trains and evaluates the classifier and returns the classification report (section 4)
-def classifier_train_and_evaluate(model, features_vectors, labels):
+def classifier_evaluate(model, features_vectors, labels):
     preds = cross_val_predict(model, features_vectors, labels, cv=5)
     report = classification_report(labels, preds)
     return report
-
+    
 def main():
     file = 'knesset_corpus.jsonl'
     json_lines = json_lines_extract(file)
@@ -151,7 +151,7 @@ def main():
 
     #Tf-idf vector creation (section 3.1)
     all_sentences = first_sentences + second_sentences + others_sentences
-    tfidf_vectors = tfidf_vector_creator(all_sentences)
+    tfidf_vectorizer, tfidf_vectors = tfidf_vector_creator(all_sentences)
 
     #Our vector creation (section 3.2)
     features_vectors = our_vector_creator(all_sentences)
@@ -160,18 +160,23 @@ def main():
     labels = [line.speaker for line in all_sentences]
 
     #initializing the classifiers (section 4)
-    knn = KNeighborsClassifier(n_neighbors=5)
-    logistic_reg = LogisticRegression(max_iter=1000)
+    knn_tfidf = KNeighborsClassifier(n_neighbors=5)
+    logistic_reg_tfidf = LogisticRegression(max_iter=1000)
+    knn_custom = KNeighborsClassifier(n_neighbors=5)
+    logistic_reg_custom = LogisticRegression(max_iter=1000)
+
 
     #training the classifiers (section 4)
-    knn.fit(tfidf_vectors, labels)
-    logistic_reg.fit(features_vectors, labels)
+    knn_tfidf.fit(tfidf_vectors, labels)
+    logistic_reg_tfidf.fit(tfidf_vectors, labels)
+    knn_custom.fit(features_vectors, labels)
+    logistic_reg_custom.fit(features_vectors, labels)
+
 
     #evaluating the classifiers (section 4)
-    for model in [(knn, 'KNN'), (logistic_reg, 'Logistic Regression')]:
-        for feature_vector in [(tfidf_vectors, 'Tf-idf features vector'), (features_vectors, 'Our Features vector')]:
-            report = classifier_train_and_evaluate(model[0], feature_vector[0], labels)
-            print(f'{model[1]} with {feature_vector[1]} features:')
+    for model in [(knn_tfidf, tfidf_vectors, 'KNN', 'tf-idf'), (logistic_reg_tfidf, tfidf_vectors, 'Logistic Regression', 'tf-idf'), (knn_custom, features_vectors, 'KNN', 'custom'), (logistic_reg_custom, features_vectors, 'Logistic Regression', 'custom')]:
+            report = classifier_evaluate(model[0], model[1], labels)
+            print(f'{model[2]} classifier with {model[3]} features:')
             print(report)
 
 if __name__ == '__main__':
