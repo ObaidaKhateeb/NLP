@@ -1,6 +1,7 @@
 import json
 import random 
 import numpy as np
+from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 random.seed(42)
 np.random.seed(42)
 
@@ -66,6 +67,47 @@ def split_data_by_speaker(json_lines, speaker1, speaker2):
                 others_data.append(line)
     return speaker1_data, speaker2_data, others_data
 
+# A method that creates tf-idf vectors (section 3.1)
+def tfidf_vector_creator(lines):
+    all_texts = [line['sentence_text'] for line in lines]
+    vectorizer = TfidfVectorizer()
+    tfidfVectors = vectorizer.fit_transform(all_texts)
+    return tfidfVectors
+
+# A method that creates vector of features (section 3.2)
+def our_vector_creator(lines):
+    all_texts = [line['sentence_text'] for line in lines]
+    features = []
+    labels = []
+    for line in lines:
+        features_vector = []
+        sentence_splitted = line['sentence_text'].split()
+
+        #Feature 1: Knesset number 
+        knesset_number = line['knesset_number']
+        features_vector.append(knesset_number)
+        
+        #Feature 2: Protocol type
+        feature_value = 1 if line['protocol_type'] == 'committee' else 0
+        features_vector.append(feature_value)
+
+        #Feature 3: Sentence length
+        sentence_length = len(sentence_splitted)
+
+        #Feature 4: If digit appears in the sentence 
+        feature_value = 1 if any(token.isdigit() for token in sentence_splitted) else 0
+
+        #Rest of features: if one of the collocations below appears in the sentence
+        collocations = [ 'אני', 'חבר הכנסת', 'חברי הכנסת', 'לחבר הכנסת', 'הצעת חוק', 'רבותי חברי', 'כהצעת הוועדה', 'ההסתייגות של', 'אדוני היושב', 'רבותי חברי הכנסת', 'בבקשה', 'תודה' ]
+        for collocation in collocations:
+            feature_value = 1 if collocation in sentence_splitted else 0
+            features_vector.append(feature_value)
+        features.append(features_vector)
+        labels.append(line['speaker_name'])
+    return features, labels
+
+
+
 def main():
     file = 'knesset_corpus.jsonl'
     json_lines = json_lines_extract(file)
@@ -75,31 +117,38 @@ def main():
     #print(top_speakers)
 
     #split the data according to the speaker (section 1.2)
-    rivlin_full_data, burg_full_data, others_full_data = split_data_by_speaker(json_lines, "ראובן ריבלין", "א' בורג")
+    first_full_data, second_full_data, others_full_data = split_data_by_speaker(json_lines, "ראובן ריבלין", "א' בורג")
     
     #classes balancing (section 2)
-    class_count = min(len(rivlin_full_data), len(burg_full_data), len(others_full_data))
-    rivlin_data = random.sample(rivlin_full_data, class_count)
-    burg_data = random.sample(burg_full_data, class_count)
+    class_count = min(len(first_full_data), len(second_full_data), len(others_full_data))
+    first_data = random.sample(first_full_data, class_count)
+    second_data = random.sample(second_full_data, class_count)
     others_data = random.sample(others_full_data, class_count)
 
     # #printing the count of sentences of each class before and after the down sampling (section 2)
     # print('Sentences count of each class before the down sampling:')
-    # print('rivlin_sentences:', len(rivlin_full_data))
-    # print('burg_sentences:', len(burg_full_data))
+    # print('first_sentences:', len(first_full_data))
+    # print('second_sentences:', len(second_full_data))
     # print('others_sentences:', len(others_full_data))
     # print('Sentences count of each class after the down sampling:')
-    # print('rivlin_sentences:', len(rivlin_data))
-    # print('burg_sentences:', len(burg_data))
+    # print('first_sentences:', len(first_data))
+    # print('second_sentences:', len(second_data))
     # print('others_sentences:', len(others_data))
 
     #Creating the sentences and speakers objects (pre-section 3)
-    rivlin_sentences = [Sentence(line['protocol_name'], line['knesset_number'], line['protocol_type'], line['protocol_number'], line['speaker_name'], line['sentence_text']) for line in rivlin_data]
-    rivlin = speaker("ראובן ריבלין", rivlin_sentences)
-    burg_sentences = [Sentence(line['protocol_name'], line['knesset_number'], line['protocol_type'], line['protocol_number'], line['speaker_name'], line['sentence_text']) for line in burg_data]
-    burg = speaker("א' בורג", burg_sentences)
+    first_sentences = [Sentence(line['protocol_name'], line['knesset_number'], line['protocol_type'], line['protocol_number'], line['speaker_name'], line['sentence_text']) for line in first_data]
+    first = speaker("ראובן ריבלין", first_sentences)
+    second_sentences = [Sentence(line['protocol_name'], line['knesset_number'], line['protocol_type'], line['protocol_number'], line['speaker_name'], line['sentence_text']) for line in second_data]
+    second = speaker("א' בורג", second_sentences)
     others_sentences = [Sentence(line['protocol_name'], line['knesset_number'], line['protocol_type'], line['protocol_number'], line['speaker_name'], line['sentence_text']) for line in others_data]
     others = speaker("others", others_sentences)
+
+    #Tf-idf vector creation (section 3.1)
+    all_sentences = first_sentences + second_sentences + others_sentences
+    tfidf_vectors = tfidf_vector_creator(all_sentences)
+
+    #Our vector creation (section 3.2)
+    features_vectors, labels = our_vector_creator(all_sentences)
 
 
 if __name__ == '__main__':
