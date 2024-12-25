@@ -113,6 +113,17 @@ def classifier_evaluate(model, features_vectors, labels):
     preds = cross_val_predict(model, features_vectors, labels, cv=5)
     report = classification_report(labels, preds)
     return report
+
+def sentences_classify(model, vectorizer, input_file, output_file):
+    with open(input_file, 'r', encoding='utf-8') as file:
+        sentences = file.readlines()
+    features = vectorizer.transform(sentences)
+    preds = model.predict(features)
+    mapped_labels = {"ראובן ריבלין": "first", "א' בורג": "second", "Other": "other"}
+    classifications = [mapped_labels.get(pred, "other") for pred in preds]
+    with open(output_file, 'w', encoding='utf-8') as file:
+        for classification in classifications:
+            file.write(classification + '\n') 
     
 def main():
     file = 'knesset_corpus.jsonl'
@@ -178,6 +189,10 @@ def main():
             report = classifier_evaluate(model[0], model[1], labels)
             print(f'{model[2]} classifier with {model[3]} features:')
             print(report)
+    
+    #Classifying the sentences in the input file (section 5)
+    #sentences_classify(logistic_reg_tfidf, tfidf_vectorizer, 'knesset_sentences.txt', 'classification_results.txt')
+    sentences_classify(logistic_reg_tfidf, tfidf_vectorizer, 'knesset_sentences.txt', 'classification_results.txt')
 
 if __name__ == '__main__':
     main()
