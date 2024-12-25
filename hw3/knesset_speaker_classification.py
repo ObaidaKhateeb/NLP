@@ -38,9 +38,9 @@ def split_data_by_speaker(json_lines, speaker1, speaker2):
             speaker_splitted = speaker.split()
             
             #checking if the sentence said by one of the two speakers but with a different given name
-            if len(speaker_splitted) == 1 and speaker_splitted[0] == speaker1_splitted[1]:
+            if len(speaker_splitted) == 1 and speaker_splitted[0] == speaker1_splitted[-1]:
                 speaker1_sentences.append(line['sentence_text'])
-            elif len(speaker_splitted) == 1 and speaker_splitted[0] == speaker2_splitted[1]:
+            elif len(speaker_splitted) == 1 and speaker_splitted[0] == speaker2_splitted[-1]:
                     speaker2_sentences.append(line['sentence_text'])
             elif len(speaker_splitted) > 1 and  speaker_splitted[0][0] == speaker1_splitted[0][0] and speaker_splitted[-1] == speaker1_splitted[-1]:
                 speaker1_sentences.append(line['sentence_text'])
@@ -62,12 +62,21 @@ def main():
 
     #split the data according to the speaker (section 1.2)
     rivlin_total_sentences, burg_total_sentences, others_total_sentences = split_data_by_speaker(json_lines, "ראובן ריבלין", "א' בורג")
-
+    
     #classes balancing (section 2)
     class_count = min(len(rivlin_total_sentences), len(burg_total_sentences), len(others_total_sentences))
     rivlin_sentences = random.sample(rivlin_total_sentences, class_count)
     burg_sentences = random.sample(burg_total_sentences, class_count)
     others_sentences = random.sample(others_total_sentences, class_count)
 
+    #printing the count of sentences of each class before and after the down sampling (section 2)
+    # print('Sentences count of each class before the down sampling:')
+    # print('rivlin_sentences:', len(rivlin_total_sentences))
+    # print('burg_sentences:', len(burg_total_sentences))
+    # print('others_sentences:', len(others_total_sentences))
+    # print('Sentences count of each class after the down sampling:')
+    # print('rivlin_sentences:', len(rivlin_sentences))
+    # print('burg_sentences:', len(burg_sentences))
+    # print('others_sentences:', len(others_sentences))
 if __name__ == '__main__':
     main()
