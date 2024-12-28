@@ -28,23 +28,24 @@ def json_lines_extract(file):
     with open(file, 'r', encoding='utf-8') as file:
         return [json.loads(line) for line in file]
 
-# A method used for extracting the top two speakers (section 1)
-# def top_two_speakers(json_lines):
-#     speakers = {}
-#     for line in json_lines:
-#         speaker = line['speaker_name']
-#         if speaker in speakers:
-#             speakers[speaker] += 1
-#         else:
-#             speakers[speaker] = 1
-#     sorted_speakers = sorted(speakers.items(), key=lambda x: x[1], reverse=True)
-#     return sorted_speakers[:2]
+#A method extracts the top two speakers (section 1)
+def top_two_speakers(json_lines):
+    speakers = {}
+    for line in json_lines:
+        speaker = line['speaker_name']
+        if speaker in speakers:
+            speakers[speaker] += 1
+        else:
+            speakers[speaker] = 1
+    sorted_speakers = sorted(speakers.items(), key=lambda x: x[1], reverse=True)
+    #print(sorted_speakers[:2])
+    return sorted_speakers[0][0], sorted_speakers[1][0]
 
 # A method that splits the sentences according to the speaker (section 1.2)
 def split_data_by_speaker(json_lines, speaker1, speaker2):
     speaker1_data = []
     speaker2_data = []
-    others_data = []
+    other_data = []
     speaker1_splitted = speaker1.split()
     speaker2_splitted = speaker2.split()
     for line in json_lines:
@@ -68,8 +69,8 @@ def split_data_by_speaker(json_lines, speaker1, speaker2):
             
             #the case where the sentence supposed to be said by someone other than the two
             else:
-                others_data.append(line)
-    return speaker1_data, speaker2_data, others_data
+                other_data.append(line)
+    return speaker1_data, speaker2_data, other_data
 
 # A method that creates tf-idf vectors (section 3.1)
 def tfidf_vector_creator(lines):
@@ -129,39 +130,39 @@ def main():
     file = 'knesset_corpus.jsonl'
     json_lines = json_lines_extract(file)
 
-    #lines used for extracting the top two speakers in section 1
-    #top_speakers = top_two_speakers(json_lines)
-    #print(top_speakers)
+    #extracting the top two speakers in section 1
+    speaker1, speaker2 = top_two_speakers(json_lines)
 
     #split the data according to the speaker (section 1.2)
-    first_full_data, second_full_data, others_full_data = split_data_by_speaker(json_lines, "ראובן ריבלין", "א' בורג")
+    first_full_data, second_full_data, other_full_data = split_data_by_speaker(json_lines, speaker1, speaker2)
     
     #classes balancing (section 2)
-    class_count = min(len(first_full_data), len(second_full_data), len(others_full_data))
+    class_count = min(len(first_full_data), len(second_full_data), len(other_full_data))
     first_data = random.sample(first_full_data, class_count)
     second_data = random.sample(second_full_data, class_count)
-    others_data = random.sample(others_full_data, class_count)
+    other_data = random.sample(other_full_data, class_count)
 
     # #printing the count of sentences of each class before and after the down sampling (section 2)
     # print('Sentences count of each class before the down sampling:')
     # print('first_sentences:', len(first_full_data))
     # print('second_sentences:', len(second_full_data))
-    # print('others_sentences:', len(others_full_data))
+    # print('other_sentences:', len(other_full_data))
     # print('Sentences count of each class after the down sampling:')
     # print('first_sentences:', len(first_data))
     # print('second_sentences:', len(second_data))
-    # print('others_sentences:', len(others_data))
+    # print('other_sentences:', len(other_data))
+
 
     #Creating the sentences and speakers objects (pre-section 3)
     first_sentences = [Sentence(line['protocol_name'], line['knesset_number'], line['protocol_type'], line['protocol_number'], 'Rivlin', line['sentence_text']) for line in first_data]
-    first = speaker("ראובן ריבלין", first_sentences)
+    first = speaker(speaker1, first_sentences)
     second_sentences = [Sentence(line['protocol_name'], line['knesset_number'], line['protocol_type'], line['protocol_number'], 'Burg', line['sentence_text']) for line in second_data]
-    second = speaker("א' בורג", second_sentences)
-    others_sentences = [Sentence(line['protocol_name'], line['knesset_number'], line['protocol_type'], line['protocol_number'], 'Other', line['sentence_text']) for line in others_data]
-    others = speaker("others", others_sentences)
+    second = speaker(speaker2, second_sentences)
+    other_sentences = [Sentence(line['protocol_name'], line['knesset_number'], line['protocol_type'], line['protocol_number'], 'Other', line['sentence_text']) for line in other_data]
+    other = speaker("other", other_sentences)
 
     #Tf-idf vector creation (section 3.1)
-    all_sentences = first_sentences + second_sentences + others_sentences
+    all_sentences = first_sentences + second_sentences + other_sentences
     tfidf_vectorizer, tfidf_vectors = tfidf_vector_creator(all_sentences)
 
     #Our vector creation (section 3.2)
