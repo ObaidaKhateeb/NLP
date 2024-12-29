@@ -112,7 +112,7 @@ def custom_vector_creator(lines, speakers):
                     high_diff_collocations[collocation] = first_speaker.n_grams[collocation] - second_speaker.n_grams[collocation]
                 elif collocation not in second_speaker.n_grams:
                     high_diff_collocations[collocation] = first_speaker.n_grams[collocation] 
-            high_diff_collocations = sorted(high_diff_collocations.items(), key=lambda x: x[1], reverse=True)[:5]
+            high_diff_collocations = sorted(high_diff_collocations.items(), key=lambda x: x[1], reverse=True)[:20]
             high_diff_collocations = [' '.join(collocation[0]) if isinstance(collocation[0], tuple) else collocation[0] for collocation in high_diff_collocations]  
             highest_diff_collocations.update(high_diff_collocations)
     
@@ -191,11 +191,11 @@ def main():
 
 
     #Creating the sentences and speakers objects (pre-section 3)
-    first_sentences = [Sentence(line['protocol_name'], line['knesset_number'], line['protocol_type'], line['protocol_number'], 'Rivlin', line['sentence_text']) for line in first_data]
+    first_sentences = [Sentence(line['protocol_name'], line['knesset_number'], line['protocol_type'], line['protocol_number'], 'speaker1', line['sentence_text']) for line in first_data]
     first = speaker(speaker1, first_sentences)
-    second_sentences = [Sentence(line['protocol_name'], line['knesset_number'], line['protocol_type'], line['protocol_number'], 'Burg', line['sentence_text']) for line in second_data]
+    second_sentences = [Sentence(line['protocol_name'], line['knesset_number'], line['protocol_type'], line['protocol_number'], 'speaker2', line['sentence_text']) for line in second_data]
     second = speaker(speaker2, second_sentences)
-    other_sentences = [Sentence(line['protocol_name'], line['knesset_number'], line['protocol_type'], line['protocol_number'], 'Other', line['sentence_text']) for line in other_data]
+    other_sentences = [Sentence(line['protocol_name'], line['knesset_number'], line['protocol_type'], line['protocol_number'], 'other', line['sentence_text']) for line in other_data]
     other = speaker("other", other_sentences)
 
     #Tf-idf vector creation (section 3.1)
@@ -209,9 +209,9 @@ def main():
     labels = [line.speaker for line in all_sentences]
 
     #initializing the classifiers (section 4)
-    knn_tfidf = KNeighborsClassifier(n_neighbors=5)
+    knn_tfidf = KNeighborsClassifier(n_neighbors=8, weights='distance')
     logistic_reg_tfidf = LogisticRegression(max_iter=1000)
-    knn_custom = KNeighborsClassifier(n_neighbors=5)
+    knn_custom = KNeighborsClassifier(n_neighbors=8, p=1, weights='distance')
     logistic_reg_custom = LogisticRegression(max_iter=1000)
 
 
@@ -224,9 +224,9 @@ def main():
 
     #evaluating the classifiers (section 4)
     for model in [(knn_tfidf, tfidf_vectors, 'KNN', 'tf-idf'), (logistic_reg_tfidf, tfidf_vectors, 'Logistic Regression', 'tf-idf'), (knn_custom, features_vectors, 'KNN', 'custom'), (logistic_reg_custom, features_vectors, 'Logistic Regression', 'custom')]:
-            report = classifier_evaluate(model[0], model[1], labels)
-            print(f'{model[2]} classifier with {model[3]} features:')
-            print(report)
+        report = classifier_evaluate(model[0], model[1], labels)
+        print(f'{model[2]} classifier with {model[3]} features:')
+        print(report)
     
     #Classifying the sentences in the input file (section 5)
     sentences_classify(logistic_reg_tfidf, tfidf_vectorizer, 'knesset_sentences.txt', 'classification_results.txt')
