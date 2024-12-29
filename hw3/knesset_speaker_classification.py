@@ -80,9 +80,8 @@ def tfidf_vector_creator(lines):
     return vectorizer, tfidfVectors
 
 # A method that creates vector of features (section 3.2)
-def our_vector_creator(lines):
-    all_texts = [line.text for line in lines]
-    features = []
+def custom_vector_creator(lines):
+    vectors = []
     for line in lines:
         features_vector = []
         sentence_splitted = line.text.split()
@@ -104,12 +103,12 @@ def our_vector_creator(lines):
         features_vector.append(feature_value)
 
         #Rest of features: if one of the collocations below appears in the sentence
-        collocations = [ 'אני', 'חבר הכנסת', 'חברי הכנסת', 'לחבר הכנסת', 'הצעת חוק', 'רבותי חברי', 'כהצעת הוועדה', 'ההסתייגות של', 'אדוני היושב', 'רבותי חברי הכנסת', 'בבקשה', 'תודה' ]
+        collocations = [ 'אני', 'חבר הכנסת', 'חברי הכנסת', 'לחבר הכנסת', 'הצעת חוק', 'רבותי חברי', 'כהצעת הוועדה', 'ההסתייגות של', 'אדוני היושב', 'רבותי חברי הכנסת', 'בבקשה', 'תודה', ',']
         for collocation in collocations:
             feature_value = 1 if collocation in sentence_splitted else 0
             features_vector.append(feature_value)
-        features.append(features_vector)
-    return features
+        vectors.append(features_vector)
+    return vectors
 
 # A method that trains and evaluates the classifier and returns the classification report (section 4)
 def classifier_evaluate(model, features_vectors, labels):
@@ -168,7 +167,7 @@ def main():
     tfidf_vectorizer, tfidf_vectors = tfidf_vector_creator(all_sentences)
 
     #Our vector creation (section 3.2)
-    features_vectors = our_vector_creator(all_sentences)
+    features_vectors = custom_vector_creator(all_sentences)
 
     #Labels for the vectors (section 3.2)
     labels = [line.speaker for line in all_sentences]
