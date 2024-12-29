@@ -97,9 +97,11 @@ def our_vector_creator(lines):
 
         #Feature 3: Sentence length
         sentence_length = len(sentence_splitted)
+        features_vector.append(sentence_length)
 
         #Feature 4: If digit appears in the sentence 
         feature_value = 1 if any(token.isdigit() for token in sentence_splitted) else 0
+        features_vector.append(feature_value)
 
         #Rest of features: if one of the collocations below appears in the sentence
         collocations = [ 'אני', 'חבר הכנסת', 'חברי הכנסת', 'לחבר הכנסת', 'הצעת חוק', 'רבותי חברי', 'כהצעת הוועדה', 'ההסתייגות של', 'אדוני היושב', 'רבותי חברי הכנסת', 'בבקשה', 'תודה' ]
@@ -192,7 +194,6 @@ def main():
             print(report)
     
     #Classifying the sentences in the input file (section 5)
-    #sentences_classify(logistic_reg_tfidf, tfidf_vectorizer, 'knesset_sentences.txt', 'classification_results.txt')
     sentences_classify(logistic_reg_tfidf, tfidf_vectorizer, 'knesset_sentences.txt', 'classification_results.txt')
 
 if __name__ == '__main__':
