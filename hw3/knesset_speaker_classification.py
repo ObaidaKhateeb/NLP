@@ -79,7 +79,7 @@ def tfidf_vector_creator(lines):
     tfidfVectors = vectorizer.fit_transform(all_texts)
     return vectorizer, tfidfVectors
 
-# A method that creates vector of features (section 3.2)
+# A method that creates custom vectors of features (section 3.2)
 def custom_vector_creator(lines):
     vectors = []
     for line in lines:
@@ -102,7 +102,7 @@ def custom_vector_creator(lines):
         feature_value = 1 if any(token.isdigit() for token in sentence_splitted) else 0
         features_vector.append(feature_value)
 
-        #Rest of features: if one of the collocations below appears in the sentence
+        #Collocation-related features: if one of the collocations below appears in the sentence
         collocations = [ 'אני', 'חבר הכנסת', 'חברי הכנסת', 'לחבר הכנסת', 'הצעת חוק', 'רבותי חברי', 'כהצעת הוועדה', 'ההסתייגות של', 'אדוני היושב', 'רבותי חברי הכנסת', 'בבקשה', 'תודה', ',']
         for collocation in collocations:
             feature_value = 1 if collocation in sentence_splitted else 0
