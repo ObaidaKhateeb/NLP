@@ -1,7 +1,7 @@
 import json
 import random 
 import numpy as np
-from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
+from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import cross_val_predict
@@ -22,6 +22,26 @@ class speaker:
     def __init__(self, name, sentences):
         self.name = name
         self.sentences = sentences
+        self.n_grams = {}
+        for sentence in sentences:
+            words = sentence.text.split()
+            for i in range(len(words)):
+                if words[i] in self.n_grams:
+                    self.n_grams[words[i]] += 1
+                else:
+                    self.n_grams[words[i]] = 1
+                if i < len(words) - 1:
+                    if (words[i], words[i+1]) in self.n_grams:
+                        self.n_grams[(words[i], words[i+1])] += 1
+                    else:
+                        self.n_grams[(words[i], words[i+1])] = 1
+                if i < len(words) - 2:
+                    if (words[i], words[i+1], words[i+2]) in self.n_grams:
+                        self.n_grams[(words[i], words[i+1], words[i+2])] += 1
+                    else:
+                        self.n_grams[(words[i], words[i+1], words[i+2])] = 1
+                
+                
 
 #A method that extracts the json lines from a JSONL file (section 1)
 def json_lines_extract(file):
@@ -61,11 +81,11 @@ def split_data_by_speaker(json_lines, speaker1, speaker2):
             if len(speaker_splitted) == 1 and speaker_splitted[0] == speaker1_splitted[-1]:
                 speaker1_data.append(line)
             elif len(speaker_splitted) == 1 and speaker_splitted[0] == speaker2_splitted[-1]:
-                    speaker2_data.append(line)
+                speaker2_data.append(line)
             elif len(speaker_splitted) > 1 and  speaker_splitted[0][0] == speaker1_splitted[0][0] and speaker_splitted[-1] == speaker1_splitted[-1]:
                 speaker1_data.append(line)
             elif len(speaker_splitted) > 1 and speaker_splitted[0][0] == speaker2_splitted[0][0] and speaker_splitted[-1] == speaker2_splitted[-1]:
-                    speaker2_data.append(line)
+                speaker2_data.append(line)
             
             #the case where the sentence supposed to be said by someone other than the two
             else:
@@ -80,10 +100,27 @@ def tfidf_vector_creator(lines):
     return vectorizer, tfidfVectors
 
 # A method that creates custom vectors of features (section 3.2)
-def custom_vector_creator(lines):
+def custom_vector_creator(lines, speakers):
+    
+    #finding the collocations with the highest difference in appeareance between each two speakers
+    highest_diff_collocations = set()
+    for first_speaker in speakers:
+        for second_speaker in [speaker for speaker in speakers if speaker != first_speaker]:
+            high_diff_collocations = {} #will store the collocations with the highest difference in appeareance between the two speakers
+            for collocation in first_speaker.n_grams:
+                if collocation in second_speaker.n_grams and first_speaker.n_grams[collocation] > second_speaker.n_grams[collocation]:
+                    high_diff_collocations[collocation] = first_speaker.n_grams[collocation] - second_speaker.n_grams[collocation]
+                elif collocation not in second_speaker.n_grams:
+                    high_diff_collocations[collocation] = first_speaker.n_grams[collocation] 
+            high_diff_collocations = sorted(high_diff_collocations.items(), key=lambda x: x[1], reverse=True)[:5]
+            high_diff_collocations = [' '.join(collocation[0]) if isinstance(collocation[0], tuple) else collocation[0] for collocation in high_diff_collocations]  
+            highest_diff_collocations.update(high_diff_collocations)
+    
+    #creating the vectors
     vectors = []
     for line in lines:
         features_vector = []
+        sentence_text = line.text
         sentence_splitted = line.text.split()
 
         #Feature 1: Knesset number 
@@ -101,11 +138,10 @@ def custom_vector_creator(lines):
         #Feature 4: If digit appears in the sentence 
         feature_value = 1 if any(token.isdigit() for token in sentence_splitted) else 0
         features_vector.append(feature_value)
-
+    
         #Collocation-related features: if one of the collocations below appears in the sentence
-        collocations = [ 'אני', 'חבר הכנסת', 'חברי הכנסת', 'לחבר הכנסת', 'הצעת חוק', 'רבותי חברי', 'כהצעת הוועדה', 'ההסתייגות של', 'אדוני היושב', 'רבותי חברי הכנסת', 'בבקשה', 'תודה', ',']
-        for collocation in collocations:
-            feature_value = 1 if collocation in sentence_splitted else 0
+        for collocation in highest_diff_collocations:
+            feature_value = sentence_text.count(collocation)
             features_vector.append(feature_value)
         vectors.append(features_vector)
     return vectors
@@ -166,8 +202,8 @@ def main():
     all_sentences = first_sentences + second_sentences + other_sentences
     tfidf_vectorizer, tfidf_vectors = tfidf_vector_creator(all_sentences)
 
-    #Our vector creation (section 3.2)
-    features_vectors = custom_vector_creator(all_sentences)
+    #Our vector creation (section 3.2)        
+    features_vectors = custom_vector_creator(all_sentences, [first, second, other])
 
     #Labels for the vectors (section 3.2)
     labels = [line.speaker for line in all_sentences]
