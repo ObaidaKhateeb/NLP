@@ -152,13 +152,14 @@ def classifier_evaluate(model, features_vectors, labels):
     report = classification_report(labels, preds)
     return report
 
-def sentences_classify(model, vectorizer, input_file, output_file):
+#A method that classifies sentences in input file to one of two speakers or other (section 5)
+def sentences_classify(model, vectorizer, speaker1, speaker2, input_file, output_file):
     with open(input_file, 'r', encoding='utf-8') as file:
         sentences = file.readlines()
     features = vectorizer.transform(sentences)
     preds = model.predict(features)
-    mapped_labels = {"ראובן ריבלין": "first", "א' בורג": "second", "Other": "other"}
-    classifications = [mapped_labels.get(pred, "other") for pred in preds]
+    mapped_labels = {speaker1: "first", speaker2: "second", "other": "other"}
+    classifications = [mapped_labels[str(pred)] for pred in preds]
     with open(output_file, 'w', encoding='utf-8') as file:
         for classification in classifications:
             file.write(classification + '\n') 
@@ -191,9 +192,9 @@ def main():
 
 
     #Creating the sentences and speakers objects (pre-section 3)
-    first_sentences = [Sentence(line['protocol_name'], line['knesset_number'], line['protocol_type'], line['protocol_number'], 'speaker1', line['sentence_text']) for line in first_data]
+    first_sentences = [Sentence(line['protocol_name'], line['knesset_number'], line['protocol_type'], line['protocol_number'], speaker1, line['sentence_text']) for line in first_data]
     first = speaker(speaker1, first_sentences)
-    second_sentences = [Sentence(line['protocol_name'], line['knesset_number'], line['protocol_type'], line['protocol_number'], 'speaker2', line['sentence_text']) for line in second_data]
+    second_sentences = [Sentence(line['protocol_name'], line['knesset_number'], line['protocol_type'], line['protocol_number'], speaker2, line['sentence_text']) for line in second_data]
     second = speaker(speaker2, second_sentences)
     other_sentences = [Sentence(line['protocol_name'], line['knesset_number'], line['protocol_type'], line['protocol_number'], 'other', line['sentence_text']) for line in other_data]
     other = speaker("other", other_sentences)
@@ -225,11 +226,11 @@ def main():
     #evaluating the classifiers (section 4)
     for model in [(knn_tfidf, tfidf_vectors, 'KNN', 'tf-idf'), (logistic_reg_tfidf, tfidf_vectors, 'Logistic Regression', 'tf-idf'), (knn_custom, features_vectors, 'KNN', 'custom'), (logistic_reg_custom, features_vectors, 'Logistic Regression', 'custom')]:
         report = classifier_evaluate(model[0], model[1], labels)
-        print(f'{model[2]} classifier with {model[3]} features:')
-        print(report)
+        #print(f'{model[2]} classifier with {model[3]} features:')
+        #print(report)
     
     #Classifying the sentences in the input file (section 5)
-    sentences_classify(logistic_reg_tfidf, tfidf_vectorizer, 'knesset_sentences.txt', 'classification_results.txt')
+    sentences_classify(logistic_reg_tfidf, tfidf_vectorizer, speaker1, speaker2, 'knesset_sentences.txt', 'classification_results.txt')
 
 if __name__ == '__main__':
     main()
