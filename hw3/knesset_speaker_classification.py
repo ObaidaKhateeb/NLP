@@ -6,6 +6,8 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import cross_val_predict
 from sklearn.metrics import classification_report
+import sys
+import os
 random.seed(42)
 np.random.seed(42)
 
@@ -153,22 +155,33 @@ def classifier_evaluate(model, features_vectors, labels):
     return report
 
 #A method that classifies sentences in input file to one of two speakers or other (section 5)
-def sentences_classify(model, vectorizer, speaker1, speaker2, input_file, output_file):
+def sentences_classify(model, vectorizer, speaker1, speaker2, input_file, output_path):
     with open(input_file, 'r', encoding='utf-8') as file:
         sentences = file.readlines()
     features = vectorizer.transform(sentences)
     preds = model.predict(features)
     mapped_labels = {speaker1: "first", speaker2: "second", "other": "other"}
     classifications = [mapped_labels[str(pred)] for pred in preds]
+    output_file = os.path.join(output_path, 'classification_results.txt')
     with open(output_file, 'w', encoding='utf-8') as file:
         for classification in classifications:
             file.write(classification + '\n') 
     
 def main():
-    file = 'knesset_corpus.jsonl'
+    if len(sys.argv) != 4:
+        print("4 arguments are required")
+        sys.exit(1)
+    
+    file = sys.argv[1]
+    input_file = sys.argv[2]
+    output_path = sys.argv[3]
+
+    os.makedirs(output_path, exist_ok=True)
+
+    #extracting the json lines from the JSONL file
     json_lines = json_lines_extract(file)
 
-    #extracting the top two speakers in section 1
+    #extracting the top two speakers (section 1)
     speaker1, speaker2 = top_two_speakers(json_lines)
 
     #split the data according to the speaker (section 1.2)
@@ -230,7 +243,7 @@ def main():
         #print(report)
     
     #Classifying the sentences in the input file (section 5)
-    sentences_classify(logistic_reg_tfidf, tfidf_vectorizer, speaker1, speaker2, 'knesset_sentences.txt', 'classification_results.txt')
+    sentences_classify(logistic_reg_tfidf, tfidf_vectorizer, speaker1, speaker2, input_file, output_path)
 
 if __name__ == '__main__':
     main()
