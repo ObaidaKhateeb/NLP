@@ -1,6 +1,7 @@
 from gensim.models import Word2Vec
 import json
 import sys
+import numpy as np
 
 #A method that extracts the json lines from a JSONL file (section 1)
 def json_lines_extract(file):
@@ -49,15 +50,26 @@ def json_lines_to_tokens(json_lines):
     return tokenized_sentences
 
 #A method that finds for each of the list words the most 5 similar words out of the list and write the results to a txt file (section 2.1)
-def most_similar_words(model, words_list, output_file):
+def most_similar_words(word_vectors, words_list, output_file):
     with open(output_file, 'w', encoding='utf-8') as file:
         for word1 in words_list:
-            similarities = [(word2, model.wv.similarity(word1, word2)) for word2 in words_list if word1 != word2]
+            similarities = [(word2, word_vectors.similarity(word1, word2)) for word2 in words_list if word1 != word2]
             similarities.sort(key=lambda x: x[1], reverse=True)
             written_text = [f"({word}, {similarity})" for word, similarity in similarities[:5]]
             file.write(f'{word1}: ')
             file.write(', '.join(written_text))
             file.write('\n')
+
+def sentences_embed(sentences, word_vectors):
+    embedddings = []
+    for sentence in sentences:
+        sentence_embedding = [word_vectors[word] for word in sentence if word in word_vectors]
+        if sentence_embedding:
+            embedddings.append(np.mean(sentence_embedding, axis=0))
+        else:
+            embedddings.append(np.zeros(50))
+    return embedddings
+
 
 def main():
     file = 'knesset_corpus.jsonl'
@@ -71,14 +83,17 @@ def main():
     model = Word2Vec(sentences=tokenized_sentences, vector_size=50, window=5, min_count=1)
     #saving the model (section 1.2)
     model.save("knesset_word2vec.model")
+
     #using the model and testing it (section 1.3)
     word_vectors = model.wv
-    print(word_vectors['ישראל'])
+    #print(word_vectors['ישראל'])
 
     #finding the 5 most similar words to each of the list words and writing the results to the txt file (section 2.1)
     words_list = ['ישראל', 'גברת', 'ממשלה', 'חבר', 'בוקר', 'מים', 'אסור', 'רשות', 'זכויות']
-    most_similar_words(model, words_list, 'knesset_similar_words.txt')
+    most_similar_words(word_vectors, words_list, 'knesset_similar_words.txt')
 
+    #creating sentene embeddings for each sentence in the corpus (section 2.2)
+    sentences_embeddings = sentences_embed(tokenized_sentences, word_vectors)
 
 if __name__ == '__main__':
     main()
