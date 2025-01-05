@@ -91,7 +91,7 @@ def split_data_by_speaker(json_lines, speaker1, speaker2):
                 speaker2_data.append(line) 
     return speaker1_data, speaker2_data
 
-# A method that do down-sampling (section 2)
+# A method that do down-sampling 
 def down_sample(classes_data):
     class_count = min([len(class_data) for class_data in classes_data]) #finding the minimum class count
     downed_classes_data = []
@@ -101,36 +101,33 @@ def down_sample(classes_data):
         downed_classes_data.append(downed_class_data)
     return downed_classes_data
 
-# A method that trains and evaluates the classifier and returns the classification report (section 4)
+# A method that trains and evaluates the classifier and returns the classification report
 def classifier_evaluate(model, features_vectors, labels):
     preds = cross_val_predict(model, features_vectors, labels, cv=5)
     report = classification_report(labels, preds)
     return report
     
 def main():
-    if len(sys.argv) != 4:
-        print("4 arguments are required")
-        sys.exit(1)
+    #if len(sys.argv) != 3:
+    #    print("3 arguments are required")
+    #    sys.exit(1)
     
-    file = sys.argv[1]
-    input_file = sys.argv[2]
-    output_path = sys.argv[3]
+    #jsonl_file = sys.argv[1]
+    #model = sys.argv[2]
 
-    #file = 'knesset_corpus.jsonl'
-    #input_file = 'knesset_sentences.txt'
-    #output_path = 'output'
-    os.makedirs(output_path, exist_ok=True)
+    jsonl_file = 'knesset_corpus.jsonl'
+    input_file = 'knesset_word2vec.model'
 
     #extracting the json lines from the JSONL file
-    json_lines = json_lines_extract(file)
+    json_lines = json_lines_extract(jsonl_file)
 
-    #extracting the top two speakers (section 1)
+    #extracting the top two speakers 
     speaker1, speaker2 = top_two_speakers(json_lines)
 
-    #split the data according to the speaker (section 1)
+    #split the data according to the speaker
     first_full_data, second_full_data = split_data_by_speaker(json_lines, speaker1, speaker2)
     
-    #class balancing - binary classification (section 2)
+    #class balancing - binary classification
     first_binary_data, second_binary_data = down_sample([first_full_data, second_full_data])
 
     #Creating the sentences and speakers objects 
@@ -139,25 +136,25 @@ def main():
     second_binary_sentences = [Sentence(line['protocol_name'], line['knesset_number'], line['protocol_type'], line['protocol_number'], 'speaker2', line['sentence_text']) for line in second_binary_data]
     second_binary = speaker(speaker2, second_binary_sentences)
 
-    #Tf-idf vector creation - binary classificaion (section 3.1)
+    #Tf-idf vector creation - binary classificaion
     all_binary_sentences = first_binary_sentences + second_binary_sentences
     tfidf_binary_vectorizer, tfidf_binary_vectors = tfidf_vector_creator(all_binary_sentences)
 
-    #Our vector creation - binary classificaion (section 3.2)
+    #Our vector creation - binary classificaion 
     features_binary_vectors = custom_vector_creator(all_binary_sentences, [first_binary, second_binary])
 
-    #Labels for the vectors - binary classificaion (section 3.2)
+    #Labels for the vectors - binary classificaion 
     binary_labels = [line.speaker for line in all_binary_sentences]
 
-    #initializing the binary classification classifiers (section 4)
+    #initializing the binary classification classifiers
     knn_binary_tfidf = KNeighborsClassifier(n_neighbors=8, weights='distance')
     knn_binary_custom = KNeighborsClassifier(n_neighbors=8, p=1, weights='distance')
 
-    #training the binary classification classifiers (section 4)
+    #training the binary classification classifiers
     knn_binary_tfidf.fit(tfidf_binary_vectors, binary_labels)
     knn_binary_custom.fit(features_binary_vectors, binary_labels)
 
-    #evaluating the binary classification classifiers (section 4)
+    #evaluating the binary classification classifiers
     for model in [(knn_binary_tfidf, tfidf_binary_vectors, 'KNN', 'tf-idf'), (knn_binary_custom, features_binary_vectors, 'KNN', 'custom')]:
         binary_report = classifier_evaluate(model[0], model[1], binary_labels)
         print(f'{model[2]} classifier with {model[3]} features:')
