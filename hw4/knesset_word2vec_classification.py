@@ -106,6 +106,17 @@ def classifier_evaluate(model, features_vectors, labels):
     preds = cross_val_predict(model, features_vectors, labels, cv=5)
     report = classification_report(labels, preds)
     return report
+
+#A method that creates embeddings for each of given sentences
+def sentences_embed(sentences, word_vectors):
+    embedddings = []
+    for sentence in sentences:
+        sentence_embedding = [word_vectors[word] for word in sentence if word in word_vectors]
+        if sentence_embedding:
+            embedddings.append(np.mean(sentence_embedding, axis=0))
+        else:
+            embedddings.append(np.zeros(word_vectors.vector_size))
+    return embedddings
     
 def main():
     #if len(sys.argv) != 3:
@@ -116,7 +127,8 @@ def main():
     #model = sys.argv[2]
 
     jsonl_file = 'knesset_corpus.jsonl'
-    input_file = 'knesset_word2vec.model'
+    model = Word2Vec.load("knesset_word2vec.model")
+    word_vectors = model.wv
 
     #extracting the json lines from the JSONL file
     json_lines = json_lines_extract(jsonl_file)
@@ -127,38 +139,33 @@ def main():
     #split the data according to the speaker
     first_full_data, second_full_data = split_data_by_speaker(json_lines, speaker1, speaker2)
     
-    #class balancing - binary classification
-    first_binary_data, second_binary_data = down_sample([first_full_data, second_full_data])
+    #class balancing
+    first_speaker_data, second_speaker_data = down_sample([first_full_data, second_full_data])
 
     #Creating the sentences and speakers objects 
-    first_binary_sentences = [Sentence(line['protocol_name'], line['knesset_number'], line['protocol_type'], line['protocol_number'], 'speaker1', line['sentence_text']) for line in first_binary_data]
-    first_binary = speaker(speaker1, first_binary_sentences)
-    second_binary_sentences = [Sentence(line['protocol_name'], line['knesset_number'], line['protocol_type'], line['protocol_number'], 'speaker2', line['sentence_text']) for line in second_binary_data]
-    second_binary = speaker(speaker2, second_binary_sentences)
+    first_speaker_sentences = [Sentence(line['protocol_name'], line['knesset_number'], line['protocol_type'], line['protocol_number'], 'speaker1', line['sentence_text']) for line in first_speaker_data]
+    first_speaker = speaker(speaker1, first_speaker_sentences)
+    second_speaker_sentences = [Sentence(line['protocol_name'], line['knesset_number'], line['protocol_type'], line['protocol_number'], 'speaker2', line['sentence_text']) for line in second_speaker_data]
+    second_speaker = speaker(speaker2, second_speaker_sentences)
 
-    #Tf-idf vector creation - binary classificaion
-    all_binary_sentences = first_binary_sentences + second_binary_sentences
-    tfidf_binary_vectorizer, tfidf_binary_vectors = tfidf_vector_creator(all_binary_sentences)
+    #Create sentence embeddings
+    all_sentences = first_speaker_sentences + second_speaker_sentences
+    splitted_sentences = [sentence.text.split() for sentence in all_sentences]
+    sentences_embeddings = sentences_embed(splitted_sentences, word_vectors)
 
-    #Our vector creation - binary classificaion 
-    features_binary_vectors = custom_vector_creator(all_binary_sentences, [first_binary, second_binary])
 
-    #Labels for the vectors - binary classificaion 
-    binary_labels = [line.speaker for line in all_binary_sentences]
+    #Labels for the vectors
+    labels = [line.speaker for line in all_sentences]
 
-    #initializing the binary classification classifiers
-    knn_binary_tfidf = KNeighborsClassifier(n_neighbors=8, weights='distance')
-    knn_binary_custom = KNeighborsClassifier(n_neighbors=8, p=1, weights='distance')
+    #initializing the classifier
+    knn_classifier = KNeighborsClassifier(n_neighbors=8, weights='distance')
+    
+    #training the classifier
+    knn_classifier.fit(sentences_embeddings, labels)
 
-    #training the binary classification classifiers
-    knn_binary_tfidf.fit(tfidf_binary_vectors, binary_labels)
-    knn_binary_custom.fit(features_binary_vectors, binary_labels)
-
-    #evaluating the binary classification classifiers
-    for model in [(knn_binary_tfidf, tfidf_binary_vectors, 'KNN', 'tf-idf'), (knn_binary_custom, features_binary_vectors, 'KNN', 'custom')]:
-        binary_report = classifier_evaluate(model[0], model[1], binary_labels)
-        print(f'{model[2]} classifier with {model[3]} features:')
-        print(binary_report)
+    #evaluating the classifier
+    report = classifier_evaluate(knn_classifier, sentences_embeddings, labels)
+    print(report)
 
 if __name__ == '__main__':
     main()
