@@ -2,7 +2,6 @@ from gensim.models import Word2Vec
 import json
 import sys
 import numpy as np
-import random
 from sklearn.metrics.pairwise import cosine_similarity
 
 
