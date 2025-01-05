@@ -82,7 +82,27 @@ def most_similar_sentence(chosen_sentences, chosen_sentences_embeddings, json_li
             original_sentence = chosen_sentences[i]
             most_similar_sentence = json_lines[most_similar_index]['sentence_text']
             file.write(f"{original_sentence}: most similar sentence: {most_similar_sentence}\n")
-        
+
+def tokens_replace_to_similar(word_vectors, sentences, indices_to_replace, output_file, positive = {}, negative = {}):
+    with open(output_file, 'w', encoding='utf-8') as file:
+        for i,sentence in enumerate(sentences): 
+            sentence_splitted = sentence.split()
+            sentence_after_replace = sentence.split()
+            tokens_replacement = []
+            for j in indices_to_replace[i]:
+                token_to_replace = sentence_splitted[j]
+                token_positive = positive[token_to_replace] if token_to_replace in positive else [token_to_replace]
+                token_negative = negative[token_to_replace] if token_to_replace in negative else []
+                similar_word = word_vectors.most_similar(positive = token_positive, negative = token_negative, topn=1)[0][0]
+                tokens_replacement.append((token_to_replace, similar_word))
+                sentence_after_replace[j] = similar_word
+            sentence_after_replace = ' '.join(sentence_after_replace)
+            file.write(f"{sentence}: {sentence_after_replace}\n")
+            file.write('replaced words: ')
+            file.write(','.join([f"({original_word},{similar_word})" for original_word, similar_word in tokens_replacement]))
+            file.write('\n')
+                
+
 
 def main():
     file = 'knesset_corpus.jsonl'
@@ -122,6 +142,18 @@ def main():
     tokenized_chosen_sentences = [keep_only_words(sentence.split()) for sentence in chosen_sentences]
     chosen_sentences_embeddings = sentences_embed(tokenized_chosen_sentences, word_vectors) #creating embeddings for the chosen sentences
     most_similar_sentence(chosen_sentences, chosen_sentences_embeddings, json_lines, sentences_embeddings, 'knesset_similar_sentences.txt')
+
+    #section 2.4
+    sentences_with_reds = ["בעוד מספר דקות נתחיל את הדיון בנושא השבת החטופים .", 
+                           "בתור יושבת ראש הוועדה , אני מוכנה להאריך את ההסכם באותם תנאים .", 
+                           "בוקר טוב , אני פותח את הישיבה .", 
+                           "שלום , אנחנו שמחים להודיע שחברינו היקר קיבל קידום .", 
+                           "אין מניעה להמשיך לעסוק בנושא ."]
+    tokens_to_replace_indices = [[2,5], [3,5,9], [0,4], [0,3,6,8], [1]]
+    positive = {'דקות' : ['דקות', 'שנים'], 'הדיון' : ['הדיון'], 'הוועדה': ['הוועדה'], 'אני' : ['אני', 'אנוכי'], 'ההסכם' : ['ההסכם'], 'בוקר' : ['בוקר', 'צהריים'], 'פותח' : ['פותח'], 'שלום' : ['שלום', 'היי'], 'שמחים' : ['שמחים'] ,'היקר' : ['היקר'], 'קידום' : ['קידום'], 'מניעה' : ['מניעה']}
+    negative = {'דקות' : ['דקה'] , 'הדיון' : [], 'הוועדה': [], 'אני' : [], 'ההסכם' : [], 'בוקר' : [], 'פותח' : [], 'שלום' : [], 'שמחים' : [] ,'היקר' : [], 'קידום' : ['הקידום'], 'מניעה' : []}
+    tokens_replace_to_similar(word_vectors, sentences_with_reds, tokens_to_replace_indices, 'red_words_sentences.txt', positive, negative)
+
 
 
 if __name__ == '__main__':
