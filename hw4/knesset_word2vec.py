@@ -83,6 +83,7 @@ def most_similar_sentence(chosen_sentences, chosen_sentences_embeddings, json_li
             most_similar_sentence = json_lines[most_similar_index]['sentence_text']
             file.write(f"{original_sentence}: most similar sentence: {most_similar_sentence}\n")
 
+#A method that replaces words in sentences with similar words and writes the the results to a given txt file (section 2.4)
 def tokens_replace_to_similar(word_vectors, sentences, indices_to_replace, output_file, positive = {}, negative = {}):
     with open(output_file, 'w', encoding='utf-8') as file:
         for i,sentence in enumerate(sentences): 
@@ -143,15 +144,15 @@ def main():
     chosen_sentences_embeddings = sentences_embed(tokenized_chosen_sentences, word_vectors) #creating embeddings for the chosen sentences
     most_similar_sentence(chosen_sentences, chosen_sentences_embeddings, json_lines, sentences_embeddings, 'knesset_similar_sentences.txt')
 
-    #section 2.4
+    #replacing specific words in the sentences with similar words (section 2.4)
     sentences_with_reds = ["בעוד מספר דקות נתחיל את הדיון בנושא השבת החטופים .", 
                            "בתור יושבת ראש הוועדה , אני מוכנה להאריך את ההסכם באותם תנאים .", 
                            "בוקר טוב , אני פותח את הישיבה .", 
                            "שלום , אנחנו שמחים להודיע שחברינו היקר קיבל קידום .", 
                            "אין מניעה להמשיך לעסוק בנושא ."]
     tokens_to_replace_indices = [[2,5], [3,5,9], [0,4], [0,3,6,8], [1]]
-    positive = {'דקות' : ['דקות', 'שנים'], 'הדיון' : ['הדיון'], 'הוועדה': ['הוועדה'], 'אני' : ['אני', 'אנוכי'], 'ההסכם' : ['ההסכם'], 'בוקר' : ['בוקר', 'צהריים'], 'פותח' : ['פותח'], 'שלום' : ['שלום', 'היי'], 'שמחים' : ['שמחים'] ,'היקר' : ['היקר'], 'קידום' : ['קידום'], 'מניעה' : ['מניעה']}
-    negative = {'דקות' : ['דקה'] , 'הדיון' : [], 'הוועדה': [], 'אני' : [], 'ההסכם' : [], 'בוקר' : [], 'פותח' : [], 'שלום' : [], 'שמחים' : [] ,'היקר' : [], 'קידום' : ['הקידום'], 'מניעה' : []}
+    positive = {'דקות' : ['דקות', 'שנים'], 'הדיון' : ['הדיון'], 'הוועדה': ['הוועדה'], 'אני' : ['אני', 'אנוכי'], 'ההסכם' : ['ההסכם'], 'בוקר' : ['בוקר', 'צהריים'], 'פותח' : ['פותח'], 'שלום' : ['שלום', 'היי'], 'שמחים' : ['שמחים'] ,'היקר' : ['היקר'], 'קידום' : ['קידום', 'שדרוג']}
+    negative = {'דקות' : ['דקה'] , 'הדיון' : [], 'הוועדה': [], 'אני' : [], 'ההסכם' : [], 'בוקר' : [], 'פותח' : [], 'שלום' : [], 'שמחים' : [] ,'היקר' : [], 'קידום' : ['הקידום']}
     tokens_replace_to_similar(word_vectors, sentences_with_reds, tokens_to_replace_indices, 'red_words_sentences.txt', positive, negative)
 
 
