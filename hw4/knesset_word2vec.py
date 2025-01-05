@@ -2,6 +2,9 @@ from gensim.models import Word2Vec
 import json
 import sys
 import numpy as np
+import random
+from sklearn.metrics.pairwise import cosine_similarity
+
 
 #A method that extracts the json lines from a JSONL file (section 1)
 def json_lines_extract(file):
@@ -45,8 +48,7 @@ def json_lines_to_tokens(json_lines):
     for line in json_lines:
         text = line['sentence_text']
         tokenized_text = keep_only_words(text.split())
-        if tokenized_text:
-            tokenized_sentences.append(tokenized_text)
+        tokenized_sentences.append(tokenized_text)
     return tokenized_sentences
 
 #A method that finds for each of the list words the most 5 similar words out of the list and write the results to a txt file (section 2.1)
@@ -60,6 +62,7 @@ def most_similar_words(word_vectors, words_list, output_file):
             file.write(', '.join(written_text))
             file.write('\n')
 
+#A method that creates embeddings for each of given sentences (section 2.2)
 def sentences_embed(sentences, word_vectors):
     embedddings = []
     for sentence in sentences:
@@ -67,9 +70,19 @@ def sentences_embed(sentences, word_vectors):
         if sentence_embedding:
             embedddings.append(np.mean(sentence_embedding, axis=0))
         else:
-            embedddings.append(np.zeros(50))
+            embedddings.append(np.zeros(100))
     return embedddings
 
+#A method that finds the most similar sentence for each of the given sentences and write the results to given txt file (section 2.3)
+def most_similar_sentence(chosen_sentences, chosen_sentences_embeddings, json_lines, sentences_embeddings, output_file):
+    with open(output_file, 'w', encoding='utf-8') as file:
+        for i in range(len(chosen_sentences)):
+            similarities = cosine_similarity([chosen_sentences_embeddings[i]], sentences_embeddings)
+            most_similar_index = similarities.argsort()[0][-2] #the 2nd most similar since the most similar is the sentence itself
+            original_sentence = chosen_sentences[i]
+            most_similar_sentence = json_lines[most_similar_index]['sentence_text']
+            file.write(f"{original_sentence}: most similar sentence: {most_similar_sentence}\n")
+        
 
 def main():
     file = 'knesset_corpus.jsonl'
@@ -80,7 +93,7 @@ def main():
     tokenized_sentences = json_lines_to_tokens(json_lines)
 
     #creating word2vec model (section 1.2)
-    model = Word2Vec(sentences=tokenized_sentences, vector_size=50, window=5, min_count=1)
+    model = Word2Vec(sentences=tokenized_sentences, vector_size=100, window=5, min_count=1)
     #saving the model (section 1.2)
     model.save("knesset_word2vec.model")
 
@@ -94,6 +107,22 @@ def main():
 
     #creating sentene embeddings for each sentence in the corpus (section 2.2)
     sentences_embeddings = sentences_embed(tokenized_sentences, word_vectors)
+
+    #finding the most similar sentence for a collection of 10 sentences (section 2.3)
+    chosen_sentences = ['אמרו שזכות עם ישראל להתנחל ביהודה ושומרון , ועל - פי המדיניות הזאת של ממשלת ישראל כל מי שהלך להתנחל בשטחי יש"ע פעל על - פי ההוראה הזאת ודומות לה .', 
+                        "יש מדד חדש שנקרא מדד הפריפריאליות שמשרד האוצר והלשכה המרכזית לסטטיסטיקה פרסמו לפני מספר חודשים ויש לזה ביטוי בהחלטות הממשלה האחרונות לקראת תקציב 2009 .", 
+                        "מדינת ישראל תהיה הריבונית מהירדן ועד לים .", 
+                        "דחייה כזו או אחרת במתן שירותים במשרד הבריאות יש לה משמעות אחת , לפגיעה בתקציבו : סבל לחולים , פגיעה פיזית בנזקקים ואולי אפילו מותם של אחדים , כי במי אנו מדברים ?", 
+                        "המוסד לביטוח לאומי הוא המוסמך , על - פי חוק , לקבוע מהי ההכשרה המתאימה לשיקומם של נכים .", 
+                        "אמרתי שנמתין , נחכה ונראה מה יש לו להגיד בעניין .", 
+                        "תודה רבה חבר הכנסת כבל .", 
+                        "זה כואב , זה מרגיז וצריך למצוא פתרונות .", 
+                        "אני מאוד שמחה , אבל אני גם מאוד מתרגשת , עודד .", 
+                        "המתווה הזה הוא טוב ."]
+    tokenized_chosen_sentences = [keep_only_words(sentence.split()) for sentence in chosen_sentences]
+    chosen_sentences_embeddings = sentences_embed(tokenized_chosen_sentences, word_vectors) #creating embeddings for the chosen sentences
+    most_similar_sentence(chosen_sentences, chosen_sentences_embeddings, json_lines, sentences_embeddings, 'knesset_similar_sentences.txt')
+
 
 if __name__ == '__main__':
     main()
