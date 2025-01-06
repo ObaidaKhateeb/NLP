@@ -54,7 +54,7 @@ def json_lines_to_tokens(json_lines):
 def most_similar_words(word_vectors, words_list, output_file):
     with open(output_file, 'w', encoding='utf-8') as file:
         for word1 in words_list:
-            similarities = [(word2, word_vectors.similarity(word1, word2)) for word2 in words_list if word1 != word2]
+            similarities = [(word2, word_vectors.similarity(word1, word2)) for word2 in word_vectors.index_to_key if word1 != word2]
             similarities.sort(key=lambda x: x[1], reverse=True)
             written_text = [f"({word}, {similarity})" for word, similarity in similarities[:5]]
             file.write(f'{word1}: ')
@@ -156,11 +156,14 @@ def main():
                            "שלום , אנחנו שמחים להודיע שחברינו היקר קיבל קידום .", 
                            "אין מניעה להמשיך לעסוק בנושא ."]
     tokens_to_replace_indices = [[2,5], [3,5,9], [0,4], [0,3,6,8], [1]]
-    positive = {'דקות' : ['דקות', 'שנים'], 'הדיון' : ['הדיון'], 'הוועדה': ['הוועדה'], 'אני' : ['אני', 'אנוכי'], 'ההסכם' : ['ההסכם'], 'בוקר' : ['בוקר', 'צהריים'], 'פותח' : ['פותח'], 'שלום' : ['שלום', 'בוקר'], 'שמחים' : ['שמחים', 'מתרגשים'] ,'היקר' : ['היקר'], 'קידום' : ['קידום', 'שדרוג']}
+    positive = {'דקות' : ['דקות', 'שנים'], 'הדיון' : ['הדיון'], 'הוועדה': ['הוועדה'], 'אני' : ['אני', 'הנני'], 'ההסכם' : ['ההסכם'], 'בוקר' : ['בוקר', 'צהריים', 'שלום'], 'פותח' : ['פותח'], 'שלום' : ['שלום', 'בוקר'], 'שמחים' : ['שמחים', 'מתרגשים', 'מאושרים'] ,'היקר' : ['היקר', 'הנכבד'], 'קידום' : ['קידום', 'שדרוג']}
     negative = {'דקות' : ['דקה'] , 'הדיון' : [], 'הוועדה': [], 'אני' : [], 'ההסכם' : [], 'בוקר' : [], 'פותח' : [], 'שלום' : [], 'שמחים' : [] ,'היקר' : [], 'קידום' : ['הקידום', 'קידמה']}
     tokens_replace_to_similar(word_vectors, sentences_with_reds, tokens_to_replace_indices, 'red_words_sentences.txt', positive, negative)
 
-
+    #check similarity between a word and its opposite (section 2, question 3)
+    #word_and_opposite = [('מהיר', 'איטי'), ('ימין', 'שמאל'), ('כבד', 'קל')]
+    #for word1, word2 in word_and_opposite:
+    #    print(f'{word1}, {word2}: ', word_vectors.similarity(word1, word2))
 
 if __name__ == '__main__':
     main()
