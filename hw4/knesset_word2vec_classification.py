@@ -17,12 +17,7 @@ class Sentence:
         self.protocol_type = protocol_type
         self.protocol_no = protocol_no
         self.speaker = speaker
-        self.text = text
-
-class speaker:
-    def __init__(self, name, sentences):
-        self.name = name
-        self.sentences = sentences                
+        self.text = text           
 
 #A method that extracts the json lines from a JSONL file
 def json_lines_extract(file):
@@ -144,9 +139,7 @@ def main():
 
     #Creating the sentences and speakers objects 
     first_speaker_sentences = [Sentence(line['protocol_name'], line['knesset_number'], line['protocol_type'], line['protocol_number'], 'speaker1', line['sentence_text']) for line in first_speaker_data]
-    first_speaker = speaker(speaker1, first_speaker_sentences)
     second_speaker_sentences = [Sentence(line['protocol_name'], line['knesset_number'], line['protocol_type'], line['protocol_number'], 'speaker2', line['sentence_text']) for line in second_speaker_data]
-    second_speaker = speaker(speaker2, second_speaker_sentences)
 
     #Create sentence embeddings
     all_sentences = first_speaker_sentences + second_speaker_sentences

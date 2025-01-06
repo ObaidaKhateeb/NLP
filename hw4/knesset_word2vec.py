@@ -91,8 +91,14 @@ def tokens_replace_to_similar(word_vectors, sentences, indices_to_replace, outpu
             tokens_replacement = []
             for j in indices_to_replace[i]:
                 token_to_replace = sentence_splitted[j]
-                token_positive = positive[token_to_replace] if token_to_replace in positive else [token_to_replace]
-                token_negative = negative[token_to_replace] if token_to_replace in negative else []
+                if token_to_replace in positive: 
+                    token_positive = [token for token in positive[token_to_replace] if token in word_vectors]
+                else: 
+                    token_positive = [token_to_replace]
+                if token_to_replace in negative:
+                    token_negative = [token for token in negative[token_to_replace] if token in word_vectors]
+                else:
+                    token_negative = []
                 similar_word = word_vectors.most_similar(positive = token_positive, negative = token_negative, topn=1)[0][0]
                 tokens_replacement.append((token_to_replace, similar_word))
                 sentence_after_replace[j] = similar_word
@@ -150,13 +156,11 @@ def main():
                            "שלום , אנחנו שמחים להודיע שחברינו היקר קיבל קידום .", 
                            "אין מניעה להמשיך לעסוק בנושא ."]
     tokens_to_replace_indices = [[2,5], [3,5,9], [0,4], [0,3,6,8], [1]]
-    positive = {'דקות' : ['דקות', 'שנים'], 'הדיון' : ['הדיון'], 'הוועדה': ['הוועדה'], 'אני' : ['אני', 'אנוכי'], 'ההסכם' : ['ההסכם'], 'בוקר' : ['בוקר', 'צהריים'], 'פותח' : ['פותח'], 'שלום' : ['שלום', 'היי'], 'שמחים' : ['שמחים'] ,'היקר' : ['היקר'], 'קידום' : ['קידום', 'שדרוג']}
-    negative = {'דקות' : ['דקה'] , 'הדיון' : [], 'הוועדה': [], 'אני' : [], 'ההסכם' : [], 'בוקר' : [], 'פותח' : [], 'שלום' : [], 'שמחים' : [] ,'היקר' : [], 'קידום' : ['הקידום']}
+    positive = {'דקות' : ['דקות', 'שנים'], 'הדיון' : ['הדיון'], 'הוועדה': ['הוועדה'], 'אני' : ['אני', 'אנוכי'], 'ההסכם' : ['ההסכם'], 'בוקר' : ['בוקר', 'צהריים'], 'פותח' : ['פותח'], 'שלום' : ['שלום', 'בוקר'], 'שמחים' : ['שמחים', 'מתרגשים'] ,'היקר' : ['היקר'], 'קידום' : ['קידום', 'שדרוג']}
+    negative = {'דקות' : ['דקה'] , 'הדיון' : [], 'הוועדה': [], 'אני' : [], 'ההסכם' : [], 'בוקר' : [], 'פותח' : [], 'שלום' : [], 'שמחים' : [] ,'היקר' : [], 'קידום' : ['הקידום', 'קידמה']}
     tokens_replace_to_similar(word_vectors, sentences_with_reds, tokens_to_replace_indices, 'red_words_sentences.txt', positive, negative)
 
 
 
 if __name__ == '__main__':
     main()
-
-
