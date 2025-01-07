@@ -18,9 +18,10 @@ def json_lines_extract(file):
 def is_word(token):
     hebrew_letters = {'א', 'ב', 'ג', 'ד', 'ה', 'ו', 'ז', 'ח', 'ט', 'י', 'כ', 'ך', 'ל', 'מ', 'ם','נ', 'ן', 'ס', 'ע', 'פ', 'ף', 'צ', 'ץ','ק', 'ר', 'ש', 'ת'}
     valid_start = token[0] in hebrew_letters
-    valid_end = token[-1] in hebrew_letters or (token[-1] == "'" and len(token) > 2)
-    valid_middle = all((char in hebrew_letters) or (char in ['"', "”","'"]) for char in token[1:-1])
-    if valid_start and valid_end and valid_middle:
+    valid_end = token[-1] in hebrew_letters or token[-1] in ["'", "’"]
+    valid_middle = all((char in hebrew_letters) or (char in ['"', "”","'", "’"]) for char in token[1:-1])
+    valid_length = len(token) > 2 or (len(token) == 2 and token[1] not in ["'", "’"])
+    if valid_start and valid_end and valid_middle and valid_length:
         return True
     else:
         if token[0] == '"' and token[-1] == '"' and len(token) > 2 and is_word(token[1:-1]):
@@ -159,7 +160,7 @@ def main():
                            "אין מניעה להמשיך לעסוק בנושא ."]
     tokens_to_replace_indices = [[2,5], [3,5,9], [0,4], [0,3,6,8], [1]]
     positive = {'דקות' : ['דקות', 'שנים'], 'הדיון' : ['הדיון'], 'הוועדה': ['הוועדה'], 'אני' : ['אני', 'הנני'], 'ההסכם' : ['ההסכם'], 'בוקר' : ['בוקר', 'טובים'], 'פותח' : ['פותח'], 'שלום' : ['שלום', 'לכולם'], 'שמחים' : ['שמחים', 'מאושרים'] ,'היקר' : ['היקר', 'הנכבד'], 'קידום' : ['קידום', 'לקידום']}
-    negative = {'דקות' : ['דקה'] , 'הדיון' : [], 'הוועדה': [], 'אני' : [], 'ההסכם' : [], 'בוקר' : ['כל'], 'פותח' : [], 'שלום' : ['סילבן', 'שמחון'], 'שמחים' : [] ,'היקר' : [], 'קידום' : ['הקידום', 'קידמה']}
+    negative = {'דקות' : ['דקה'] , 'הדיון' : [], 'הוועדה': [], 'אני' : [], 'ההסכם' : [], 'בוקר' : ['כל'], 'פותח' : [], 'שלום' : ['סילבן', 'שמחון'], 'שמחים' : [] ,'היקר' : [], 'קידום' : ['קידמה', 'בקידום']}
     tokens_replace_to_similar(word_vectors, sentences_with_reds, tokens_to_replace_indices, 'red_words_sentences.txt', positive, negative)
 
     #check similarity between a word and its opposite (section 2, question 3)
