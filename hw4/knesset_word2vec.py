@@ -18,7 +18,7 @@ def json_lines_extract(file):
 def is_word(token):
     hebrew_letters = {'א', 'ב', 'ג', 'ד', 'ה', 'ו', 'ז', 'ח', 'ט', 'י', 'כ', 'ך', 'ל', 'מ', 'ם','נ', 'ן', 'ס', 'ע', 'פ', 'ף', 'צ', 'ץ','ק', 'ר', 'ש', 'ת'}
     valid_start = token[0] in hebrew_letters
-    valid_end = token[-1] in hebrew_letters or token[-1] == "'"
+    valid_end = token[-1] in hebrew_letters or (token[-1] == "'" and len(token) > 2)
     valid_middle = all((char in hebrew_letters) or (char in ['"', "”","'"]) for char in token[1:-1])
     if valid_start and valid_end and valid_middle:
         return True
@@ -119,9 +119,11 @@ def main():
     tokenized_sentences = json_lines_to_tokens(json_lines)
 
     #creating word2vec model (section 1.2)
-    model = Word2Vec(sentences=tokenized_sentences, vector_size=100, window=5, min_count=1)
+    #model = Word2Vec(sentences=tokenized_sentences, vector_size=100, window=5, min_count=1)
     #saving the model (section 1.2)
-    model.save("knesset_word2vec.model")
+    #model.save("knesset_word2vec.model")
+
+    model = Word2Vec.load("knesset_word2vec.model")
 
     #using the model and testing it (section 1.3)
     word_vectors = model.wv
@@ -156,8 +158,8 @@ def main():
                            "שלום , אנחנו שמחים להודיע שחברינו היקר קיבל קידום .", 
                            "אין מניעה להמשיך לעסוק בנושא ."]
     tokens_to_replace_indices = [[2,5], [3,5,9], [0,4], [0,3,6,8], [1]]
-    positive = {'דקות' : ['דקות', 'שנים'], 'הדיון' : ['הדיון'], 'הוועדה': ['הוועדה'], 'אני' : ['אני', 'הנני'], 'ההסכם' : ['ההסכם'], 'בוקר' : ['בוקר', 'צהריים', 'שלום'], 'פותח' : ['פותח'], 'שלום' : ['שלום', 'בוקר'], 'שמחים' : ['שמחים', 'מתרגשים', 'מאושרים'] ,'היקר' : ['היקר', 'הנכבד'], 'קידום' : ['קידום', 'שדרוג']}
-    negative = {'דקות' : ['דקה'] , 'הדיון' : [], 'הוועדה': [], 'אני' : [], 'ההסכם' : [], 'בוקר' : [], 'פותח' : [], 'שלום' : [], 'שמחים' : [] ,'היקר' : [], 'קידום' : ['הקידום', 'קידמה']}
+    positive = {'דקות' : ['דקות', 'שנים'], 'הדיון' : ['הדיון'], 'הוועדה': ['הוועדה'], 'אני' : ['אני', 'הנני'], 'ההסכם' : ['ההסכם'], 'בוקר' : ['בוקר', 'טובים'], 'פותח' : ['פותח'], 'שלום' : ['שלום', 'לכולם'], 'שמחים' : ['שמחים', 'מאושרים'] ,'היקר' : ['היקר', 'הנכבד'], 'קידום' : ['קידום', 'לקידום']}
+    negative = {'דקות' : ['דקה'] , 'הדיון' : [], 'הוועדה': [], 'אני' : [], 'ההסכם' : [], 'בוקר' : ['כל'], 'פותח' : [], 'שלום' : ['סילבן', 'שמחון'], 'שמחים' : [] ,'היקר' : [], 'קידום' : ['הקידום', 'קידמה']}
     tokens_replace_to_similar(word_vectors, sentences_with_reds, tokens_to_replace_indices, 'red_words_sentences.txt', positive, negative)
 
     #check similarity between a word and its opposite (section 2, question 3)
