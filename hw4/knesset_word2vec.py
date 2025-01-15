@@ -1,9 +1,9 @@
 from gensim.models import Word2Vec
 import json
 import sys
+import os 
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
-
 
 #A method that extracts the json lines from a JSONL file (section 1)
 def json_lines_extract(file):
@@ -119,12 +119,12 @@ def main():
     #convert each line to a list of only words tokens (section 1.1)
     tokenized_sentences = json_lines_to_tokens(json_lines)
 
-    #creating word2vec model (section 1.2)
-    #model = Word2Vec(sentences=tokenized_sentences, vector_size=100, window=5, min_count=1)
-    #saving the model (section 1.2)
-    #model.save("knesset_word2vec.model")
-
-    model = Word2Vec.load("knesset_word2vec.model")
+    #creating word2vec model if it's not already exists, otherwise uses the existing one (section 1.2)
+    if os.path.exists("knesset_word2vec.model"):
+        model = Word2Vec.load("knesset_word2vec.model")
+    else:
+        model = Word2Vec(sentences=tokenized_sentences, vector_size=100, window=5, min_count=1)
+        model.save("knesset_word2vec.model")
 
     #using the model and testing it (section 1.3)
     word_vectors = model.wv
