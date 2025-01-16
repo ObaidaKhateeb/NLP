@@ -114,15 +114,14 @@ def sentences_embed(sentences, word_vectors):
     return embedddings
     
 def main():
-    #if len(sys.argv) != 3:
-    #    print("3 arguments are required")
-    #    sys.exit(1)
+    if len(sys.argv) != 3:
+        print("3 arguments are required")
+        sys.exit(1)
     
-    #jsonl_file = sys.argv[1]
-    #model = sys.argv[2]
+    jsonl_file = sys.argv[1]
+    model = sys.argv[2]
 
-    jsonl_file = 'knesset_corpus.jsonl'
-    model = Word2Vec.load("knesset_word2vec.model")
+    model = Word2Vec.load(model)
     word_vectors = model.wv
 
     #extracting the json lines from the JSONL file
