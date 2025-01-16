@@ -104,7 +104,7 @@ def tokens_replace_to_similar(word_vectors, sentences, indices_to_replace, outpu
                 tokens_replacement.append((token_to_replace, similar_word))
                 sentence_after_replace[j] = similar_word
             sentence_after_replace = ' '.join(sentence_after_replace)
-            file.write(f"{sentence}: {sentence_after_replace}\n")
+            file.write(f"{i+1}: {sentence}: {sentence_after_replace}\n")
             file.write('replaced words: ')
             file.write(','.join([f"({original_word},{similar_word})" for original_word, similar_word in tokens_replacement]))
             file.write('\n')
