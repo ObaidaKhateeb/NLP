@@ -5,6 +5,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 import numpy as np
 
+#function used in computing the accuracy of the model
 def compute_metrics(eval_pred):
     logits, labels = eval_pred 
     predictions = np.argmax(logits, axis=-1)
@@ -22,6 +23,7 @@ def main():
     
     #loading bert-base-uncased model (section 2.1)
     model = BertForSequenceClassification.from_pretrained('bert-base-uncased', num_labels = 2)
+
     #tokenizing the text data (section 2.2)
     tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
     def tokenization(examples):
@@ -39,7 +41,7 @@ def main():
     trainer = Trainer(model = model, args = training_args, train_dataset = train_set, eval_dataset = val_set, tokenizer = tokenizer, compute_metrics=compute_metrics)
     trainer.train()
 
-    #evaluating the model (section 2.5) using compute_metrics function
+    #evaluating the model (section 2.5) 
     accuracy = trainer.evaluate()
     print(accuracy)
 
