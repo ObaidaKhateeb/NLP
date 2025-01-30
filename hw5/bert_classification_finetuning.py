@@ -2,7 +2,6 @@ import os
 import sys
 from datasets import load_dataset, load_from_disk
 from transformers import BertTokenizer, BertForSequenceClassification, TrainingArguments, Trainer
-from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 import numpy as np
 
