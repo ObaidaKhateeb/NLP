@@ -8,14 +8,18 @@ def data_load(dataset_path):
     except Exception as e:
         print(f'Failed to load the dataset from disk: {e}')
         exit(1)
-    positive_review = subset.filter(lambda example: example["label"] == 1).shuffle(seed=42)
-    negative_review = subset.filter(lambda example: example["label"] == 0).shuffle(seed=42)
-    # to avoid the case of error as a result of less than 25 samples in one of the subsets. then it will choose as many samples as there are 
-    positive_review_len = len(positive_review)
-    negative_review_len = len(negative_review)
-    positive_review = positive_review.select(range(min(25, positive_review_len)))
-    negative_review = negative_review.select(range(min(25, negative_review_len)))
-    dataset = concatenate_datasets([positive_review, negative_review])
+    try:
+        positive_review = subset.filter(lambda example: example["label"] == 1).shuffle(seed=42)
+        negative_review = subset.filter(lambda example: example["label"] == 0).shuffle(seed=42)
+        # to avoid the case of error as a result of less than 25 samples in one of the subsets. then it will choose as many samples as there are 
+        positive_review_len = len(positive_review)
+        negative_review_len = len(negative_review)
+        positive_review = positive_review.select(range(min(25, positive_review_len)))
+        negative_review = negative_review.select(range(min(25, negative_review_len)))
+        dataset = concatenate_datasets([positive_review, negative_review])
+    except Exception as e:
+        print(f'Failed to process the dataset: {e}')
+        exit(1)
     return dataset
 
 def reviews_classify_helper(review, prompt, tokenizer, model):
@@ -37,16 +41,18 @@ def reviews_classify(dataset, zero_shot_prompt, few_shot_prompt, ins_based_promp
     return results
 
 def save_results(classification_results, results_path):
-    with open(results_path, "w") as file:
-        for result in classification_results:
-            file.write(f"Review {result['idx']}: {result['Review']}\n")
-            file.write(f"Review {result['idx']} true label: {result['true Label']}\n")
-            file.write(f"Review {result['idx']} zero-shot: {result['zero-shot']}\n")
-            file.write(f"Review {result['idx']} few-shot: {result['few-shot']}\n")
-            file.write(f"Review {result['idx']} instruction-based: {result['instruction-based']}\n\n")
+    try: 
+        with open(results_path, "w") as file:
+            for result in classification_results:
+                file.write(f"Review {result['idx']}: {result['Review']}\n")
+                file.write(f"Review {result['idx']} true label: {result['true Label']}\n")
+                file.write(f"Review {result['idx']} zero-shot: {result['zero-shot']}\n")
+                file.write(f"Review {result['idx']} few-shot: {result['few-shot']}\n")
+                file.write(f"Review {result['idx']} instruction-based: {result['instruction-based']}\n\n")
+    except Exception as e:
+        print(f'Failed to save the results to the disk: {e}')
 
 def main():
-
     dataset_path = sys.argv[1]
     results_path = sys.argv[2] 
 
