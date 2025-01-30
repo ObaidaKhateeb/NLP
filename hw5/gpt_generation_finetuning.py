@@ -1,5 +1,28 @@
 from transformers import GPT2LMHeadModel, GPT2Tokenizer, Trainer, TrainingArguments, DataCollatorForLanguageModeling
-from datasets import load_dataset
+from datasets import load_dataset, load_from_disk
+import os
+import sys
+
+#choosing subset of a given dataset, if the subset already exists to load it (section 1)
+def data_load(dataset_path):
+    if os.path.exists(dataset_path): #if there's already subset in the disk load it 
+        try: 
+            subset = load_from_disk(dataset_path)
+        except Exception as e:
+            print(f'Failed to load the dataset from disk: {e}')
+            exit(1)
+        positive_review = subset.filter(lambda example: example["label"] == 1).shuffle(seed=42)
+        negative_review = subset.filter(lambda example: example["label"] == 0).shuffle(seed=42)
+        # to avoid the case of error as a result of less than 100 samples in one of the subsets. then it will choose as many samples as there are 
+        positive_review_len = len(positive_review)
+        negative_review_len = len(negative_review)
+        positive_review = positive_review.select(range(min(100, positive_review_len)))
+        negative_review = negative_review.select(range(min(100, negative_review_len)))
+    else: 
+        dataset = load_dataset('imdb') #loading the IMDB dataset
+        positive_review = dataset["train"].filter(lambda example: example["label"] == 1).shuffle(seed=42).select(range(100))
+        negative_review = dataset["train"].filter(lambda example: example["label"] == 0).shuffle(seed=42).select(range(100))
+    return positive_review, negative_review
 
 #A function that tokenizes the training dataset (section 3.2)
 def tokenize_reviews(dataset, tokenizer, max_length=100):
@@ -29,12 +52,10 @@ def save_reviews(positive_reviews, negative_reviews, file_name):
 
 
 def main():
-    save_directory = "." #directory to save the model and tokenizer
-
-    dataset = load_dataset("imdb") #loading the dataset
-
-    positive_review = dataset["train"].filter(lambda example: example["label"] == 1).shuffle(seed=42).select(range(100))
-    negative_review = dataset["train"].filter(lambda example: example["label"] == 0).shuffle(seed=42).select(range(100))
+    dataset_path = sys.argv[1] #directory to the dataset
+    generated_reviews_path = sys.argv[2] #directory to the reviewes txt file 
+    save_directory = sys.argv[3]  #directory to save the model and tokenizer
+    positive_review, negative_review = data_load(dataset_path) #loading the dataset
 
     #loading GPT-2 models and tokenizers (section 3.1)
     model_positive = GPT2LMHeadModel.from_pretrained("gpt2")
@@ -47,8 +68,8 @@ def main():
     tokenized_negative_dataset = tokenize_reviews(negative_review, tokenizer_negative)
 
     #choosing the training arguments (section 3.3)
-    training_positive_args = TrainingArguments(output_dir= './gpt_results', evaluation_strategy = "no", learning_rate= 2e-5, per_device_train_batch_size = 8, per_device_eval_batch_size = 8, num_train_epochs = 3, weight_decay = 0.01)
-    training_negative_args = TrainingArguments(output_dir= './gpt_results', evaluation_strategy = "no", learning_rate= 2e-5, per_device_train_batch_size = 8, per_device_eval_batch_size = 8, num_train_epochs = 3, weight_decay = 0.01)
+    training_positive_args = TrainingArguments(output_dir= '/tmp', do_eval = False, evaluation_strategy = "no", learning_rate= 2e-5, per_device_train_batch_size = 8, per_device_eval_batch_size = 8, num_train_epochs = 3, weight_decay = 0.01)
+    training_negative_args = TrainingArguments(output_dir= '/tmp', do_eval = False, evaluation_strategy = "no", learning_rate= 2e-5, per_device_train_batch_size = 8, per_device_eval_batch_size = 8, num_train_epochs = 3, weight_decay = 0.01)
 
     #creating trainer (section 3.4)
     trainer_positive = Trainer(model=model_positive, args=training_positive_args, train_dataset=tokenized_positive_dataset, data_collator=DataCollatorForLanguageModeling(tokenizer=tokenizer_positive, mlm=False),)
@@ -82,7 +103,7 @@ def main():
     negative_reviews = reviews_generate(model_negative, tokenizer_negative, input_ids_negative, attention_mask_negative, max_length=100, temperature=0.5, top_p=0.9, repetition_penalty=1.2)
 
     #print the generated reviews to a txt file (section 3.10)  
-    save_reviews(positive_reviews, negative_reviews, 'generated_reviews.txt')
+    save_reviews(positive_reviews, negative_reviews, generated_reviews_path)
 
 if __name__ == "__main__":
     main()
