@@ -12,8 +12,8 @@ def tokenize_reviews(dataset, tokenizer, max_length=100):
     return tokenized_dataset
 
 #A function that generates reviews (section 3.9)
-def reviews_generate(model, tokenizer, input_ids, attention_mask, max_length, temperature, top_k, top_p, repetition_penalty):
-    output = model.generate(input_ids, attention_mask=attention_mask, max_length=max_length, temperature=temperature, top_k = top_k, top_p=top_p, repetition_penalty = repetition_penalty, do_sample=True, num_return_sequences=5)
+def reviews_generate(model, tokenizer, input_ids, attention_mask, max_length, temperature, top_p, repetition_penalty):
+    output = model.generate(input_ids, attention_mask=attention_mask, max_length=max_length, temperature=temperature, top_p=top_p, repetition_penalty = repetition_penalty, do_sample=True, num_return_sequences=5)
     generated_sentences = tokenizer.decode(output[0], skip_special_tokens=True)
     generated_sentences = [tokenizer.decode(output[i], skip_special_tokens=True) for i in range(5)]
     return generated_sentences 
