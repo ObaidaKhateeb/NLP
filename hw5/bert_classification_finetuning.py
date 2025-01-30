@@ -8,7 +8,7 @@ import numpy as np
 
 #choosing subset of a given dataset, if the subset already exists to load it (section 1)
 def data_load(dataset_path):
-    if os.path.exists(os.path.join(dataset_path, 'dataset_info.json')): #if there's already subset in the disk load it 
+    if os.path.exists(dataset_path): #if there's already subset in the disk load it 
         try: 
             subset = load_from_disk(dataset_path)
         except Exception as e:
