@@ -1,6 +1,5 @@
 from transformers import GPT2LMHeadModel, GPT2Tokenizer, Trainer, TrainingArguments, DataCollatorForLanguageModeling
-from datasets import load_dataset, load_from_disk
-import os
+from datasets import load_from_disk
 import sys
 
 #choosing subset of a given dataset, if the subset already exists to load it (section 1)
