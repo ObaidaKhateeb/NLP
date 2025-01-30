@@ -58,9 +58,9 @@ def main():
     dataset = data_load(dataset_path) #loading the dataset
 
     #creating the prompts (section 4.3)
-    zero_shot_prompt = "Classify the following movie reviews as positive or negative:"
-    few_shot_prompt = "Classify the following movie reviews as positive or negative:\n 1. 'The movie was absolutely fantastic, I couldn't stop watching!', 2. 'It was a complete waste of time, I regret watching it.' -> negative:"
-    ins_based_prompt = "You are a movie reviews classifier: Please classify the following reviews as positive or negative:" 
+    zero_shot_prompt = "Classify the following movie reviews as positive or negative. The review:"
+    few_shot_prompt = "Classify the following movie reviews as 'positive' or 'negative':\n1. 'The movie was absolutely fantastic, I couldn't stop watching!' -> positive\n2. 'It was a complete waste of time, I regret watching it.' -> negative\n3. 'The film had great acting but the plot was weak.' -> negative\n4. 'A must-watch! One of the best movies I’ve seen in years!' -> positive. The review:"
+    ins_based_prompt = "You are a movie reviews classifier: Please classify the following reviews as positive or negative. The review:" 
 
     #classifying the reviews and saving the results to the given file (section 4.4)
     classification_results = reviews_classify(dataset, zero_shot_prompt, few_shot_prompt, ins_based_prompt, model, tokenizer)
