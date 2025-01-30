@@ -5,23 +5,18 @@ import sys
 
 #choosing subset of a given dataset, if the subset already exists to load it (section 1)
 def data_load(dataset_path):
-    if os.path.exists(dataset_path): #if there's already subset in the disk load it 
-        try: 
-            subset = load_from_disk(dataset_path)
-        except Exception as e:
-            print(f'Failed to load the dataset from disk: {e}')
-            exit(1)
-        positive_review = subset.filter(lambda example: example["label"] == 1).shuffle(seed=42)
-        negative_review = subset.filter(lambda example: example["label"] == 0).shuffle(seed=42)
-        # to avoid the case of error as a result of less than 100 samples in one of the subsets. then it will choose as many samples as there are 
-        positive_review_len = len(positive_review)
-        negative_review_len = len(negative_review)
-        positive_review = positive_review.select(range(min(100, positive_review_len)))
-        negative_review = negative_review.select(range(min(100, negative_review_len)))
-    else: 
-        dataset = load_dataset('imdb') #loading the IMDB dataset
-        positive_review = dataset["train"].filter(lambda example: example["label"] == 1).shuffle(seed=42).select(range(100))
-        negative_review = dataset["train"].filter(lambda example: example["label"] == 0).shuffle(seed=42).select(range(100))
+    try: 
+        subset = load_from_disk(dataset_path)
+    except Exception as e:
+        print(f'Failed to load the dataset from disk: {e}')
+        exit(1)
+    positive_review = subset.filter(lambda example: example["label"] == 1).shuffle(seed=42)
+    negative_review = subset.filter(lambda example: example["label"] == 0).shuffle(seed=42)
+    # to avoid the case of error as a result of less than 100 samples in one of the subsets. then it will choose as many samples as there are 
+    positive_review_len = len(positive_review)
+    negative_review_len = len(negative_review)
+    positive_review = positive_review.select(range(min(100, positive_review_len)))
+    negative_review = negative_review.select(range(min(100, negative_review_len)))
     return positive_review, negative_review
 
 #A function that tokenizes the training dataset (section 3.2)
