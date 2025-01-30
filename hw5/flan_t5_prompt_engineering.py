@@ -1,6 +1,6 @@
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 from datasets import load_from_disk, concatenate_datasets
-from sklearn.metrics import accuracy_score
+import sys
 
 def data_load(dataset_path):
     try: 
@@ -10,7 +10,7 @@ def data_load(dataset_path):
         exit(1)
     positive_review = subset.filter(lambda example: example["label"] == 1).shuffle(seed=42)
     negative_review = subset.filter(lambda example: example["label"] == 0).shuffle(seed=42)
-    # to avoid the case of error as a result of less than 100 samples in one of the subsets. then it will choose as many samples as there are 
+    # to avoid the case of error as a result of less than 25 samples in one of the subsets. then it will choose as many samples as there are 
     positive_review_len = len(positive_review)
     negative_review_len = len(negative_review)
     positive_review = positive_review.select(range(min(25, positive_review_len)))
@@ -47,8 +47,8 @@ def save_results(classification_results, results_path):
 
 def main():
 
-    dataset_path = 'imdb_subset'
-    results_path = './resultssss.txt'
+    dataset_path = sys.argv[1]
+    results_path = sys.argv[2] 
 
     #loading the model and its tokinizer (section 4.1)
     tokenizer = AutoTokenizer.from_pretrained("google/flan-t5-small") 
@@ -67,6 +67,7 @@ def main():
     save_results(classification_results, results_path)
     
     #calculating the accuracy of the model (section 4.5)
+    #from sklearn.metrics import accuracy_score 
     #true_labels = [review['true Label'] for review in classification_results]
     #for prompt in ['zero-shot', 'few-shot', 'instruction-based']:
     #    predicted_labels = [review[prompt] for review in classification_results]
