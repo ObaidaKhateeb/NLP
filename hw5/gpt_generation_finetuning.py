@@ -8,8 +8,9 @@ def data_load(dataset_path):
         subset = load_from_disk(dataset_path)
     except Exception as e:
         print(f'Failed to load the dataset from disk: {e}')
-        exit(1)
+        return None, None 
     try: 
+        #splitting the dataset into positive and negative reviews
         positive_review = subset.filter(lambda example: example["label"] == 1).shuffle(seed=42)
         negative_review = subset.filter(lambda example: example["label"] == 0).shuffle(seed=42)
         # to avoid the case of error as a result of less than 100 samples in one of the subsets. then it will choose as many samples as there are 
@@ -19,7 +20,7 @@ def data_load(dataset_path):
         negative_review = negative_review.select(range(min(100, negative_review_len)))
     except Exception as e:
         print(f'Failed to process the dataset: {e}')
-        exit(1)
+        return None, None
     return positive_review, negative_review
 
 #A function that tokenizes the training dataset (section 3.2)
@@ -55,7 +56,10 @@ def main():
     dataset_path = sys.argv[1] #directory to the dataset
     generated_reviews_path = sys.argv[2] #directory to the reviewes txt file 
     save_directory = sys.argv[3]  #directory to save the model and tokenizer
+    
     positive_review, negative_review = data_load(dataset_path) #loading the dataset
+    if positive_review == None or negative_review == None: #if the dataset is not loaded successfully
+        exit(1) 
 
     #loading GPT-2 models and tokenizers (section 3.1)
     model_positive = GPT2LMHeadModel.from_pretrained("gpt2")
@@ -68,8 +72,8 @@ def main():
     tokenized_negative_dataset = tokenize_reviews(negative_review, tokenizer_negative)
 
     #choosing the training arguments (section 3.3)
-    training_positive_args = TrainingArguments(output_dir= '/tmp', do_eval = False, evaluation_strategy = "no", learning_rate= 2e-5, per_device_train_batch_size = 8, per_device_eval_batch_size = 8, num_train_epochs = 3, weight_decay = 0.01)
-    training_negative_args = TrainingArguments(output_dir= '/tmp', do_eval = False, evaluation_strategy = "no", learning_rate= 2e-5, per_device_train_batch_size = 8, per_device_eval_batch_size = 8, num_train_epochs = 3, weight_decay = 0.01)
+    training_positive_args = TrainingArguments(output_dir= '/tmp', do_eval = False, eval_strategy = "no", learning_rate= 2e-5, per_device_train_batch_size = 8, per_device_eval_batch_size = 8, num_train_epochs = 3, weight_decay = 0.01)
+    training_negative_args = TrainingArguments(output_dir= '/tmp', do_eval = False, eval_strategy = "no", learning_rate= 2e-5, per_device_train_batch_size = 8, per_device_eval_batch_size = 8, num_train_epochs = 3, weight_decay = 0.01)
 
     #creating trainer (section 3.4)
     trainer_positive = Trainer(model=model_positive, args=training_positive_args, train_dataset=tokenized_positive_dataset, data_collator=DataCollatorForLanguageModeling(tokenizer=tokenizer_positive, mlm=False),)
@@ -80,16 +84,18 @@ def main():
     trainer_negative.train()
 
     #saving the model and the tokenizer for future use (section 3.6)
-    trainer_positive.model.save_pretrained(save_directory) 
-    tokenizer_positive.save_pretrained(save_directory)
-    trainer_negative.model.save_pretrained(save_directory)
-    tokenizer_negative.save_pretrained(save_directory)
+    positive_save_directory = save_directory + "/positive"
+    trainer_positive.model.save_pretrained(positive_save_directory) 
+    tokenizer_positive.save_pretrained(positive_save_directory)
+    negative_save_directory = save_directory + "/negative"
+    trainer_negative.model.save_pretrained(negative_save_directory)
+    tokenizer_negative.save_pretrained(negative_save_directory)
 
     #loading the model and the tokenizer (section 3.7)
-    model_positive = GPT2LMHeadModel.from_pretrained(save_directory)
-    tokenizer_positive = GPT2Tokenizer.from_pretrained(save_directory)
-    model_negative = GPT2LMHeadModel.from_pretrained(save_directory)
-    tokenizer_negative = GPT2Tokenizer.from_pretrained(save_directory)
+    model_positive = GPT2LMHeadModel.from_pretrained(positive_save_directory)
+    tokenizer_positive = GPT2Tokenizer.from_pretrained(positive_save_directory)
+    model_negative = GPT2LMHeadModel.from_pretrained(negative_save_directory)
+    tokenizer_negative = GPT2Tokenizer.from_pretrained(negative_save_directory)
 
     #creating input_ids and attention mask (section 3.8)
     prompt = "The movie was"
