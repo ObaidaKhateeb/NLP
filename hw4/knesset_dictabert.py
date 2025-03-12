@@ -46,7 +46,6 @@ def masked_replace(masked_sentences, predicted_tokens):
     return ' '.join(masked_sentence_splitted)
 
 def main():
-
     if len(sys.argv) != 3:
         print('provde 3 parameters please')
         sys.exit(1)
