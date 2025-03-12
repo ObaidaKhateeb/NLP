@@ -2,6 +2,7 @@ import math
 import pandas as pd
 import random
 import os
+import sys
 
 class Trigram_LM:
     def __init__(self, sentences):
@@ -184,13 +185,10 @@ def mask_tokens_in_sentences(sentences, x):
     return masked_sentences
 
 def main():
-    #if len(sys.argv) != 3:
-    #    sys.exit(1)
-    #file_path = sys.argv[1] 
-    file_path = 'knesset_corpus.jsonl'
-    #output_folder = sys.argv[2] 
-    output_folder = 'output'
-    #os.makedirs("example_dir", exist_ok=True)
+    if len(sys.argv) != 3:
+        sys.exit(1)
+    file_path = sys.argv[1] 
+    output_folder = sys.argv[2] 
     #reading the JSON file 
     try:
         corpus_df = pd.read_json(file_path, lines=True, encoding='utf-8')
